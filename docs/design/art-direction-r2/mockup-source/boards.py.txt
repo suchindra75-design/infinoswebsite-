@@ -1,0 +1,81 @@
+# Side-by-side boards from the captures: desktop (rows = moments, columns = current + three concepts, two sheets),
+# phone (rows = concepts, columns = moments), the Act ramps, and per-concept opening strips.
+import os, sys, glob
+from PIL import Image, ImageDraw, ImageFont
+O = sys.argv[1]; os.makedirs(O, exist_ok=True)
+HN = '/System/Library/Fonts/HelveticaNeue.ttc'
+F = lambda s, i=0: ImageFont.truetype(HN, s, index=i)
+MONO = ImageFont.truetype('/System/Library/Fonts/SFNSMono.ttf', 15)
+BG, INK, MUTE = (17, 18, 19), (238, 236, 231), (148, 154, 160)
+COLS = [('base', 'CURRENT SITE'), ('noir', '1 · STUDIO NOIR'), ('atelier', '2 · ATELIER'), ('acts', '3 · ONE STUDIO, LIT IN ACTS')]
+MOM = [('0000', 'OPENING (AFTER THE INTRO)'), ('0150', '01  THE COLD CHAIN, MADE SMART'), ('0250', '02  TWO TEMPERATURE ZONES'), ('0380', '03  COLD, PREPARED IN ADVANCE'), ('0440', '04  A PLACE FOR EVERY SAMPLE'), ('0550', '05  EVERY HANDOVER'), ('0660', '06  REUSABLE COLD'), ('0780', '07  SAMPLE INTEGRITY'), ('0950', '08  DOORSTEP TO LABORATORY'), ('cx1', 'COOLANT SHOWCASE (NEXT SECTION)')]
+def save(im, name): p = f'{O}/{name}'; im.save(p, quality=86, optimize=True, progressive=True); print(p, im.size, os.path.getsize(p) // 1024, 'KB')
+
+def desktop(rows, name, title):
+    TW, TH, G, M, LH = 600, 375, 12, 40, 30
+    W = M * 2 + 4 * TW + 3 * G; H = M + 64 + 34 + len(rows) * (TH + LH + G) + M
+    im = Image.new('RGB', (W, H), BG); d = ImageDraw.Draw(im)
+    d.text((M, M), title, font=F(34), fill=INK)
+    for j, (_, lab) in enumerate(COLS): d.text((M + j * (TW + G), M + 64), lab, font=MONO, fill=INK if j else MUTE)
+    y = M + 64 + 34
+    for key, lab in rows:
+        d.text((M, y + 6), lab, font=MONO, fill=MUTE)
+        for j, (c, _) in enumerate(COLS):
+            f = f'out/{c}_d/{key}.png'
+            if os.path.exists(f): im.paste(Image.open(f).convert('RGB').resize((TW, TH), Image.LANCZOS), (M + j * (TW + G), y + LH))
+        y += TH + LH + G
+    save(im, name)
+
+def phone(name):
+    TW, TH, G, M = 180, 390, 10, 40
+    keys = [m for m in MOM]
+    W = M * 2 + 230 + len(keys) * (TW + G); H = M + 60 + 30 + len(COLS) * (TH + G + 8) + M
+    im = Image.new('RGB', (W, H), BG); d = ImageDraw.Draw(im)
+    d.text((M, M), 'Phone 390 × 844 — the same moments, side by side', font=F(30), fill=INK)
+    for i, (k, lab) in enumerate(keys): d.text((M + 230 + i * (TW + G), M + 60), lab.split('  ')[0].split(' (')[0][:14], font=MONO, fill=MUTE)
+    y = M + 90
+    for c, lab in COLS:
+        d.text((M, y + TH // 2 - 10), lab, font=MONO, fill=INK if c != 'base' else MUTE)
+        for i, (k, _) in enumerate(keys):
+            f = f'out/{c}_m/{k}.png'
+            if os.path.exists(f): im.paste(Image.open(f).convert('RGB').resize((TW, TH), Image.LANCZOS), (M + 230 + i * (TW + G), y))
+        y += TH + G + 8
+    save(im, name)
+
+def ramps(name):
+    fs = sorted(glob.glob('out/acts_ramp/*.png'))
+    up = [f for f in fs if int(os.path.basename(f)[:4]) < 500]; dn = [f for f in fs if int(os.path.basename(f)[:4]) >= 500]
+    TW, TH, G, M = 400, 250, 10, 40
+    n = max(len(up), len(dn)); W = M * 2 + n * (TW + G); H = M + 60 + 2 * (TH + 60) + M
+    im = Image.new('RGB', (W, H), BG); d = ImageDraw.Draw(im)
+    d.text((M, M), 'Concept 3 — the two lighting cues (scroll left to right)', font=F(30), fill=INK)
+    for r, (row, lab) in enumerate([(up, 'ACT I → II: FLOOR BANKS FIRST, THEN THE WALL (WHILE THE CHAPTER TEXT IS OUT)'), (dn, 'ACT II → III: WALL FIRST, THEN THE FLOOR CONTRACTS TO THE KEY')]):
+        y = M + 60 + r * (TH + 60)
+        d.text((M, y), lab, font=MONO, fill=MUTE)
+        for i, f in enumerate(row):
+            im.paste(Image.open(f).convert('RGB').resize((TW, TH), Image.LANCZOS), (M + i * (TW + G), y + 26))
+            d.text((M + i * (TW + G), y + 26 + TH + 4), 'p ' + str(int(os.path.basename(f)[:4]) / 1000), font=MONO, fill=MUTE)
+    save(im, name)
+
+def openings(name):
+    rows = [(c, lab) for c, lab in COLS if os.path.isdir(f'out/open_{c}')]
+    if not rows: return
+    TW, TH, G, M = 330, 206, 8, 40
+    sel = ['02400', '03600', '04400', '05200', '06000', '07200']
+    W = M * 2 + 230 + len(sel) * (TW + G); H = M + 60 + len(rows) * (TH + G + 10) + M
+    im = Image.new('RGB', (W, H), BG); d = ImageDraw.Draw(im)
+    d.text((M, M), 'The opening: the (unchanged) intro handing over to each studio', font=F(30), fill=INK)
+    y = M + 60
+    for c, lab in rows:
+        d.text((M, y + TH // 2 - 10), lab, font=MONO, fill=MUTE)
+        for i, s in enumerate(sel):
+            f = f'out/open_{c}/{s}.png'
+            if os.path.exists(f): im.paste(Image.open(f).convert('RGB').resize((TW, TH), Image.LANCZOS), (M + 230 + i * (TW + G), y))
+        y += TH + G + 10
+    save(im, name)
+
+desktop(MOM[:5], 'side-by-side-desktop-1.jpg', 'Desktop 1440 × 900 — the same moments, side by side (1/2)')
+desktop(MOM[5:], 'side-by-side-desktop-2.jpg', 'Desktop 1440 × 900 — the same moments, side by side (2/2)')
+phone('side-by-side-phone.jpg')
+if glob.glob('out/acts_ramp/*.png'): ramps('acts-lighting-cues.jpg')
+openings('openings.jpg')

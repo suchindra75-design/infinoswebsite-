@@ -1,0 +1,22 @@
+(() => {
+  const st = document.querySelector('.stage')
+  const env = document.createElement('div'); env.className = 'env'; env.innerHTML = '<i class="env-vig"></i>'
+  st.insertBefore(env, st.firstChild)
+  // one day: [wall top, wall low, cove, floor far, floor near, window glow, pool, vignette, scrim, tone]
+  const DAY = {
+    morning: ['#c6c5c2', '#d4d3cf', '#dcdad5', '#d2d0cb', '#b6b4ae', 'rgba(250,252,255,0.55)', 'rgba(255,255,255,0.32)', 'rgba(120,122,124,0.32)', 'rgba(222,221,217,0.82)', 'day'],
+    midday: ['#c9c5bd', '#d8d3ca', '#e0dbd1', '#d6d0c5', '#bab3a7', 'rgba(255,252,246,0.5)', 'rgba(255,253,248,0.3)', 'rgba(128,122,114,0.3)', 'rgba(226,222,214,0.82)', 'day'],
+    afternoon: ['#b9ab97', '#cdbda6', '#d6c5ac', '#cbb89d', '#a99780', 'rgba(255,226,186,0.6)', 'rgba(255,236,206,0.3)', 'rgba(110,90,66,0.34)', 'rgba(214,201,182,0.84)', 'day'],
+    dusk: ['#2a2c30', '#3a3a3d', '#454240', '#3a3735', '#1f2022', 'rgba(214,170,130,0.16)', 'rgba(240,220,200,0.12)', 'rgba(8,9,10,0.5)', 'rgba(20,21,23,0.8)', 'night'],
+    night: ['#0e0f10', '#16181a', '#212426', '#1b1d1f', '#0c0d0e', 'rgba(140,150,160,0.05)', 'rgba(232,228,221,0.16)', 'rgba(6,7,8,0.55)', 'rgba(12,13,14,0.82)', 'night'],
+  }
+  const BY_CH = [null, 'morning', 'morning', 'midday', 'midday', 'midday', 'afternoon', 'dusk', 'night']
+  window.__envUpdate = (g) => {
+    const s = document.documentElement.style, d = DAY[BY_CH[g.ch]]
+    ;['--c-w0', '--c-w1', '--c-cove', '--c-f0', '--c-f1', '--c-window', '--c-pool', '--c-vig', '--c-scrim'].forEach((k, i) => s.setProperty(k, d[i]))
+    document.documentElement.dataset.tone = d[9]
+    const [px, py, rx, ry] = g.pool
+    s.setProperty('--pool-x', px + 'px'); s.setProperty('--pool-y', py + 'px'); s.setProperty('--pool-rx', Math.round(rx * 1.3) + 'px'); s.setProperty('--pool-ry', Math.round(ry * 1.3) + 'px')
+    s.setProperty('--cove', g.cove[1] + 'px')
+  }
+})()

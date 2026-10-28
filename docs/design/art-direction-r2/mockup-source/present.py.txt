@@ -1,0 +1,119 @@
+# Builds the self-contained presentation page (docs/design/art-direction-r2/index.html) from the proposal Markdown:
+# a small Markdown subset (headings, paragraphs, nested lists, tables, images, rules, **bold**, `code`), images embedded.
+import sys, os, re, base64, html
+
+md_path, out_path = sys.argv[1:3]
+base = os.path.dirname(md_path)
+lines = open(md_path, encoding='utf8').read().split('\n')
+
+
+def inline(t):
+    t = html.escape(t, quote=False)
+    t = re.sub(r'`([^`]+)`', r'<code>\1</code>', t)
+    t = re.sub(r'\*\*([^*]+)\*\*', r'<strong>\1</strong>', t)
+    return t
+
+
+def image(line):
+    m = re.match(r'\s*!\[([^\]]*)\]\(([^)]+)\)', line)
+    alt, src = m.group(1), m.group(2)
+    data = base64.b64encode(open(os.path.join(base, src), 'rb').read()).decode()
+    return f'<figure><img src="data:image/jpeg;base64,{data}" alt="{html.escape(alt)}" loading="lazy"><figcaption>{inline(alt)}</figcaption></figure>'
+
+
+def indent(l):
+    return len(l) - len(l.lstrip(' '))
+
+
+def parse(block):
+    """block: list of lines (already dedented to the block's base)"""
+    out, i = [], 0
+    while i < len(block):
+        l = block[i]
+        s = l.strip()
+        if not s:
+            i += 1; continue
+        if re.match(r'^#{1,3} ', l):
+            n = len(l) - len(l.lstrip('#'))
+            text = l[n:].strip()
+            anchor = re.sub(r'[^a-z0-9]+', '-', text.lower()).strip('-')
+            out.append(f'<h{n} id="{anchor}">{inline(text)}</h{n}>'); i += 1; continue
+        if s == '---':
+            out.append('<hr>'); i += 1; continue
+        if s.startswith('!['):
+            out.append(image(l)); i += 1; continue
+        if s.startswith('|'):
+            rows = []
+            while i < len(block) and block[i].strip().startswith('|'):
+                rows.append([c.strip() for c in block[i].strip().strip('|').split('|')]); i += 1
+            head, body = rows[0], [r for r in rows[2:]]
+            t = '<div class="table"><table><thead><tr>' + ''.join(f'<th>{inline(c)}</th>' for c in head) + '</tr></thead><tbody>'
+            t += ''.join('<tr>' + ''.join(f'<td>{inline(c)}</td>' for c in r) + '</tr>' for r in body) + '</tbody></table></div>'
+            out.append(t); continue
+        m = re.match(r'^(\s*)(- |\d+\. )', l)
+        if m:
+            ordered = m.group(2) != '- '
+            base_ind = indent(l)
+            items = []
+            while i < len(block):
+                l2 = block[i]
+                m2 = re.match(r'^(\s*)(- |\d+\. )', l2)
+                if m2 and indent(l2) == base_ind and (m2.group(2) != '- ') == ordered:
+                    items.append([l2[base_ind + len(m2.group(2)):]]); i += 1
+                    while i < len(block) and (not block[i].strip() or indent(block[i]) > base_ind):
+                        nxt = block[i]
+                        # a blank line ends the item unless indented content follows
+                        if not nxt.strip():
+                            j = i + 1
+                            while j < len(block) and not block[j].strip(): j += 1
+                            if j < len(block) and indent(block[j]) > base_ind: items[-1].append(''); i += 1; continue
+                            break
+                        items[-1].append(nxt[base_ind + len(m2.group(2)):] if indent(nxt) >= base_ind + len(m2.group(2)) else nxt.strip())
+                        i += 1
+                else:
+                    break
+            tag = 'ol' if ordered else 'ul'
+            out.append(f'<{tag}>' + ''.join('<li>' + parse(it) + '</li>' for it in items) + f'</{tag}>')
+            continue
+        para = []
+        while i < len(block) and block[i].strip() and not re.match(r'^\s*(#{1,3} |- |\d+\. |\||!\[|---$)', block[i]):
+            para.append(block[i].strip()); i += 1
+        if para:
+            out.append('<p>' + inline(' '.join(para)) + '</p>')
+        else:
+            i += 1
+    # a single paragraph inside a list item renders without <p>
+    h = ''.join(out)
+    return h[3:-4] if len(out) == 1 and h.startswith('<p>') else h
+
+
+body = parse(lines)
+page = f'''<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>INFINOS Art Direction</title>
+<style>
+:root {{ --paper: #efede8; --ink: #15181b; --ink-2: #3a4147; --rule: rgba(21,24,27,.14); --panel: #111213; }}
+@media (prefers-color-scheme: dark) {{ :root:not([data-theme="light"]) {{ --paper: #17191b; --ink: #ecebe7; --ink-2: #b4bbc1; --rule: rgba(236,235,231,.14); }} }}
+* {{ box-sizing: border-box; }}
+body {{ margin: 0; background: var(--paper); color: var(--ink); font: 17px/1.6 "DM Sans", -apple-system, "Helvetica Neue", Arial, sans-serif; }}
+main {{ max-width: 1180px; margin: 0 auto; padding: 56px 24px 120px; }}
+h1 {{ font-size: clamp(2rem, 4vw, 3rem); line-height: 1.1; letter-spacing: -.02em; font-weight: 500; margin: 0 0 18px; }}
+h2 {{ font-size: 1.7rem; font-weight: 500; letter-spacing: -.01em; margin: 64px 0 14px; padding-top: 22px; border-top: 1px solid var(--rule); }}
+h3 {{ font-size: 1.2rem; margin: 36px 0 10px; }}
+p, li {{ color: var(--ink-2); }} strong {{ color: var(--ink); }}
+code {{ font: .86em "SF Mono", Menlo, monospace; background: rgba(127,127,127,.12); padding: 1px 5px; border-radius: 3px; }}
+hr {{ border: 0; border-top: 1px solid var(--rule); margin: 56px 0; }}
+figure {{ margin: 28px 0 34px; }}
+figure img {{ display: block; width: 100%; height: auto; border-radius: 6px; background: var(--panel); }}
+figcaption {{ font-size: .86rem; color: var(--ink-2); margin-top: 8px; }}
+.table {{ overflow-x: auto; margin: 18px 0 26px; }}
+table {{ border-collapse: collapse; width: 100%; font-size: .93rem; }}
+th, td {{ text-align: left; vertical-align: top; padding: 9px 12px; border-bottom: 1px solid var(--rule); }}
+th {{ font-weight: 600; color: var(--ink); }}
+ol, ul {{ padding-left: 1.3em; }} li {{ margin: 6px 0; }}
+@media (max-width: 640px) {{ body {{ font-size: 16px; }} main {{ padding: 32px 16px 80px; }} }}
+</style></head><body><main>
+{body}
+</main></body></html>'''
+open(out_path, 'w', encoding='utf8').write(page)
+print(out_path, os.path.getsize(out_path) // 1024, 'KB')

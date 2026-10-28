@@ -1,0 +1,23 @@
+// node opening.mjs <url> <outDir> <concept|base> [w h dpr mobile] — the intro handing over to the studio: the concept
+// is injected as soon as the intro starts (the intro itself is untouched), then a still every 0.4 s from 2.4 s to 7.2 s.
+import puppeteer from 'puppeteer-core'
+import { readFileSync, mkdirSync } from 'node:fs'
+const D = new URL('.', import.meta.url).pathname
+const [url, out, concept, w = 1440, h = 900, dpr = 1, mobile] = process.argv.slice(2)
+mkdirSync(out, { recursive: true })
+const b = await puppeteer.launch({ executablePath: '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome', headless: 'new', args: ['--use-angle=metal', '--enable-gpu', '--ignore-gpu-blocklist', '--disable-gpu-vsync'] })
+const p = await b.newPage(); await p.setViewport({ width: +w, height: +h, deviceScaleFactor: +dpr, isMobile: !!mobile, hasTouch: !!mobile })
+await p.goto(url, { waitUntil: 'domcontentloaded' })
+await p.waitForFunction(() => document.querySelector('.intro[data-run]') && document.querySelector('.stage'), { timeout: 60000 })
+const t0 = Date.now()
+if (concept !== 'base') {
+  for (const src of [readFileSync(`${D}core.js`, 'utf8'), readFileSync(`${D}concepts/${concept}.js`, 'utf8'), readFileSync(`${D}env.js`, 'utf8')]) await p.evaluate((code) => { (0, eval)(code) }, src)
+  const cx = await p.evaluate(() => window.__CONCEPT.cx || '')
+  await p.addStyleTag({ content: readFileSync(`${D}env.css`, 'utf8') + '\n' + cx })
+}
+for (let i = 0; i < 13; i++) {
+  const at = 2400 + i * 400
+  await new Promise((r) => setTimeout(r, Math.max(0, t0 + at - Date.now())))
+  await p.screenshot({ path: `${out}/${String(at).padStart(5, '0')}.png` })
+}
+await b.close(); console.log(out.split('/').pop(), 'done')

@@ -1,0 +1,26 @@
+// CONCEPT 3 — ONE STUDIO, LIT IN ACTS: one warm-grey cyclorama whose tone is set only by light. Act I (reveal) low key;
+// Act II (understanding, chapters 02-06) the background banks come up to a luminous pale grey; Act III (display, system,
+// coolants) low key again. Ramps happen while the chapter text is out, inside live chapters (no photoreal frames).
+window.__CONCEPT = {
+  name: 'acts', coveDist: 2.8, extend: true, shadow: 1, widePoolInSystem: true, sideA: 0.45,
+  dark: { w0: '#0d0e0f', w1: '#141617', cove: '#25282c', f0: '#1f2225', f1: '#0b0c0d' },
+  light: { w0: '#bebbb5', w1: '#cfccc6', cove: '#dcd9d3', f0: '#d4d0c8', f1: '#b2ada4' },
+  lightVig: [104, 100, 94], lightSide: [222, 219, 212], lightScrim: [224, 221, 214],
+  tone: (p, P) => (P.wall > 0.5 ? 'light' : 'dark'),
+  plan: [
+    [0.0, { wall: 0, floor: 0, pool: 0.2, size: 0.95, wash: 0.1, vig: 0.68 }],    // Act I: first light
+    [0.08, { wall: 0, floor: 0, pool: 0.24, size: 1.25, wash: 0.16, vig: 0.6 }],
+    [0.165, { wall: 0, floor: 0, pool: 0.24, size: 1.25, wash: 0.16, vig: 0.6 }],
+    [0.188, { wall: 0.12, floor: 0.55, pool: 0.3, size: 1.7, wash: 0.2, vig: 0.56 }], // the floor banks come up first...
+    [0.205, { wall: 1, floor: 1, pool: 0.3, size: 1.3, wash: 0.3, vig: 0.48 }],       // ...then the wall: Act II
+    [0.6, { wall: 1, floor: 1, pool: 0.3, size: 1.2, wash: 0.28, vig: 0.48 }],
+    [0.66, { wall: 1, floor: 1, pool: 0.32, size: 1.5, wash: 0.22, vig: 0.46 }],       // 06 top-down light table
+    [0.69, { wall: 1, floor: 1, pool: 0.32, size: 1.5, wash: 0.22, vig: 0.46 }],
+    [0.705, { wall: 0.15, floor: 0.5, pool: 0.22, size: 1.2, wash: 0.12, vig: 0.6 }],  // the wall goes down first...
+    [0.72, { wall: 0, floor: 0, pool: 0.14, size: 0.9, wash: 0.07, vig: 0.72 }],       // ...Act III: low key display
+    [0.83, { wall: 0, floor: 0, pool: 0.14, size: 0.9, wash: 0.07, vig: 0.72 }],
+    [0.88, { wall: 0, floor: 0, pool: 0.17, size: 1.0, wash: 0.2, vig: 0.5 }],         // 08 the system as an exhibit
+    [1.0, { wall: 0, floor: 0, pool: 0.17, size: 1.0, wash: 0.2, vig: 0.5 }],
+  ],
+  cx: `.cx-backdrop{background:radial-gradient(60% 48% at 50% 44%, rgba(232,228,221,.12) 0%, transparent 100%), linear-gradient(180deg,#0d0e0f 0%,#151719 34%,#25282c 61%,#1f2225 66%,#0b0c0d 100%) !important}`,
+}

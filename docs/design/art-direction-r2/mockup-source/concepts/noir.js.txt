@@ -1,0 +1,23 @@
+// CONCEPT 1 — STUDIO NOIR: a black-box studio at night; one photographer's softbox carves the bag out of darkness.
+window.__CONCEPT = {
+  name: 'noir', coveDist: 2.6, extend: true, shadow: 1, widePoolInSystem: true, sideA: 0.5,
+  dark: { w0: '#0d0e0f', w1: '#141617', cove: '#25282c', f0: '#1f2225', f1: '#0b0c0d' },
+  light: { w0: '#0d0e0f', w1: '#141617', cove: '#25282c', f0: '#1f2225', f1: '#0b0c0d' },
+  tone: () => 'dark',
+  plan: [
+    [0.0, { wall: 0, floor: 0, pool: 0.2, size: 0.95, wash: 0.1, vig: 0.68 }],   // first light: a tight pool, the set still dark
+    [0.08, { wall: 0, floor: 0, pool: 0.24, size: 1.25, wash: 0.16, vig: 0.6 }],  // 01 the hero shot: one big soft key
+    [0.19, { wall: 0, floor: 0, pool: 0.24, size: 1.2, wash: 0.16, vig: 0.6 }],
+    [0.215, { wall: 0, floor: 0, pool: 0.22, size: 1.1, wash: 0.14, vig: 0.62 }], // 02 exterior: narrower, raking
+    [0.31, { wall: 0, floor: 0, pool: 0.22, size: 1.1, wash: 0.14, vig: 0.62 }],
+    [0.34, { wall: 0, floor: 0, pool: 0.2, size: 1.0, wash: 0.12, vig: 0.64 }],   // 03-05 the opening: tight on the bag
+    [0.6, { wall: 0, floor: 0, pool: 0.2, size: 1.0, wash: 0.12, vig: 0.64 }],
+    [0.64, { wall: 0, floor: 0, pool: 0.18, size: 1.5, wash: 0.08, vig: 0.6 }],   // 06 top-down: the floor is the backdrop
+    [0.7, { wall: 0, floor: 0, pool: 0.18, size: 1.5, wash: 0.08, vig: 0.6 }],
+    [0.73, { wall: 0, floor: 0, pool: 0.13, size: 0.9, wash: 0.07, vig: 0.72 }],  // 07 display: low key, the screen glows
+    [0.83, { wall: 0, floor: 0, pool: 0.13, size: 0.9, wash: 0.07, vig: 0.72 }],
+    [0.88, { wall: 0, floor: 0, pool: 0.16, size: 1.0, wash: 0.2, vig: 0.5 }],    // 08 the full studio, wide and even
+    [1.0, { wall: 0, floor: 0, pool: 0.16, size: 1.0, wash: 0.2, vig: 0.5 }],
+  ],
+  cx: `.cx-backdrop{background:radial-gradient(60% 48% at 50% 44%, rgba(232,228,221,.12) 0%, transparent 100%), linear-gradient(180deg,#0d0e0f 0%,#151719 34%,#24272b 61%,#1e2124 66%,#0b0c0d 100%) !important}`,
+}

@@ -1,0 +1,27 @@
+/* CONCEPT A — "The Graphite Studio": a seamless photographic cyclorama. Floor and wall meet at a soft cove 2.6 m behind
+   the bag (projected from the real camera); one overhead softbox from the front-left (the baked key) lays a pool of
+   light on the floor that makes the real contact shadow read; the wall is washed just above the cove behind the product.
+   The photographer re-lights per chapter (pool size, level, temperature). Smooth gradients only: no grain, no pattern,
+   nothing behind the text but a calm dark field. */
+.stage {
+  background:
+    radial-gradient(var(--pool-rx) var(--pool-ry) at var(--pool-x) var(--pool-y), rgba(var(--tint), calc(var(--pool-a) * 1)) 0%, rgba(var(--tint), calc(var(--pool-a) * 0.5)) 40%, rgba(var(--tint), calc(var(--pool-a) * 0.16)) 70%, rgba(var(--tint), 0) 100%),
+    radial-gradient(var(--wash-rx) var(--wash-ry) at var(--wash-x) var(--wash-y), rgba(var(--tint), var(--wash-a)) 0%, rgba(var(--tint), calc(var(--wash-a) * 0.4)) 46%, rgba(var(--tint), 0) 100%),
+    linear-gradient(180deg,
+      #0e0f10 0%,
+      #131516 calc(var(--cove) - 46vh),
+      #1b1d1f calc(var(--cove) - 14vh),
+      #24272a calc(var(--cove) - 1px),
+      #202325 calc(var(--cove) + 3vh),
+      #17191a calc(var(--cove) + 16vh),
+      #0c0d0e calc(var(--cove) + 62vh)) !important;
+  background-color: #0e0f10 !important;
+}
+.env { position: absolute; inset: 0; pointer-events: none; }
+.env-vig { position: absolute; inset: 0; background: radial-gradient(115% 95% at var(--wash-x) 52%, rgba(7, 8, 9, 0) 48%, rgba(7, 8, 9, var(--vig-a)) 100%); }
+.env-side { position: absolute; inset: 0; }
+html[data-side='left'] .env-side { background: linear-gradient(90deg, rgba(9, 10, 11, 0.55) 0%, rgba(9, 10, 11, 0.32) 30%, rgba(9, 10, 11, 0) 52%); }
+html[data-side='right'] .env-side { background: linear-gradient(270deg, rgba(9, 10, 11, 0.55) 0%, rgba(9, 10, 11, 0.32) 30%, rgba(9, 10, 11, 0) 52%); }
+.ed-scrim--left { background: linear-gradient(90deg, rgba(12, 13, 14, 0.82) 0%, rgba(12, 13, 14, 0.55) 38%, rgba(12, 13, 14, 0) 100%) !important; }
+.ed-scrim--right { background: linear-gradient(270deg, rgba(12, 13, 14, 0.82) 0%, rgba(12, 13, 14, 0.55) 38%, rgba(12, 13, 14, 0) 100%) !important; }
+.ed-scrim--below { background: linear-gradient(0deg, rgba(12, 13, 14, 0.96) 0%, rgba(12, 13, 14, 0.9) 55%, rgba(12, 13, 14, 0) 100%) !important; }

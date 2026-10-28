@@ -1,0 +1,36 @@
+// node cap.mjs <url> <outDir> <concept|base> <positions> [w h dpr mobile]
+// Mockup stills from the production build: after the intro, the concept's environment (core.js + concept + env.js +
+// env.css) is injected — nothing in the project changes — then the page is scrolled to each position and captured.
+// Positions: story progress 0..1, or cx0 / cx1 (the coolant showcase: hand-over, then the family on its own).
+import puppeteer from 'puppeteer-core'
+import { readFileSync, mkdirSync } from 'node:fs'
+const D = new URL('.', import.meta.url).pathname
+const [url, out, concept, posArg, w = 1440, h = 900, dpr = 1, mobile] = process.argv.slice(2)
+mkdirSync(out, { recursive: true })
+const b = await puppeteer.launch({ executablePath: '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome', headless: 'new', args: ['--use-angle=metal', '--enable-gpu', '--ignore-gpu-blocklist', '--disable-gpu-vsync'] })
+const p = await b.newPage(); await p.setViewport({ width: +w, height: +h, deviceScaleFactor: +dpr, isMobile: !!mobile, hasTouch: !!mobile })
+const errs = []; p.on('pageerror', (e) => errs.push(e.message))
+await p.goto(url, { waitUntil: 'domcontentloaded' })
+await p.waitForFunction(() => !document.documentElement.classList.contains('intro-lock') && document.querySelector('.intro--done'), { timeout: 90000 })
+if (concept !== 'base') {
+  const cfg = readFileSync(`${D}concepts/${concept}.js`, 'utf8')
+  for (const src of [readFileSync(`${D}core.js`, 'utf8'), cfg, readFileSync(`${D}env.js`, 'utf8')]) await p.evaluate((code) => { (0, eval)(code) }, src)
+  const cx = await p.evaluate(() => window.__CONCEPT.cx || '')
+  await p.addStyleTag({ content: readFileSync(`${D}env.css`, 'utf8') + '\n' + cx })
+}
+await new Promise((r) => setTimeout(r, 2000))
+for (const pos of posArg.split(',')) {
+  await p.evaluate((pos) => {
+    const H = innerHeight, sp = document.querySelector('.narrative-spacer'), total = sp.offsetHeight - H
+    let y
+    if (pos.startsWith('cx')) { const cx = document.getElementById('coolants'); const top = cx.getBoundingClientRect().top + scrollY; y = top + (pos === 'cx0' ? 0.35 : 1.4) * H }
+    else y = Math.round(total * +pos)
+    window.scrollTo(0, y)
+  }, pos)
+  await new Promise((r) => setTimeout(r, 3400))
+  const name = pos.startsWith('cx') ? pos : String(Math.round(+pos * 1000)).padStart(4, '0')
+  await p.screenshot({ path: `${out}/${name}.png` })
+}
+const envErr = await p.evaluate(() => window.__ENVERR || '')
+console.log(out.split('/').slice(-2).join('/'), 'done', errs.length ? 'PAGE ERRORS ' + errs.slice(0, 2).join(' | ') : 'no page errors', envErr ? 'ENV ERROR ' + envErr.slice(0, 300) : '')
+await b.close()

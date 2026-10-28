@@ -1,0 +1,28 @@
+# One board per concept: the opening, the eight chapters and the coolant showcase at desktop, and the same at phone.
+import sys, os
+from PIL import Image, ImageDraw, ImageFont
+c, title, sub, out = sys.argv[1:5]
+F = lambda s: ImageFont.truetype('/System/Library/Fonts/HelveticaNeue.ttc', s)
+MONO = ImageFont.truetype('/System/Library/Fonts/SFNSMono.ttf', 15)
+BG, INK, MUTE = (17, 18, 19), (238, 236, 231), (148, 154, 160)
+MOM = [('0000', 'OPENING'), ('0150', '01  THE COLD CHAIN'), ('0250', '02  TWO ZONES'), ('0380', '03  COLD, PREPARED'), ('0440', '04  COMPARTMENTS'), ('0550', '05  HANDOVER'), ('0660', '06  REUSABLE COLD'), ('0780', '07  INTEGRITY'), ('0950', '08  THE SYSTEM'), ('cx1', 'COOLANT SHOWCASE')]
+TW, TH, G, M = 640, 400, 12, 44
+PW, PH = 186, 403
+W = M * 2 + 5 * TW + 4 * G
+H = M + 118 + 2 * (TH + 34) + 44 + PH + 34 + M
+im = Image.new('RGB', (W, H), BG); d = ImageDraw.Draw(im)
+d.text((M, M), title, font=F(42), fill=INK); d.text((M, M + 58), sub, font=F(20), fill=MUTE)
+y0 = M + 118
+for i, (k, lab) in enumerate(MOM):
+    x, y = M + (i % 5) * (TW + G), y0 + (i // 5) * (TH + 34)
+    f = f'out/{c}_d/{k}.png'
+    if os.path.exists(f): im.paste(Image.open(f).convert('RGB').resize((TW, TH), Image.LANCZOS), (x, y))
+    d.text((x, y + TH + 8), lab, font=MONO, fill=MUTE)
+y = y0 + 2 * (TH + 34) + 44
+d.text((M, y - 26), 'PHONE 390 × 844', font=MONO, fill=MUTE)
+for i, (k, lab) in enumerate(MOM):
+    f = f'out/{c}_m/{k}.png'
+    x = M + i * (PW + 10)
+    if os.path.exists(f): im.paste(Image.open(f).convert('RGB').resize((PW, PH), Image.LANCZOS), (x, y))
+    d.text((x, y + PH + 8), lab.split('  ')[0][:9], font=MONO, fill=MUTE)
+im.save(out, quality=86, optimize=True, progressive=True); print(out, im.size, os.path.getsize(out) // 1024, 'KB')

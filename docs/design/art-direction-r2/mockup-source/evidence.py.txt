@@ -1,0 +1,35 @@
+# Evidence boards: (1) the same photoreal frames on today's dark studio and on a lit floor; (2) a 2x2 hero comparison.
+import sys, os
+import numpy as np
+from PIL import Image, ImageDraw, ImageFont
+R, O = sys.argv[1], sys.argv[2]; os.makedirs(O, exist_ok=True)
+F = lambda s: ImageFont.truetype('/System/Library/Fonts/HelveticaNeue.ttc', s)
+MONO = ImageFont.truetype('/System/Library/Fonts/SFNSMono.ttf', 15)
+BG, INK, MUTE = (17, 18, 19), (238, 236, 231), (148, 154, 160)
+picks = [('reveal', 0), ('reveal', 42), ('open', 30), ('open', 60)]
+def over(a, top, bot):
+    H, W = a.shape[:2]; t = np.linspace(0, 1, H)[:, None, None]
+    bg = np.array(top) / 255 * (1 - t) + np.array(bot) / 255 * t
+    bg = np.broadcast_to(bg, (H, W, 3))
+    return a[..., :3] * a[..., 3:4] + bg * (1 - a[..., 3:4])
+TW, TH, G, M = 560, 350, 10, 40
+W = M * 2 + 4 * TW + 3 * G; H = M + 60 + 2 * (TH + 40) + M
+im = Image.new('RGB', (W, H), BG); d = ImageDraw.Draw(im)
+d.text((M, M), 'The same photoreal frames: on today’s dark studio, and on a lit floor', font=F(30), fill=INK)
+for r, (top, bot, lab) in enumerate([((26, 30, 34), (24, 27, 31), 'TODAY: DARK STUDIO (THE SHADOW IS THERE, BUT INVISIBLE)'), ((222, 219, 213), (196, 191, 183), 'LIT FLOOR: THE SAME PIXELS, NOW A PHOTOGRAPH')]):
+    y = M + 60 + r * (TH + 40); d.text((M, y), lab, font=MONO, fill=MUTE)
+    for i, (seq, n) in enumerate(picks):
+        a = np.asarray(Image.open(f'{R}/{seq}/desktop/{n:04d}.webp').convert('RGBA')).astype(float) / 255
+        t = Image.fromarray((np.clip(over(a, top, bot), 0, 1) * 255).astype(np.uint8)).resize((TW, TH), Image.LANCZOS)
+        im.paste(t, (M + i * (TW + G), y + 24))
+p = f'{O}/frames-on-a-lit-floor.jpg'; im.save(p, quality=86, optimize=True, progressive=True); print(p, im.size, os.path.getsize(p) // 1024, 'KB')
+
+TW, TH = 1000, 625
+W = M * 2 + 2 * TW + G; H = M + 60 + 2 * (TH + 44) + M
+im = Image.new('RGB', (W, H), BG); d = ImageDraw.Draw(im)
+d.text((M, M), 'Chapter 01, the same moment in all four', font=F(30), fill=INK)
+for i, (c, lab) in enumerate([('base', 'Current site'), ('noir', '1 · Studio Noir'), ('atelier', '2 · Atelier, with First Light  (recommended)'), ('acts', '3 · One Studio, Lit in Acts')]):
+    x, y = M + (i % 2) * (TW + G), M + 60 + (i // 2) * (TH + 44)
+    im.paste(Image.open(f'out/{c}_d/0150.png').convert('RGB').resize((TW, TH), Image.LANCZOS), (x, y))
+    d.text((x, y + TH + 10), lab, font=F(20), fill=INK if c == 'atelier' else MUTE)
+p = f'{O}/compare-hero.jpg'; im.save(p, quality=86, optimize=True, progressive=True); print(p, im.size, os.path.getsize(p) // 1024, 'KB')

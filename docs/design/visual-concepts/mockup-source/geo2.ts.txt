@@ -1,0 +1,83 @@
+// Per-still environment geometry from the real camera track (same maths as the site): bag box, floor contact,
+// cove line, a perspective-correct floor light pool, and camera-relative architecture polygons, in viewport px.
+import { cameraAt } from './cameraTrack.ts'
+import { compositionAt, layoutMode } from './composition.ts'
+import { filmLayout, FILM } from './sequences.ts'
+type V = [number, number, number]
+const CH = [['intro',0,0.01],['reveal',0.01,0.11],['hero',0.11,0.19],['detail',0.19,0.31],['open',0.31,0.57],['interior',0.57,0.69],['display',0.69,0.83],['overview',0.83,1]] as const
+const ED = [0, 0.19, 0.31, 0.3932, 0.518, 0.62, 0.71, 0.83, 1.01]
+const SIDE = ['left', 'left', 'right', 'right', 'right', 'left', 'right', 'left']
+export function geo(progress: number, W: number, H: number) {
+  const c = CH.find((x) => progress >= x[1] && progress < x[2]) ?? CH[7]
+  const t = Math.min(1, Math.max(0, (progress - c[1]) / (c[2] - c[1])))
+  const pose = cameraAt(c[0] as any, t)
+  const mode = layoutMode(W, H)
+  const comp = compositionAt(progress, mode)
+  const L = filmLayout(W, H, pose, comp)
+  const [px, py, pz] = pose.pos
+  let fx = pose.target[0] - px, fy = pose.target[1] - py, fz = pose.target[2] - pz
+  const fl = Math.hypot(fx, fy, fz); fx /= fl; fy /= fl; fz /= fl
+  let rx = -fz, rz = fx; const rl = Math.hypot(rx, rz); rx /= rl; rz /= rl
+  const ux = -rz * fy, uy = rz * fx - rx * fz, uz = rx * fy
+  const tn = Math.tan((pose.fov * Math.PI) / 360)
+  const cam = (p: V): V => { const vx = p[0] - px, vy = p[1] - py, vz = p[2] - pz; return [vx * rx + vz * rz, vx * ux + vy * uy + vz * uz, vx * fx + vy * fy + vz * fz] }
+  const scr = (q: V) => { const nx = q[0] / (q[2] * tn * FILM.aspect), ny = q[1] / (q[2] * tn); return [(0.5 + nx / 2) * L.w - L.ox, (0.5 - ny / 2) * L.h - L.oy] }
+  const NEAR = 0.05
+  const poly = (pts: V[]) => {
+    // clip against the near plane in camera space, then project
+    const q = pts.map(cam); const out: V[] = []
+    for (let i = 0; i < q.length; i++) {
+      const a = q[i], b = q[(i + 1) % q.length]
+      if (a[2] >= NEAR) out.push(a)
+      if ((a[2] >= NEAR) !== (b[2] >= NEAR)) { const s = (NEAR - a[2]) / (b[2] - a[2]); out.push([a[0] + (b[0] - a[0]) * s, a[1] + (b[1] - a[1]) * s, NEAR]) }
+    }
+    return out.map(scr).map(([x, y]) => [Math.round(x), Math.round(y)])
+  }
+  const pt = (p: V) => scr(cam(p)).map(Math.round)
+  const corners: number[][] = []
+  for (const x of [-0.76, 0.76]) for (const y of [0, 1.8]) for (const z of [-0.69, 0.69]) corners.push(pt([x, y, z]))
+  const xs = corners.map((p) => p[0]), ys = corners.map((p) => p[1])
+  // horizontal frame of the view: forward h (floor plane) and right s
+  let hx = fx, hz = fz; const hl = Math.hypot(hx, hz); hx /= hl; hz /= hl
+  const sx = -hz, sz = hx
+  const ch = ED.findIndex((a, i) => progress >= a && progress < ED[i + 1]) + 1
+  const side = SIDE[ch - 1]
+  // floor light pool: key from the upper front-left (LightingSystem), so the pool sits slightly back-right of the bag
+  const pool = (cxw: number, czw: number, R: number) => {
+    const ps: number[][] = []
+    for (let i = 0; i < 48; i++) { const a = (i / 48) * Math.PI * 2; ps.push(pt([cxw + Math.cos(a) * R, 0, czw + Math.sin(a) * R])) }
+    const X = ps.map((p) => p[0]), Y = ps.map((p) => p[1])
+    return [Math.round((Math.min(...X) + Math.max(...X)) / 2), Math.round((Math.min(...Y) + Math.max(...Y)) / 2), Math.round((Math.max(...X) - Math.min(...X)) / 2), Math.round((Math.max(...Y) - Math.min(...Y)) / 2)]
+  }
+  // camera-relative architecture (B): one back wall D behind the bag with a single recessed vertical light slot. The
+  // slot is set per shot like a film set: on the product's side, clear of the product and the copy (solved on screen).
+  const D = 3.6, slotW = 0.15, reveal = 0.3, Y1 = 9, SH = 3.1
+  const at = (l: number, d: number, y: number): V => [sx * l + hx * d, y, sz * l + hz * d]
+  const sgn = side === 'left' ? 1 : -1
+  const goal = mode !== 'landscape'
+    ? (Math.max(...xs) < W * 0.8 ? W * 0.9 : Math.min(...xs) > W * 0.2 ? W * 0.1 : -1e4)
+    : ch === 8 ? W * 0.93 : side === 'left' ? Math.min(Math.max(...xs) + W * 0.1, W * 0.93) : Math.max(Math.min(...xs) - W * 0.1, W * 0.07)
+  let lo = -40, hi = 40
+  for (let i = 0; i < 60; i++) { const m = (lo + hi) / 2; const x = pt(at(m, D, 0.4))[0]; if (x < goal) lo = m; else hi = m }
+  const lat = (lo + hi) / 2
+  const e0 = lat - slotW / 2, e1 = lat + slotW / 2
+  const wall = [at(-60, D, 0), at(60, D, 0), at(60, D, Y1), at(-60, D, Y1)] as V[]
+  const slot = [at(e0, D + reveal, 0), at(e1, D + reveal, 0), at(e1, D + reveal, SH), at(e0, D + reveal, SH)] as V[]
+  // the reveal face the camera can see (on the side facing the bag)
+  const re = sgn > 0 ? e0 : e1
+  const ret = [at(re, D, 0), at(re, D + reveal, 0), at(re, D + reveal, SH), at(re, D, SH)] as V[]
+  const head = [at(e0, D, SH), at(e1, D, SH), at(e1, D + reveal, SH), at(e0, D + reveal, SH)] as V[]
+  const spill = [at(e0 - 0.5, D, 0), at(e1 + 0.5, D, 0), at(lat + 1.1, D - 3.2, 0), at(lat - 1.1, D - 3.2, 0)] as V[]
+  const mirror = (ps: V[]) => ps.map(([x, y, z]) => [x, -Math.min(y, 2.2), z] as V)
+  const pitch = Math.atan2(fy, Math.hypot(fx, fz)) * 180 / Math.PI
+  return {
+    phase: c[0], t: +t.toFixed(3), ch, side, mode, pitch: +pitch.toFixed(1),
+    bbox: [Math.min(...xs), Math.min(...ys), Math.max(...xs), Math.max(...ys)].map(Math.round),
+    contact: pt([0, 0, 0]), cove: pt([hx * 2.6, 0, hz * 2.6]), horizon: pt([px + hx * 400, py, pz + hz * 400])[1],
+    pool: pool(0.25, -0.3, 1.55), poolWide: pool(0.2, -0.2, 3.2),
+    arch: { wall: poly(wall), ret: poly(ret), slot: poly(slot), slotRefl: poly(mirror(slot)), spill: poly(spill), floorLine: [pt(at(-30, D, 0)), pt(at(30, D, 0))], slotBase: pt(at(lat, D, 0)), head: poly(head), show: goal > -1e3 },
+  }
+}
+const [W, H] = [+(process.argv[2] ?? 1440), +(process.argv[3] ?? 900)]
+const list = (process.argv[4] ?? '0,0.15,0.25,0.38,0.44,0.55,0.66,0.78,0.95').split(',').map(Number)
+console.log(JSON.stringify(Object.fromEntries(list.map((p) => [p, geo(p, W, H)]))))

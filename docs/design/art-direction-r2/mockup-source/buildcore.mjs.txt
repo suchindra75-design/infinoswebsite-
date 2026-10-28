@@ -1,0 +1,12 @@
+// Bundles the site's own camera/composition/film maths (types stripped, imports inlined) into one browser script that
+// exposes window.__CORE = { cameraAt, compositionAt, layoutMode, filmLayout, projectToFilm, FILM }.
+import { stripTypeScriptTypes } from 'node:module'
+import { readFileSync, writeFileSync } from 'node:fs'
+const [src, out] = process.argv.slice(2)
+const strip = (f) => stripTypeScriptTypes(readFileSync(`${src}/${f}`, 'utf8'))
+  .replace(/^import[\s\S]*?from\s+['"][^'"]+['"];?\s*$/gm, '')
+  .replace(/^export\s+(function|const|let)/gm, '$1')
+const json = readFileSync(`${src}/../content/sequences.json`, 'utf8')
+const body = [`const data = ${json};`, strip('sequences.ts'), strip('composition.ts'), strip('cameraTrack.ts')].join('\n')
+writeFileSync(out, `(() => {\n${body}\nwindow.__CORE = { cameraAt, compositionAt, layoutMode, filmLayout, projectToFilm, FILM, smoothstep }\n})()\n`)
+console.log('wrote', out, body.length, 'chars')

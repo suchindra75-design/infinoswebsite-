@@ -1,0 +1,15 @@
+/* CONCEPT B — "Architectural Light": the bag stands in a quiet architectural interior. A stepped back wall: the near
+   plane on the copy's side is deep and flat (the calmest field on the page); the recessed plane on the product's side is
+   washed by concealed floor light; between them a single vertical slot of warm light, whose return face glows and whose
+   reflection lies softly in the satin stone floor. All planes are projected from the real camera (true perspective). */
+.stage {
+  background:
+    radial-gradient(var(--pool-rx) var(--pool-ry) at var(--pool-x) var(--pool-y), rgba(226, 220, 210, 0.13) 0%, rgba(226, 220, 210, 0.05) 50%, rgba(226, 220, 210, 0) 100%),
+    linear-gradient(180deg, #121315 0%, #17181a calc(var(--floor-y) + 2px), #131415 calc(var(--floor-y) + 18vh), #0a0b0c 100%) !important;
+  background-color: #0b0c0d !important;
+}
+.env { position: absolute; inset: 0; pointer-events: none; }
+.env svg { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.env-vig { position: absolute; inset: 0; background: radial-gradient(120% 100% at 50% 45%, rgba(6, 7, 8, 0) 55%, rgba(6, 7, 8, 0.55) 100%); }
+.ed-scrim--left { background: linear-gradient(90deg, rgba(11, 12, 13, 0.8) 0%, rgba(11, 12, 13, 0.5) 38%, rgba(11, 12, 13, 0) 100%) !important; }
+.ed-scrim--right { background: linear-gradient(270deg, rgba(11, 12, 13, 0.8) 0%, rgba(11, 12, 13, 0.5) 38%, rgba(11, 12, 13, 0) 100%) !important; }

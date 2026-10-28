@@ -1,0 +1,21 @@
+/* CONCEPT C — "Daylight Atelier": a pale mineral studio lit by a large unseen window on the left. The story runs through
+   one day: cool morning light for the first look, neutral midday for the opening, warm low afternoon light for the
+   interior, dusk at the display, and night (graphite) for the complete system, which hands over to the dark sections. */
+.stage {
+  background:
+    radial-gradient(var(--pool-rx) var(--pool-ry) at var(--pool-x) var(--pool-y), var(--c-pool) 0%, transparent 100%),
+    radial-gradient(70vw 80vh at -6vw 30vh, var(--c-window) 0%, transparent 100%),
+    linear-gradient(180deg, var(--c-w0) 0%, var(--c-w1) calc(var(--cove) - 30vh), var(--c-cove) calc(var(--cove) - 1px), var(--c-f0) calc(var(--cove) + 4vh), var(--c-f1) calc(var(--cove) + 60vh)) !important;
+  background-color: var(--c-w0) !important;
+}
+.env { position: absolute; inset: 0; pointer-events: none; }
+.env-vig { position: absolute; inset: 0; background: radial-gradient(120% 100% at 45% 45%, transparent 55%, var(--c-vig) 100%); }
+html[data-tone='day'] .ed, html[data-tone='day'] .viewer-launch, html[data-tone='day'] .rotate-hint, html[data-tone='day'] .hotspot-html { --text-strong: #15181b; --text: #283036; --muted: #4c545b; --faint: #59626a; --accent: #4b5d6a; --accent-strong: #33424d; --line: rgba(23,27,31,.14); --line-mid: rgba(23,27,31,.2); --line-strong: rgba(23,27,31,.32); }
+html[data-tone='day'] .ed-scrim--left { background: linear-gradient(90deg, var(--c-scrim) 0%, transparent 100%) !important; }
+html[data-tone='day'] .ed-scrim--right { background: linear-gradient(270deg, var(--c-scrim) 0%, transparent 100%) !important; }
+html[data-tone='day'] .ed-callout-line { background: rgba(23, 27, 31, 0.5) !important; }
+html[data-tone='day'] .nav--scrolled { background: rgba(236, 233, 226, 0.86) !important; border-bottom-color: rgba(23,27,31,.1) !important; }
+html[data-tone='day'] .nav { --text-strong: #15181b; --text: #283036; --muted: #4c545b; color: #15181b; }
+html[data-tone='day'] .nav-link { color: #3b434a !important; }
+html[data-tone='day'] .ed-callout-label { color: rgba(21, 24, 27, 0.86) !important; }
+html[data-tone='day'] .viewer-launch { background: rgba(240, 237, 231, 0.7) !important; color: #283036 !important; border-color: rgba(23,27,31,.25) !important; }

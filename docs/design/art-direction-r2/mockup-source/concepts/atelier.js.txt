@@ -1,0 +1,23 @@
+// CONCEPT 2 — ATELIER: a pale mineral atelier lit by a tall window on the left; daylight warms slowly through the story.
+window.__CONCEPT = {
+  name: 'atelier', coveDist: 3.4, extend: true, shadow: 1, widePoolInSystem: true, sideA: 0.35,
+  // the same atelier before its lights come up (first light: only the key on the bag)
+  dark: { w0: '#0e0e0f', w1: '#151617', cove: '#27292c', f0: '#212326', f1: '#0b0c0d' },
+  firstLight: { delay: 700, dur: 1500 },
+  light: { w0: '#c9c7c2', w1: '#d8d6d0', cove: '#e3e0da', f0: '#dad6cf', f1: '#bfbab2' },
+  lightWarm: { w0: '#cbbfae', w1: '#dacfbe', cove: '#e4dacb', f0: '#dccfbd', f1: '#bdae99' },
+  lightVig: [118, 108, 96], lightSide: [226, 222, 214], lightScrim: [228, 224, 216],
+  window: true,
+  tone: (p, P) => (P.wall > 0.5 ? 'light' : 'dark'),
+  plan: [
+    [0.0, { wall: 1, floor: 1, pool: 0.3, size: 1.2, wash: 0.3, vig: 0.42, warm: 0 }],     // 01 morning
+    [0.19, { wall: 1, floor: 1, pool: 0.3, size: 1.2, wash: 0.3, vig: 0.42, warm: 0.1 }],
+    [0.31, { wall: 1, floor: 1, pool: 0.3, size: 1.1, wash: 0.28, vig: 0.42, warm: 0.25 }], // 02-05 the day climbs
+    [0.6, { wall: 1, floor: 1, pool: 0.3, size: 1.1, wash: 0.28, vig: 0.42, warm: 0.4 }],
+    [0.66, { wall: 1, floor: 1, pool: 0.32, size: 1.5, wash: 0.22, vig: 0.4, warm: 0.6 }],  // 06 afternoon light table
+    [0.73, { wall: 1, floor: 1, pool: 0.26, size: 1.0, wash: 0.2, vig: 0.5, warm: 0.85 }],  // 07 late light
+    [0.88, { wall: 1, floor: 1, pool: 0.3, size: 1.0, wash: 0.32, vig: 0.4, warm: 1 }],     // 08 golden, even
+    [1.0, { wall: 1, floor: 1, pool: 0.3, size: 1.0, wash: 0.32, vig: 0.4, warm: 1 }],
+  ],
+  cx: `.cx-backdrop{background:radial-gradient(60% 48% at 50% 44%, rgba(255,253,249,.3) 0%, transparent 100%), linear-gradient(180deg,#cbbfae 0%,#dacfbe 34%,#e4dacb 61%,#dccfbd 66%,#bdae99 100%) !important} .cx-pool{opacity:0 !important} .cx{--text-strong:#121518;--text:#252b30;--muted:#434b52;--faint:#566068;--accent:#46586a;--line:rgba(18,21,24,.14);--line-mid:rgba(18,21,24,.22);--line-strong:rgba(18,21,24,.34)} .cx-pick{color:#252b30 !important;border-color:rgba(18,21,24,.28) !important;background:rgba(244,242,237,.5) !important} .cx-pick[aria-pressed='true']{background:#121518 !important;color:#f2f0eb !important} .cx-family-headline,.cx-kicker,.cx-hint{color:#121518 !important;text-shadow:none !important}`,
+}

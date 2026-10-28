@@ -1,0 +1,33 @@
+(() => {
+  const st = document.querySelector('.stage')
+  const env = document.createElement('div'); env.className = 'env'
+  st.insertBefore(env, st.firstChild)
+  const P = (pts) => pts.map((p) => p.join(',')).join(' ')
+  window.__envUpdate = (g) => {
+    const W = innerWidth, H = innerHeight, a = g.arch, s = document.documentElement.style
+    const [px, py, rx, ry] = g.pool
+    s.setProperty('--pool-x', px + 'px'); s.setProperty('--pool-y', py + 'px'); s.setProperty('--pool-rx', Math.round(rx * 1.2) + 'px'); s.setProperty('--pool-ry', Math.round(ry * 1.2) + 'px')
+    const fl = a.floorLine, fy = Math.round((fl[0][1] + fl[1][1]) / 2); s.setProperty('--floor-y', fy + 'px')
+    const [bx, by] = a.slotBase
+    if (!a.show) { a.slot = []; a.ret = []; a.slotRefl = []; a.spill = []; a.head = [] }
+    env.innerHTML = `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none">
+      <defs>
+        <linearGradient id="gWall" gradientUnits="userSpaceOnUse" x1="0" y1="${by - H * 0.9}" x2="0" y2="${by}"><stop offset="0" stop-color="#0b0c0d"/><stop offset="0.7" stop-color="#121315"/><stop offset="1" stop-color="#17181a"/></linearGradient>
+        <radialGradient id="gHalo" gradientUnits="userSpaceOnUse" cx="${bx}" cy="${by - H * 0.18}" r="${W * 0.2}" gradientTransform="translate(${bx} ${by - H * 0.18}) scale(0.75 2.2) translate(${-bx} ${-(by - H * 0.18)})"><stop offset="0" stop-color="#d8cdbd" stop-opacity="0.16"/><stop offset="0.45" stop-color="#d8cdbd" stop-opacity="0.05"/><stop offset="1" stop-color="#d8cdbd" stop-opacity="0"/></radialGradient>
+        <linearGradient id="gSlot" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="0" y2="${by}"><stop offset="0" stop-color="#c9c0b2"/><stop offset="0.6" stop-color="#d9d0c3"/><stop offset="1" stop-color="#e3dacd"/></linearGradient>
+        <linearGradient id="gRet" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="0" y2="${by}"><stop offset="0" stop-color="#3a3632"/><stop offset="1" stop-color="#6a625a"/></linearGradient>
+        <linearGradient id="gRefl" gradientUnits="userSpaceOnUse" x1="0" y1="${by}" x2="0" y2="${Math.min(H, by + H * 0.45)}"><stop offset="0" stop-color="#e2d8ca" stop-opacity="0.42"/><stop offset="0.35" stop-color="#e2d8ca" stop-opacity="0.12"/><stop offset="1" stop-color="#e2d8ca" stop-opacity="0"/></linearGradient>
+        <filter id="fGlow" x="-200%" y="-10%" width="500%" height="120%"><feGaussianBlur stdDeviation="${Math.round(W * 0.006)}"/></filter>
+        <filter id="fRefl" x="-200%" y="-10%" width="500%" height="140%"><feGaussianBlur stdDeviation="${Math.round(W * 0.003)} ${Math.round(H * 0.012)}"/></filter>
+        <filter id="fSpill" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="${Math.round(W * 0.025)}"/></filter>
+      </defs>
+      ${a.spill.length ? `<polygon points="${P(a.spill)}" fill="#e2d8ca" opacity="0.06" filter="url(#fSpill)"/>` : ''}
+      ${a.slotRefl.length ? `<polygon points="${P(a.slotRefl)}" fill="url(#gRefl)" filter="url(#fRefl)"/>` : ''}
+      ${a.wall.length ? `<polygon points="${P(a.wall)}" fill="url(#gWall)"/>` : ''}
+      ${a.show ? `<rect x="0" y="0" width="${W}" height="${Math.max(0, by)}" fill="url(#gHalo)"/>` : ''}
+      ${a.ret.length ? `<polygon points="${P(a.ret)}" fill="url(#gRet)"/>` : ''}${a.head.length ? `<polygon points="${P(a.head)}" fill="#2a2724"/>` : ''}
+      ${a.slot.length ? `<polygon points="${P(a.slot)}" fill="#e6dccd" opacity="0.4" filter="url(#fGlow)"/><polygon points="${P(a.slot)}" fill="url(#gSlot)"/>` : ''}
+      <line x1="${fl[0][0]}" y1="${fl[0][1]}" x2="${fl[1][0]}" y2="${fl[1][1]}" stroke="#060707" stroke-opacity="0.5" stroke-width="1"/>
+    </svg><i class="env-vig"></i>`
+  }
+})()

@@ -1,0 +1,35 @@
+// node shots.mjs <url> <outDir> <concept.css|none> <concept.js|none> <geo.json> [w h dpr mobile]
+// Mockup stills: the real build, after the intro, at each story position in geo.json; an optional concept stylesheet
+// and layer script are injected into the page (nothing in the project changes). Per-still geometry from the real
+// camera track is exposed as CSS variables on <html> (--bx0 --by0 --bx1 --by1 bag box, --cx --cy floor contact,
+// --cove cove line y, --hz eye-level horizon y, all px) plus data-ch (editorial chapter 1-8) and data-side (text side).
+import puppeteer from 'puppeteer-core'
+import { readFileSync, mkdirSync } from 'node:fs'
+const [url, out, cssF, jsF, geoF, w = 1440, h = 900, dpr = 1, mobile] = process.argv.slice(2)
+mkdirSync(out, { recursive: true })
+const geo = JSON.parse(readFileSync(geoF, 'utf8'))
+const css = cssF !== 'none' ? readFileSync(cssF, 'utf8') : ''
+const js = jsF !== 'none' ? readFileSync(jsF, 'utf8') : ''
+const b = await puppeteer.launch({ executablePath: '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome', headless: 'new', args: ['--use-angle=metal', '--enable-gpu', '--ignore-gpu-blocklist', '--disable-gpu-vsync'] })
+const p = await b.newPage(); await p.setViewport({ width: +w, height: +h, deviceScaleFactor: +dpr, isMobile: !!mobile, hasTouch: !!mobile })
+const errs = []; p.on('pageerror', (e) => errs.push(e.message))
+await p.goto(url, { waitUntil: 'domcontentloaded' })
+await p.waitForFunction(() => !document.documentElement.classList.contains('intro-lock') && document.querySelector('.intro--done'), { timeout: 90000 })
+if (css) await p.addStyleTag({ content: css })
+if (js) await p.evaluate((code) => { (0, eval)(code) }, js)
+await new Promise((r) => setTimeout(r, 2500))
+for (const [k, g] of Object.entries(geo)) {
+  const f = +k
+  await p.evaluate((f, g) => {
+    const s = document.documentElement.style
+    s.setProperty('--bx0', g.bbox[0] + 'px'); s.setProperty('--by0', g.bbox[1] + 'px'); s.setProperty('--bx1', g.bbox[2] + 'px'); s.setProperty('--by1', g.bbox[3] + 'px')
+    s.setProperty('--cx', g.contact[0] + 'px'); s.setProperty('--cy', g.contact[1] + 'px'); s.setProperty('--cove', g.cove[1] + 'px'); s.setProperty('--hz', g.horizon + 'px')
+    s.setProperty('--pitch', g.pitch); document.documentElement.dataset.ch = g.ch; document.documentElement.dataset.side = g.side; document.documentElement.dataset.phase = g.phase
+    window.__geo = g; if (window.__envUpdate) window.__envUpdate(g)
+    const t = document.querySelector('.narrative-spacer').offsetHeight - innerHeight; window.scrollTo(0, Math.round(t * f))
+  }, f, g)
+  await new Promise((r) => setTimeout(r, 3400))
+  await p.screenshot({ path: `${out}/${String(Math.round(f * 1000)).padStart(4, '0')}.png` })
+}
+console.log(out.split('/').pop(), 'done', errs.length ? 'ERRORS ' + errs.slice(0, 2).join(' | ') : 'no page errors')
+await b.close()
