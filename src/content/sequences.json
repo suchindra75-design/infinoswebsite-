@@ -1,0 +1,246 @@
+{
+  "$comment": "Single source of truth for the hybrid scroll experience. Read by the website (src/motion/sequences.ts) AND by the Blender frame renderer (tools/render_sequences.py), so the photoreal frames and the live 3D scene are the same camera and the same pose at every scroll position. Units: three.js world units (the model is auto-scaled to 1.8 tall), vertical fov in degrees, stage windows as fractions of the chapter.",
+  "film": {
+    "aspect": 1.6,
+    "width": 1440,
+    "height": 900,
+    "mobileWidth": 960,
+    "mobileHeight": 600,
+    "portraitBreak": 1.2,
+    "portraitZoom": 1.7,
+    "portraitFocus": [
+      0.56,
+      0.5
+    ],
+    "portraitAnchorY": 0.44
+  },
+  "sequences": {
+    "reveal": {
+      "phase": "reveal",
+      "frames": 72,
+      "dir": "/sequences/reveal",
+      "keys": [
+        {
+          "t": 0.0,
+          "pos": [
+            3.6,
+            2.45,
+            4.25
+          ],
+          "target": [
+            -0.55,
+            0.92,
+            0.0
+          ],
+          "fov": 35,
+          "subject": [
+            0.0,
+            0.9,
+            0.0
+          ]
+        },
+        {
+          "t": 0.4,
+          "pos": [
+            2.85,
+            1.6,
+            5.0
+          ],
+          "target": [
+            -0.55,
+            0.9,
+            0.0
+          ],
+          "fov": 35,
+          "subject": [
+            0.0,
+            0.9,
+            0.0
+          ]
+        },
+        {
+          "t": 0.72,
+          "pos": [
+            0.35,
+            1.45,
+            5.35
+          ],
+          "target": [
+            -0.55,
+            0.92,
+            0.0
+          ],
+          "fov": 35,
+          "subject": [
+            0.0,
+            0.9,
+            0.0
+          ]
+        },
+        {
+          "t": 1.0,
+          "pos": [
+            -2.9,
+            1.5,
+            4.3
+          ],
+          "target": [
+            -0.55,
+            0.92,
+            0.0
+          ],
+          "fov": 35,
+          "subject": [
+            0.0,
+            0.9,
+            0.0
+          ]
+        }
+      ],
+      "stages": {},
+      "displayGain": 1.0,
+      "render": {
+        "width": 2560,
+        "height": 1600,
+        "mobileWidth": 1600,
+        "mobileHeight": 1000,
+        "samples": 16,
+        "exposureEV": 0.55
+      }
+    },
+    "open": {
+      "phase": "open",
+      "frames": 120,
+      "dir": "/sequences/open",
+      "keys": [
+        {
+          "t": 0.0,
+          "pos": [
+            1.1,
+            0.5,
+            2.9
+          ],
+          "target": [
+            0.3,
+            0.2,
+            0.64
+          ],
+          "fov": 24
+        },
+        {
+          "t": 0.25,
+          "pos": [
+            4.3,
+            3.1,
+            8.0
+          ],
+          "target": [
+            0.0,
+            1.6,
+            0.3
+          ],
+          "fov": 30
+        },
+        {
+          "t": 0.5,
+          "pos": [
+            2.6,
+            3.0,
+            8.6
+          ],
+          "target": [
+            0.0,
+            1.4,
+            0.6
+          ],
+          "fov": 30
+        },
+        {
+          "t": 0.78,
+          "pos": [
+            -1.7,
+            3.1,
+            7.2
+          ],
+          "target": [
+            0.0,
+            0.85,
+            1.05
+          ],
+          "fov": 30
+        },
+        {
+          "t": 1.0,
+          "pos": [
+            -0.9,
+            5.0,
+            4.4
+          ],
+          "target": [
+            0.0,
+            0.4,
+            1.3
+          ],
+          "fov": 30
+        }
+      ],
+      "stages": {
+        "flap": [
+          0.02,
+          0.3
+        ],
+        "lid": [
+          0.12,
+          0.36
+        ],
+        "drop": [
+          0.32,
+          0.55
+        ],
+        "boxOut": [
+          0.55,
+          0.8
+        ],
+        "boxLid": [
+          0.8,
+          0.97
+        ]
+      },
+      "displayGain": 1.0,
+      "render": {
+        "width": 2560,
+        "height": 1600,
+        "mobileWidth": 1600,
+        "mobileHeight": 1000,
+        "samples": 12,
+        "exposureEV": 1.25
+      },
+      "displayGainKeys": [
+        [
+          0,
+          0.7
+        ],
+        [
+          0.08,
+          0.7
+        ],
+        [
+          0.3,
+          1.0
+        ],
+        [
+          0.85,
+          1.0
+        ],
+        [
+          0.93,
+          0.95
+        ],
+        [
+          1,
+          0.95
+        ]
+      ]
+    }
+  }
+}

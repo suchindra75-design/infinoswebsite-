@@ -1,0 +1,197 @@
+{
+  "version": "0.3-photo-validated",
+  "triangles": 113380,
+  "bbox_m": {
+    "width": 0.4487,
+    "depth": 0.4098,
+    "height": 0.532
+  },
+  "bbox_min_blender": [
+    -0.2248,
+    -0.1988,
+    -0.00718
+  ],
+  "bbox_max_blender": [
+    0.22386,
+    0.211,
+    0.52481
+  ],
+  "heaviest_objects": [
+    [
+      "Flap_Quilted_Red",
+      10240
+    ],
+    [
+      "RACK_Plate_White",
+      8780
+    ],
+    [
+      "LS_Shell",
+      7078
+    ],
+    [
+      "UB_Shell",
+      5398
+    ],
+    [
+      "LS_Lining_Orange",
+      5158
+    ],
+    [
+      "IB_Shell",
+      4438
+    ],
+    [
+      "UB_Lining_Orange",
+      4438
+    ],
+    [
+      "Zipper_UpperLid",
+      4048
+    ],
+    [
+      "IB_Liner_Silver",
+      3958
+    ],
+    [
+      "Zipper_InnerBoxLid",
+      3832
+    ],
+    [
+      "Zipper_DropPanel",
+      3092
+    ],
+    [
+      "DP_Panel",
+      2876
+    ],
+    [
+      "IBL_Pad",
+      2876
+    ],
+    [
+      "UL_Pad",
+      2876
+    ],
+    [
+      "Flap_Binding_Black",
+      2556
+    ],
+    [
+      "Flap_Underside_OrangeHex",
+      2320
+    ],
+    [
+      "LS_CornerPiping",
+      2224
+    ],
+    [
+      "UB_CornerPiping",
+      1968
+    ],
+    [
+      "DP_EdgeBinding",
+      1920
+    ],
+    [
+      "IB_RimPiping",
+      1920
+    ],
+    [
+      "IBL_RimBinding",
+      1920
+    ],
+    [
+      "LS_FrontPiping",
+      1920
+    ],
+    [
+      "UB_RimPiping",
+      1920
+    ],
+    [
+      "UB_SeamBand",
+      1920
+    ],
+    [
+      "UL_RimBinding",
+      1920
+    ]
+  ],
+  "params": {
+    "W": 0.42,
+    "H_LOWER": 0.25,
+    "H_UPPER": 0.235,
+    "D_UPPER": 0.31,
+    "STEP": 0.035,
+    "WALL": 0.012,
+    "LINER": 0.004,
+    "CORNER_R": 0.024,
+    "BULGE": 0.007,
+    "WRINKLE": 0.0022,
+    "LID_T": 0.016,
+    "FLAP_T": 0.0145,
+    "FLAP_DROP": 0.172,
+    "QUILT_PITCH": 0.04,
+    "QUILT_WAVE": 0.026,
+    "QUILT_RISE": [
+      0.11,
+      0.27
+    ],
+    "QUILT_FALL": [
+      0.73,
+      0.89
+    ],
+    "INCLUDE_CARRY_HANDLE": false,
+    "BOX_W": 0.325,
+    "BOX_D": 0.285,
+    "BOX_H": 0.19,
+    "BOX_LID_T": 0.022,
+    "RACK_COLS": 12,
+    "RACK_ROWS": 7,
+    "RACK_FRONT_ROWS": 3,
+    "RACK_W": 0.205,
+    "RACK_D": 0.18,
+    "RACK_T": 0.01,
+    "RACK_HOLE_FR": 0.64,
+    "RACK_WALL_H": 0.024,
+    "DISPLAY_SIDE": 1,
+    "DISPLAY_PLATE": [
+      0.132,
+      0.082,
+      0.008
+    ],
+    "DISPLAY_SCREEN": [
+      0.04,
+      0.021
+    ],
+    "DISPLAY_Z_FRAC": 0.225,
+    "DISPLAY_LINE1": "TEMP : 24.19\u00b0C",
+    "DISPLAY_LINE2": "WiFi Disconnected",
+    "BIO_SIZE": 0.088,
+    "BIO_Z_FRAC": 0.41,
+    "SIDE_POCKET": true,
+    "STICKER_INFINOS": true,
+    "OPTIONAL_LOGO_DIR": "",
+    "INCLUDE_BAY_ITEM": true,
+    "STRAP_W": 0.1,
+    "STRAP_W_END": 0.072,
+    "STRAP_T": 0.03,
+    "STRAP_X0": 0.066,
+    "STRAP_X1": 0.088,
+    "WEAR": 0.22
+  },
+  "nodes": [
+    "INFINOS_Flap",
+    "INFINOS_UpperLid",
+    "INFINOS_UpperBody",
+    "INFINOS_Display",
+    "INFINOS_LowerShell",
+    "INFINOS_DropPanel",
+    "INFINOS_InnerBox",
+    "INFINOS_InnerBoxLid",
+    "INFINOS_Rack",
+    "INFINOS_Straps"
+  ],
+  "warning": "Photo-validated replica. Absolute scale, internal construction, zipper routing and bay contents remain UNVERIFIED."
+}
