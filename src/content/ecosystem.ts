@@ -1,18 +1,23 @@
 /**
- * "Our Ecosystem" — organisations connected with INFINOS and the VentureRISE recognition (owner, 2026-10-15).
+ * "Our Ecosystem" — organisations connected with INFINOS and the VentureRISE recognition (owner, 2026-10-15), led by
+ * INFINOS's customers Yashoda Hospitals and Pranaam Hospitals (owner, 2026-10-31: names, "Customer" and the use of
+ * the logos from their official websites).
  *
- * Logos are the original files from the previous INFINOS website (approved download, 2026-10-15), encoded by
- * tools/encode_gallery_ecosystem.mjs: trimmed to their own artwork only, never redrawn, recoloured or stretched. The
- * Amrita TBI mark is taken from its "Funded by Amrita TBI" banner without the "Funded by" text, because the funding
- * wording is unconfirmed (owner label: institutional support, subject to confirmation).
+ * The customers' logos are the header logos of yashodahospitals.com and pranaamhospitals.com (approved download,
+ * 2026-10-31); the other logos are the original files from the previous INFINOS website (approved download,
+ * 2026-10-15). All are encoded by tools/encode_gallery_ecosystem.mjs: trimmed to their own artwork only, never redrawn,
+ * recoloured or stretched. The Amrita TBI mark is taken from its "Funded by Amrita TBI" banner without the "Funded by"
+ * text, because the funding wording is unconfirmed (owner label: institutional support, subject to confirmation).
  *
- * RELATIONSHIPS: as listed on the previous website, with the owner's cautious labels. Earlier collaborations are never
- * presented as current partnerships. NOT published (owner, 2026-10-15): DPIIT recognition — unverified for the
- * current Private Limited company; it stays in docs/MIGRATION_COMPANY_INFO.md as pending.
+ * RELATIONSHIPS: customers as confirmed by the owner; the others as listed on the previous website, with the owner's
+ * cautious labels. Earlier collaborations are never presented as current partnerships. NOT published (owner,
+ * 2026-10-15): DPIIT recognition — unverified for the current Private Limited company; it stays in
+ * docs/MIGRATION_COMPANY_INFO.md as pending.
  */
-export type Relationship = 'earlier-registration' | 'institutional-support' | 'featured' | 'earlier-collaboration'
+export type Relationship = 'customer' | 'earlier-registration' | 'institutional-support' | 'featured' | 'earlier-collaboration'
 
 export const RELATIONSHIP_LABEL: Record<Relationship, string> = {
+  customer: 'Customer',
   'earlier-registration': 'Earlier registration',
   'institutional-support': 'Institutional support',
   featured: 'Featured',
@@ -36,9 +41,11 @@ export interface EcosystemLogo {
 export const ECOSYSTEM = {
   kicker: 'Ecosystem',
   title: 'Our Ecosystem.',
-  lede: 'Programmes, institutions and organisations connected with INFINOS, each shown with its relationship.',
-  note: 'Relationships as listed on the previous INFINOS website. Earlier collaborations are not necessarily current partnerships.',
+  lede: 'Customers, programmes, institutions and organisations connected with INFINOS, each shown with its relationship.',
+  note: 'Customers as confirmed by INFINOS. Other relationships as listed on the previous INFINOS website; earlier collaborations are not necessarily current partnerships.',
   logos: [
+    { id: 'yashoda-hospitals', name: 'Yashoda Hospitals', src: '/images/ecosystem/yashoda-hospitals.png', width: 143, height: 100, relationship: 'customer', pending: 'Only a small original (143 px) is published on yashodahospitals.com; a larger official file would be sharper.' },
+    { id: 'pranaam-hospitals', name: 'Pranaam Hospitals', src: '/images/ecosystem/pranaam-hospitals.png', width: 600, height: 470, relationship: 'customer', pending: 'None.' },
     { id: 'startup-india', name: 'Startup India', src: '/images/ecosystem/startup-india.png', width: 654, height: 146, relationship: 'earlier-registration', pending: 'Historical registration claim; current status for the Private Limited company to be verified.' },
     { id: 'amrita-tbi', name: 'Amrita TBI', src: '/images/ecosystem/amrita-tbi.png', width: 101, height: 99, relationship: 'institutional-support', pending: 'Institutional support, subject to confirmation ("supported" or "funded"; period). Only a 101 px original is available.' },
     { id: 'agnii', name: 'Agnii', src: '/images/ecosystem/agnii.png', width: 139, height: 91, relationship: 'featured', blend: true, pending: 'Year of the feature, if wanted. Only a small original is available.' },

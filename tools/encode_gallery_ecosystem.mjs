@@ -1,6 +1,7 @@
-// node tools/encode_gallery_ecosystem.mjs — encodes the gallery photographs and the ecosystem logos for the website.
-// Sources (tools/assets/) are the owner-supplied photographs and the original logo files from the previous INFINOS
-// website, unchanged. Photos: WebP at 560 and 1080 px wide (never upscaled), metadata stripped. Logos: PNG, only
+// node tools/encode_gallery_ecosystem.mjs [id ...] — encodes the gallery photographs and the ecosystem logos for the
+// website (only the named crops or logos when ids are given). Sources (tools/assets/) are the owner-supplied
+// photographs, the original logo files from the previous INFINOS website and the customers' logos as published on their
+// official websites (owner, 2026-10-31), unchanged. Photos: WebP at 560 and 1080 px wide (never upscaled), metadata stripped. Logos: PNG, only
 // trimmed to their own artwork (empty margins removed) and, for Amrita TBI, the "amrita tbi" mark taken from the
 // banner without its "Funded by" text (owner label: institutional support, subject to confirmation). Nothing is
 // redrawn, recoloured or stretched.
@@ -8,6 +9,8 @@ import sharp from 'sharp'
 import { mkdirSync } from 'node:fs'
 
 const SRC = 'tools/assets'
+const only = new Set(process.argv.slice(2))
+const wanted = (id) => only.size === 0 || only.has(id)
 const OUT = 'public/images'
 mkdirSync(`${OUT}/gallery`, { recursive: true })
 mkdirSync(`${OUT}/ecosystem`, { recursive: true })
@@ -24,12 +27,15 @@ const CROPS = [
   // the "Smart City Living Lab" screen (whole) and the lit device shelf — above everyone's head
   { id: 'smart-city-living-lab-crop', file: 'smart-city-living-lab.jpg', extract: { left: 645, top: 58, width: 417, height: 250 } },
 ]
-for (const c of CROPS) {
+for (const c of CROPS.filter((c) => wanted(c.id))) {
   const info = await sharp(`${SRC}/gallery/${c.file}`).rotate().extract(c.extract).webp({ quality: 90, effort: 6 }).toFile(`${OUT}/gallery/${c.id}.webp`)
   console.log(`gallery ${c.id}.webp ${info.width}x${info.height} ${Math.round(info.size / 1024)} KB`)
 }
 
 const logos = [
+  // customers (owner, 2026-10-31): the header logos of yashodahospitals.com and pranaamhospitals.com
+  { id: 'yashoda-hospitals', file: 'yashoda-hospitals.png', trim: { background: '#ffffff00', threshold: 8 } },
+  { id: 'pranaam-hospitals', file: 'pranaam-hospitals.webp', trim: { background: '#ffffff00', threshold: 8 } },
   { id: 'startup-india', file: 'startup-india.png', trim: { background: '#ffffff00', threshold: 8 } },
   { id: 'amrita-tbi', file: 'amrita-tbi-banner.jpg', extract: { left: 0, top: 0, width: 101, height: 99 } },
   { id: 'agnii', file: 'agnii.jpg', trim: { background: '#ffffff', threshold: 24 } },
@@ -39,7 +45,7 @@ const logos = [
   // a photographic JPEG original: WebP keeps it small without visible loss
   { id: 'heliox-cosmos', file: 'heliox-cosmos.jpg', trim: { background: '#ffffff', threshold: 24 }, webp: true },
 ]
-for (const l of logos) {
+for (const l of logos.filter((l) => wanted(l.id))) {
   let img = sharp(`${SRC}/ecosystem/${l.file}`).rotate()
   if (l.extract) img = img.extract(l.extract)
   if (l.trim) img = sharp(await img.png().toBuffer()).trim(l.trim)
