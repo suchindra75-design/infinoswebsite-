@@ -18,6 +18,8 @@ import { applyScrollProgress, chapterAt, computeStages, computeExplodedAmount } 
 import { cameraAt } from '@/motion/cameraTrack'
 import { filmLayout, projectToFilm } from '@/motion/sequences'
 import { compositionAt, layoutMode } from '@/motion/composition'
+import { PHONE_QUERY, isPhoneLayout } from '@/motion/phoneLayout'
+import { PhoneActionBar, PhoneProductPage } from '@/components/sections/PhoneProductPage'
 
 export function Experience() {
   const narrativeRef = useRef<HTMLDivElement>(null)
@@ -27,14 +29,21 @@ export function Experience() {
       reducedMotion: prefersReducedMotion(),
       isMobile: isMobileViewport(),
       webglSupported: supportsWebGL(),
+      phone: isPhoneLayout(),
     })
+    const phoneQuery = window.matchMedia(PHONE_QUERY)
+    const onPhoneChange = () => useExperienceStore.setState({ phone: phoneQuery.matches })
+    phoneQuery.addEventListener('change', onPhoneChange)
     // development-only test hook: the timeline is pure, so QA can sample it exactly (stripped from production builds)
     if (process.env.NODE_ENV !== 'production') {
       Object.assign(window, {
         __infinos: { applyScrollProgress, chapterAt, computeStages, computeExplodedAmount, cameraAt, filmLayout, projectToFilm, compositionAt, layoutMode, store: useExperienceStore },
       })
     }
+    return () => phoneQuery.removeEventListener('change', onPhoneChange)
   }, [])
+
+  const phone = useExperienceStore((s) => s.phone)
 
   return (
     <SmoothScrollProvider>
@@ -46,9 +55,11 @@ export function Experience() {
       <ProductViewer />
       <div ref={narrativeRef} className="narrative-spacer" aria-hidden="true" />
       <ScrollChapterController targetRef={narrativeRef} />
-      {/* the coolant showcase follows the main product animation */}
-      <CoolantShowcase />
+      {/* the coolant showcase follows the main product animation (phones: a product-page block instead) */}
+      {!phone && <CoolantShowcase />}
       <main className="site-content">
+        {/* phones (concept C): the story's later chapters, the zones and the coolants as product-page blocks */}
+        {phone && <PhoneProductPage />}
         {/* the three central ideas, in order: transportation (applications) · technology · impact — then the range */}
         <PositioningSection />
         <ApplicationsSection />
@@ -61,6 +72,7 @@ export function Experience() {
         <EcosystemSection />
         <ContactSection />
       </main>
+      {phone && <PhoneActionBar />}
     </SmoothScrollProvider>
   )
 }

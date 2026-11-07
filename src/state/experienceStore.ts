@@ -43,6 +43,8 @@ export interface ExperienceState {
   webglSupported: boolean
   reducedMotion: boolean
   isMobile: boolean
+  /** phone layout (motion/phoneLayout.ts): short story, product-page blocks, action bar */
+  phone: boolean
   menuOpen: boolean
   setPointer: (x: number, y: number) => void
   setMenuOpen: (open: boolean) => void
@@ -73,6 +75,7 @@ export const useExperienceStore = create<ExperienceState>((set) => ({
   webglSupported: true,
   reducedMotion: false,
   isMobile: false,
+  phone: false,
   menuOpen: false,
   setPointer: (x, y) => set({ pointer: { x, y } }),
   setMenuOpen: (open) => set({ menuOpen: open }),

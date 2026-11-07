@@ -1,0 +1,302 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>INFINOS mobile concepts</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=IBM+Plex+Mono:wght@400;500&family=Syne:wght@500;600&display=swap" rel="stylesheet">
+<style>
+/* Mobile concept board. Every image is a real asset from public/ (Cycles frames, gallery crops, logos); every line of
+   copy is the site's own text (src/content). Phone screens are 390 x 844 CSS px. */
+:root {
+  --graphite: #171b1f; --slate: #292f34; --ivory: #eae7df; --white: #f7f6f2; --steel: #8496a3;
+  --stone-w0: #e4e1db; --stone-w1: #d9d5ce; --stone-f0: #cfcac2; --stone-f1: #bfbab2;
+  --ink: #23282d; --ink-2: #4a5157; --ink-3: #7a8187; --line: rgba(35, 40, 45, 0.14);
+  --zone1: #9ccfff; --zone2: #6b95ff;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: #f2f0ec; font-family: 'DM Sans', system-ui, sans-serif; color: var(--ink); padding: 40px 40px 60px; }
+.board-title { font-family: 'IBM Plex Mono', monospace; font-size: 13px; letter-spacing: .22em; color: #6a7076; margin-bottom: 6px; }
+.board-sub { font-size: 15px; color: #555b61; margin-bottom: 34px; max-width: 1300px; }
+.concept { margin-bottom: 56px; }
+.c-head { display: flex; align-items: baseline; gap: 16px; margin-bottom: 6px; }
+.c-letter { font-family: 'Syne', sans-serif; font-weight: 600; font-size: 34px; }
+.c-name { font-family: 'Syne', sans-serif; font-weight: 500; font-size: 26px; }
+.c-tag { font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: .2em; padding: 4px 10px; border: 1px solid #b9bcbf; border-radius: 99px; color: #555; }
+.c-desc { font-size: 15px; color: #4b5157; max-width: 1240px; margin-bottom: 18px; line-height: 1.5; }
+.row { display: flex; gap: 34px; align-items: flex-start; }
+.cap { width: 390px; font-size: 13px; color: #555b61; margin-top: 10px; line-height: 1.45; }
+.cap b { color: #23282d; font-weight: 600; }
+
+.phone { width: 390px; height: 844px; position: relative; overflow: hidden; border-radius: 34px; box-shadow: 0 0 0 10px #1b1d20, 0 18px 50px rgba(0,0,0,.25); background: var(--stone-w0); }
+.studio { position: absolute; inset: 0; background:
+  radial-gradient(60% 40% at 12% 22%, rgba(255,250,240,.55), rgba(255,250,240,0) 70%),
+  linear-gradient(180deg, var(--stone-w0) 0%, var(--stone-w1) 34%, var(--stone-f0) 46%, var(--stone-f1) 100%); }
+.frame { position: absolute; left: 50%; transform: translateX(-50%); }
+.mono { font-family: 'IBM Plex Mono', monospace; letter-spacing: .2em; text-transform: uppercase; }
+
+/* shared nav */
+.nav { position: absolute; top: 0; left: 0; right: 0; height: 58px; display: flex; align-items: center; justify-content: space-between; padding: 0 18px; z-index: 5; }
+.nav.solid { background: rgba(234, 231, 223, .96); border-bottom: 1px solid var(--line); }
+.brand { display: flex; align-items: center; gap: 8px; font-family: 'Syne', sans-serif; font-weight: 600; font-size: 15px; letter-spacing: .06em; }
+.brand img { width: 26px; height: 26px; border-radius: 5px; }
+.brand small { font-family: 'IBM Plex Mono', monospace; font-weight: 400; font-size: 9px; letter-spacing: .25em; color: var(--ink-3); }
+.burger { width: 22px; height: 12px; border-top: 1.5px solid var(--ink); border-bottom: 1.5px solid var(--ink); }
+
+/* ── A: Studio + sheet ── */
+.chips { position: absolute; top: 58px; left: 0; right: 0; display: flex; gap: 6px; padding: 8px 18px; z-index: 5; }
+.chip { flex: 1; height: 3px; border-radius: 2px; background: rgba(35,40,45,.16); }
+.chip.on { background: var(--ink); }
+.chip.done { background: rgba(35,40,45,.45); }
+.chap-name { position: absolute; top: 76px; left: 18px; font-size: 10px; color: var(--ink-2); z-index: 5; }
+.sheet { position: absolute; left: 0; right: 0; bottom: 0; background: var(--white); border-radius: 22px 22px 0 0; padding: 20px 22px 26px; box-shadow: 0 -8px 30px rgba(0,0,0,.08); z-index: 4; }
+.grab { width: 36px; height: 4px; border-radius: 2px; background: #d3d0c9; margin: -8px auto 14px; }
+.kicker { font-size: 10px; color: var(--ink-3); margin-bottom: 10px; }
+.h { font-family: 'DM Sans'; font-weight: 400; font-size: 29px; line-height: 1.12; letter-spacing: -.01em; margin-bottom: 10px; }
+.p { font-size: 14px; line-height: 1.5; color: var(--ink-2); }
+.zones { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 16px; }
+.zone { border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px; }
+.zone .t { font-size: 22px; font-weight: 500; margin-top: 4px; }
+.zone .l { font-size: 9px; color: var(--ink-3); }
+.zone i { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 6px; }
+.callout { position: absolute; z-index: 3; display: flex; align-items: center; gap: 8px; }
+.callout .dot { width: 9px; height: 9px; border-radius: 50%; background: var(--ink); box-shadow: 0 0 0 4px rgba(35,40,45,.15); }
+.callout .lbl { background: var(--ink); color: var(--white); font-size: 10px; padding: 6px 9px; border-radius: 6px; white-space: nowrap; }
+.callout .ln { width: 40px; height: 1px; background: var(--ink); }
+.btns { display: flex; gap: 8px; margin-top: 16px; flex-wrap: wrap; }
+.btn { font-size: 13px; padding: 11px 16px; border-radius: 99px; border: 1px solid #c9c5bd; }
+.btn.pri { background: var(--ink); color: var(--white); border-color: var(--ink); }
+.spec { margin-top: 14px; border-top: 1px solid var(--line); }
+.spec div { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--line); font-size: 13px; }
+.spec span:first-child { color: var(--ink-3); }
+
+/* ── B: swipe chapters ── */
+.pager-frame { position: absolute; top: 58px; left: 0; right: 0; height: 450px; }
+.dots { position: absolute; top: 494px; left: 0; right: 0; display: flex; justify-content: center; gap: 7px; z-index: 4; }
+.dots i { width: 6px; height: 6px; border-radius: 50%; background: rgba(35,40,45,.22); }
+.dots i.on { width: 22px; border-radius: 3px; background: var(--ink); }
+.b-text { position: absolute; top: 520px; left: 22px; right: 22px; }
+.peek { position: absolute; top: 140px; right: -26px; width: 52px; height: 300px; border-radius: 16px; background: rgba(255,255,255,.45); }
+.swipe { position: absolute; bottom: 26px; left: 22px; right: 22px; display: flex; justify-content: space-between; align-items: center; }
+.arrow { width: 46px; height: 46px; border-radius: 50%; border: 1px solid #b9b5ad; display: grid; place-items: center; font-size: 18px; }
+.tabs { position: absolute; top: 58px; left: 0; right: 0; display: flex; gap: 6px; padding: 10px 14px; background: rgba(234,231,223,.96); border-bottom: 1px solid var(--line); z-index: 5; overflow: hidden; }
+.tab { font-size: 12px; padding: 8px 13px; border-radius: 99px; border: 1px solid #cdc9c1; white-space: nowrap; }
+.tab.on { background: var(--ink); color: var(--white); border-color: var(--ink); }
+.card { background: var(--white); border-radius: 18px; overflow: hidden; margin-bottom: 14px; box-shadow: 0 2px 10px rgba(0,0,0,.05); }
+.card img { display: block; width: 100%; height: 190px; object-fit: cover; }
+.card .in { padding: 14px 16px 16px; }
+.card .t { font-size: 18px; margin-bottom: 4px; }
+.card .d { font-size: 13px; color: var(--ink-2); line-height: 1.45; }
+.logos { display: flex; gap: 10px; }
+.logos div { flex: 1; height: 62px; background: #fff; border-radius: 12px; display: grid; place-items: center; }
+.logos img { max-width: 76%; max-height: 34px; }
+
+/* ── C: product page first ── */
+.dark { background: var(--graphite); color: var(--white); }
+.hero-h { position: absolute; left: 22px; right: 22px; top: 498px; }
+.hero-h .h { font-size: 34px; }
+.bar { position: absolute; left: 12px; right: 12px; bottom: 14px; display: flex; gap: 8px; padding: 8px; background: rgba(23,27,31,.94); border-radius: 18px; z-index: 6; }
+.bar div { flex: 1; text-align: center; color: var(--white); font-size: 13px; padding: 12px 0; border-radius: 12px; }
+.bar div.pri { background: var(--white); color: var(--ink); }
+.reel { display: flex; gap: 10px; overflow: hidden; margin-top: 12px; }
+.feat { flex: 0 0 160px; background: var(--white); border-radius: 16px; padding: 8px 8px 12px; }
+.feat .im { height: 130px; border-radius: 10px; background: linear-gradient(180deg, var(--stone-w0), var(--stone-f1)); position: relative; overflow: hidden; }
+.feat .im img { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); }
+.feat .n { font-size: 10px; color: var(--ink-3); margin: 10px 4px 3px; }
+.feat .t { font-size: 14px; margin: 0 4px; line-height: 1.3; }
+.sec-k { font-size: 10px; color: var(--ink-3); }
+.range { display: flex; gap: 10px; margin-top: 12px; overflow: hidden; }
+.rng { flex: 0 0 250px; background: var(--white); border-radius: 16px; overflow: hidden; }
+.rng .im { height: 150px; background: linear-gradient(180deg, var(--stone-w0), var(--stone-f1)); position: relative; }
+.rng .im img { position: absolute; left: 50%; bottom: 6px; transform: translateX(-50%); height: 140px; }
+.rng .in { padding: 12px 14px 14px; }
+.pill { display: inline-block; font-size: 10px; padding: 4px 8px; border-radius: 99px; background: #ece9e3; margin: 6px 4px 0 0; }
+.note { position: absolute; font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: .08em; color: #b14a2e; background: #fff4ee; border: 1px dashed #d9a48f; padding: 6px 8px; border-radius: 6px; z-index: 9; max-width: 220px; }
+</style>
+</head>
+<body>
+<p class="board-title">INFINOS · MOBILE · THREE CONCEPTS · 390 × 844</p>
+<p class="board-sub">Built from the real assets: Cycles frames from public/sequences, the gallery crops and partner logos, and the site's own copy. Product details shown are only those already confirmed in the project. Rows marked in orange show where details are still needed from INFINOS; on the live site they stay hidden until supplied.</p>
+
+<!-- ═════════ A ═════════ -->
+<section class="concept">
+  <div class="c-head"><span class="c-letter">A</span><span class="c-name">Studio & sheet</span><span class="c-tag">KEEPS THE SCROLL STORY</span></div>
+  <p class="c-desc">The scroll-driven story stays, re-composed for a phone. The bag owns the top half, clear of the menu; the words live on a solid sheet at the bottom instead of floating over the product, so nothing overlaps. Eight progress bars at the top name the chapter and can be tapped to jump. The hidden desktop details come back inside the sheet: the zone temperatures, the full labels, the diagrams.</p>
+  <div class="row">
+    <div>
+      <div class="phone"><div class="studio"></div>
+        <div class="nav"><div class="brand"><img src="../../../public/logo.jpg">INFINOS <small>TECH</small></div><div class="burger"></div></div>
+        <div class="chips"><i class="chip done"></i><i class="chip on"></i><i class="chip"></i><i class="chip"></i><i class="chip"></i><i class="chip"></i><i class="chip"></i><i class="chip"></i></div>
+        <div class="chap-name mono">02 · Dual-temperature</div>
+        <img class="frame" src="../../../public/sequences/open/mobile/0030.webp" style="top:96px;width:560px">
+        <div class="callout" style="top:212px;left:196px"><span class="dot"></span><span class="ln" style="width:24px"></span><span class="lbl">Zone 1 · upper chamber</span></div>
+        <div class="sheet"><div class="grab"></div>
+          <p class="kicker mono">02 — Dual-temperature architecture</p>
+          <h2 class="h">Two temperature zones, by design.</h2>
+          <p class="p">Separate zones for different sample categories, such as blood, urine and stool.</p>
+          <div class="zones">
+            <div class="zone"><span class="l mono"><i style="background:var(--zone1)"></i>Zone 1 · upper</span><div class="t">≈ 2–8 °C</div></div>
+            <div class="zone"><span class="l mono"><i style="background:var(--zone2)"></i>Zone 2 · lower</span><div class="t">e.g. −10 °C</div></div>
+          </div>
+        </div>
+      </div>
+      <p class="cap"><b>Story chapter.</b> Progress you can tap, product in a clean window, and the zone figure that is hidden on phones today.</p>
+    </div>
+    <div>
+      <div class="phone"><div class="studio"></div>
+        <div class="nav"><div class="brand"><img src="../../../public/logo.jpg">INFINOS <small>TECH</small></div><div class="burger"></div></div>
+        <div class="chips"><i class="chip done"></i><i class="chip done"></i><i class="chip done"></i><i class="chip on"></i><i class="chip"></i><i class="chip"></i><i class="chip"></i><i class="chip"></i></div>
+        <div class="chap-name mono">04 · Compartments</div>
+        <img class="frame" src="../../../public/sequences/open/mobile/0090.webp" style="top:104px;width:500px">
+        <div class="callout" style="top:372px;left:18px;flex-direction:row-reverse"><span class="dot"></span><span class="ln" style="width:20px"></span><span class="lbl">Removable inner box</span></div>
+        <div class="callout" style="top:200px;left:206px"><span class="dot"></span><span class="ln" style="width:14px"></span><span class="lbl">Zone 1 · upper chamber</span></div>
+        <div class="sheet"><div class="grab"></div>
+          <p class="kicker mono">04 — Intelligent compartments</p>
+          <h2 class="h">A place for every sample.</h2>
+          <p class="p">Organised sub-compartments keep sample categories apart: Zone 1 in the upper chamber, Zone 2 in the lower chamber, and a removable inner box.</p>
+        </div>
+      </div>
+      <p class="cap"><b>Full labels return.</b> Two labels at once, in full words, placed beside the bag rather than over the text.</p>
+    </div>
+    <div>
+      <div class="phone" style="background:var(--ivory)">
+        <div class="nav solid"><div class="brand"><img src="../../../public/logo.jpg">INFINOS <small>TECH</small></div><div class="burger"></div></div>
+        <div style="position:absolute;top:58px;left:0;right:0;height:300px;background:linear-gradient(180deg,var(--stone-w0),var(--stone-f1))"><img src="../../../public/images/range-pro.webp" style="position:absolute;left:50%;bottom:0;transform:translateX(-50%);height:290px"></div>
+        <div style="position:absolute;top:372px;left:22px;right:22px">
+          <p class="kicker mono">Product range · 2 of 3</p>
+          <h2 class="h" style="font-size:26px">INFINOS Pro Dual-Chamber Bag</h2>
+          <p class="p">A dual-compartment bag configuration for organised sample transportation, built on the flexible form factor.</p>
+          <div class="spec">
+            <div><span>Zone 1 · upper chamber</span><span>≈ 2–8 °C</span></div>
+            <div><span>Zone 2 · lower chamber</span><span>e.g. −10 °C</span></div>
+            <div><span>Cooling</span><span>Reusable PCM coolant</span></div>
+            <div><span>Inner box</span><span>Removable</span></div>
+          </div>
+          <div class="btns"><span class="btn pri">Explore in 360°</span><span class="btn">Request details</span></div>
+        </div>
+        <div class="note" style="bottom:16px;left:22px;max-width:340px">+ size, capacity, weight, hold time: needed from INFINOS</div>
+      </div>
+      <p class="cap"><b>Product sheet.</b> Each variant gets its own page-like card with its image, the confirmed facts as a spec list, and a 360° button.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ═════════ B ═════════ -->
+<section class="concept">
+  <div class="c-head"><span class="c-letter">B</span><span class="c-name">Chapters you swipe</span><span class="c-tag">SMOOTHEST · BIGGEST CHANGE</span></div>
+  <p class="c-desc">On phones the 14-screen scroll story becomes eight chapters you swipe through, like a product gallery. Each swipe plays a short, smooth move of the real frames from one chapter's pose to the next, so the bag still opens in front of you, but the phone renders only during that half-second instead of on every scroll. Scrolling down leaves the story at any time, and a sticky tab bar reaches every section.</p>
+  <div class="row">
+    <div>
+      <div class="phone"><div class="studio"></div>
+        <div class="nav"><div class="brand"><img src="../../../public/logo.jpg">INFINOS <small>TECH</small></div><div class="burger"></div></div>
+        <div class="pager-frame"><img class="frame" src="../../../public/sequences/reveal/mobile/0071.webp" style="top:10px;width:600px;transform:translateX(-64%)"></div>
+        <div class="peek"></div>
+        <div class="dots"><i class="on"></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+        <div class="b-text">
+          <p class="kicker mono">01 / 08 — Smart cold chain</p>
+          <h2 class="h">The cold chain, made smart.</h2>
+          <p class="p">Smart, temperature-controlled transportation for diagnostic samples.</p>
+        </div>
+        <div class="swipe"><span class="mono" style="font-size:10px;color:var(--ink-3)">Swipe · 360° view</span><span class="arrow">→</span></div>
+      </div>
+      <p class="cap"><b>Chapter 1.</b> One clear thing per screen: the bag, the chapter, one sentence. The next chapter peeks in from the right.</p>
+    </div>
+    <div>
+      <div class="phone"><div class="studio"></div>
+        <div class="nav"><div class="brand"><img src="../../../public/logo.jpg">INFINOS <small>TECH</small></div><div class="burger"></div></div>
+        <div class="pager-frame"><img class="frame" src="../../../public/sequences/open/mobile/0119.webp" style="top:24px;width:540px;transform:translateX(-56%)"></div>
+        <div class="callout" style="top:200px;left:228px"><span class="dot"></span><span class="ln" style="width:24px"></span><span class="lbl">Reflective lining</span></div>
+        <div class="dots"><i></i><i></i><i></i><i></i><i class="on"></i><i></i><i></i><i></i></div>
+        <div class="b-text">
+          <p class="kicker mono">05 / 08 — Smart monitoring</p>
+          <h2 class="h">Every handover, accounted for.</h2>
+          <p class="p">Sensors and a monitoring application, with chain-of-custody functionality for sample handovers.</p>
+        </div>
+        <div class="swipe"><span class="arrow">←</span><span class="arrow">→</span></div>
+      </div>
+      <p class="cap"><b>Chapter 5.</b> The same frames as today, reached by a swipe; arrows and dots for anyone who prefers to tap.</p>
+    </div>
+    <div>
+      <div class="phone" style="background:var(--ivory)">
+        <div class="nav solid"><div class="brand"><img src="../../../public/logo.jpg">INFINOS <small>TECH</small></div><div class="burger"></div></div>
+        <div class="tabs"><span class="tab">Story</span><span class="tab">Coolants</span><span class="tab on">In action</span><span class="tab">Range</span><span class="tab">Contact</span></div>
+        <div style="position:absolute;top:122px;left:16px;right:16px">
+          <p class="kicker mono" style="margin:4px 4px 10px">INFINOS in action</p>
+          <div class="card"><img src="../../../public/images/gallery/cargomen-demonstration-crop.webp"><div class="in"><p class="t">Product demonstration</p><p class="d">Cargomen Logistics</p></div></div>
+          <p class="kicker mono" style="margin:18px 4px 10px">Customers</p>
+          <div class="logos"><div><img src="../../../public/images/ecosystem/yashoda-hospitals.png"></div><div><img src="../../../public/images/ecosystem/pranaam-hospitals.png"></div></div>
+        </div>
+      </div>
+      <p class="cap"><b>After the story.</b> A sticky tab bar to every section, and photo-led cards instead of long text blocks.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ═════════ C ═════════ -->
+<section class="concept">
+  <div class="c-head"><span class="c-letter">C</span><span class="c-name">Product page first</span><span class="c-tag">SHORTEST · MOST INFORMATION</span></div>
+  <p class="c-desc">Phones open like a premium product page: the bag, the headline and two clear actions on the first screen. A shortened scroll animation keeps the three strongest moments (the reveal, the lid opening, the inner box), then the page switches to compact, scannable blocks: a feature reel, the zone figure, the range as swipeable cards, the gallery. A bottom bar keeps "Contact" and "360°" one tap away everywhere.</p>
+  <div class="row">
+    <div>
+      <div class="phone"><div class="studio"></div>
+        <div class="nav"><div class="brand"><img src="../../../public/logo.jpg">INFINOS <small>TECH</small></div><div class="burger"></div></div>
+        <img class="frame" src="../../../public/sequences/reveal/mobile/0071.webp" style="top:50px;width:620px;transform:translateX(-64%)">
+        <div class="hero-h">
+          <p class="kicker mono">Smart cold chain</p>
+          <h1 class="h">The cold chain, made smart.</h1>
+          <p class="p">Temperature-controlled transportation for diagnostic samples, from homes to laboratories and hospitals.</p>
+        </div>
+        <div class="bar"><div>Contact</div><div class="pri">Explore in 360°</div></div>
+      </div>
+      <p class="cap"><b>First screen.</b> No long intro to sit through: the product, what it is, and what to do next.</p>
+    </div>
+    <div>
+      <div class="phone" style="background:var(--ivory)">
+        <div class="nav solid"><div class="brand"><img src="../../../public/logo.jpg">INFINOS <small>TECH</small></div><div class="burger"></div></div>
+        <div style="position:absolute;top:78px;left:18px;right:0">
+          <p class="sec-k mono">What it does</p>
+          <div class="reel">
+            <div class="feat"><div class="im"><img src="../../../public/sequences/open/mobile/0030.webp" style="width:250px"></div><p class="n mono">02</p><p class="t">Two temperature zones</p></div>
+            <div class="feat"><div class="im"><img src="../../../public/sequences/open/mobile/0090.webp" style="width:260px"></div><p class="n mono">04</p><p class="t">A place for every sample</p></div>
+            <div class="feat"><div class="im"><img src="../../../public/images/coolants-fan.webp" style="width:200px"></div><p class="n mono">06</p><p class="t">Reusable PCM coolant</p></div>
+          </div>
+        </div>
+        <div style="position:absolute;top:330px;left:18px;right:18px">
+          <p class="sec-k mono">Dual-temperature architecture</p>
+          <h2 class="h" style="font-size:24px;margin-top:8px">Two temperature zones, by design.</h2>
+          <div class="zones">
+            <div class="zone"><span class="l mono"><i style="background:var(--zone1)"></i>Zone 1 · upper</span><div class="t">≈ 2–8 °C</div></div>
+            <div class="zone"><span class="l mono"><i style="background:var(--zone2)"></i>Zone 2 · lower</span><div class="t">e.g. −10 °C</div></div>
+          </div>
+          <div class="spec">
+            <div><span>Monitoring</span><span>Sensors + app</span></div>
+            <div><span>Chain of custody</span><span>For sample handovers</span></div>
+            <div><span>Coolant</span><span>Organic · Inorganic · Eutectic</span></div>
+          </div>
+        </div>
+        <div class="note" style="top:690px;left:18px">+ hold time, capacity: needed from INFINOS</div>
+        <div class="bar"><div>Contact</div><div class="pri">Explore in 360°</div></div>
+      </div>
+      <p class="cap"><b>Scannable facts.</b> A swipeable feature reel with real frames, then the zone figure and a short spec list.</p>
+    </div>
+    <div>
+      <div class="phone" style="background:var(--ivory)">
+        <div class="nav solid"><div class="brand"><img src="../../../public/logo.jpg">INFINOS <small>TECH</small></div><div class="burger"></div></div>
+        <div style="position:absolute;top:78px;left:18px;right:0">
+          <p class="sec-k mono">The INFINOS range · 3 variants</p>
+          <div class="range">
+            <div class="rng"><div class="im"><img src="../../../public/images/range-pro.webp"></div><div class="in"><p style="font-size:16px">INFINOS Pro Dual-Chamber Bag</p><span class="pill">Dual compartment</span><span class="pill">PCM</span></div></div>
+            <div class="rng"><div class="im" style="position:relative"><div class="note" style="left:12px;top:52px;max-width:200px">photo needed from INFINOS</div></div><div class="in"><p style="font-size:16px">Smart Diagnostics Flexible Container</p><span class="pill">Data logging</span></div></div>
+          </div>
+        </div>
+        <div style="position:absolute;top:400px;left:18px;right:18px">
+          <p class="sec-k mono">INFINOS in action</p>
+          <div class="card" style="margin-top:10px"><img src="../../../public/images/gallery/smart-city-living-lab-crop.webp" style="height:170px"><div class="in"><p class="t">Smart City Living Lab</p></div></div>
+        </div>
+        <div class="bar"><div>Contact</div><div class="pri">Explore in 360°</div></div>
+      </div>
+      <p class="cap"><b>Range and proof.</b> Variants as swipeable cards, the gallery right after, and the action bar always within reach.</p>
+    </div>
+  </div>
+</section>
+</body>
+</html>
