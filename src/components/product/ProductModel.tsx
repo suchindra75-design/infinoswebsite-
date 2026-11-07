@@ -5,12 +5,13 @@ import * as THREE from 'three'
 import { useGLTF } from '@react-three/drei'
 import { useThree } from '@react-three/fiber'
 import { PRODUCT } from '@/content/products'
+import { mergePartMeshes } from './mergeMeshes'
 import { registerProductComponent, unregisterProductComponent } from './ProductComponentRegistry'
 import { LayerLabel } from './ComponentLabels'
 import { sensorTarget } from './TelemetryVisualization'
 import { Hotspots } from './Hotspots'
 import { useExperienceStore } from '@/state/experienceStore'
-import { requestWarmRender } from '@/motion/frameLoop'
+import { liveScene, requestWarmRender } from '@/motion/frameLoop'
 
 function findNodeByName(root: THREE.Object3D, nodeName: string): THREE.Object3D | null {
   const target = nodeName.toLowerCase()
@@ -47,12 +48,20 @@ function findMaterialByName(object: THREE.Object3D, name: string): THREE.MeshSta
 function ProductModelInner() {
   const source = PRODUCT.model.source as string
   const gltf = useGLTF(source)
-  const cloned = useMemo(() => gltf.scene.clone(true), [gltf])
+  // a private clone with each part's same-material meshes merged into one draw (mergeMeshes.ts)
+  const cloned = useMemo(() => {
+    const c = gltf.scene.clone(true)
+    const { before, after } = mergePartMeshes(c, PRODUCT.modelComponents.map((s) => s.nodeName))
+    if (process.env.NODE_ENV !== 'production') console.info(`[product] draws per pass: ${before} -> ${after}`)
+    return c
+  }, [gltf])
   const rootRef = useRef<THREE.Group>(null!)
   const wrapperRefs = useRef(new Map<string, THREE.Group>())
   const restRef = useRef(new Map<string, { pos: THREE.Vector3; rot: THREE.Euler }>())
   const [labelOffset, setLabelOffset] = useState(0.95)
   const gl = useThree((s) => s.gl)
+  const scene = useThree((s) => s.scene)
+  const camera = useThree((s) => s.camera)
 
   useEffect(() => {
     const aniso = Math.min(8, gl.capabilities.getMaxAnisotropy())
@@ -135,17 +144,29 @@ function ProductModelInner() {
     const finalBox = new THREE.Box3().setFromObject(root)
     // finalBox is in WORLD units but the label offset is applied in root-local (model) units -> divide by the auto-scale
     setLabelOffset(Math.max(0.6, (finalBox.max.x - finalBox.min.x) * 0.5 * 1.15) / root.scale.x)
-    useExperienceStore.setState({ modelReady: true })
-    // render once now so shaders compile and textures upload while the reveal frames still cover the canvas, instead
-    // of at the cross-fade
-    requestWarmRender()
+    // Compile the product's shader programs in the background first (KHR_parallel_shader_compile, where available):
+    // a plain first render makes three.js wait on the main thread until every program is compiled and linked — about
+    // twenty physically based materials, which froze the intro and the first scroll for seconds on phones. Only then
+    // is the model ready to stand in for the frames; it renders once, hidden under them, so textures upload before the
+    // cross-fade.
+    let live = true
+    gl.compileAsync(scene, camera)
+      .catch(() => undefined)
+      .then(() => {
+        if (!live) return
+        liveScene.compiled = true
+        useExperienceStore.setState({ modelReady: true })
+        requestWarmRender()
+      })
 
     return () => {
+      live = false
+      liveScene.compiled = false
       for (const spec of PRODUCT.modelComponents) unregisterProductComponent(spec.id)
       sensorTarget.current = null
       useExperienceStore.setState({ modelReady: false })
     }
-  }, [cloned])
+  }, [cloned, gl, scene, camera])
 
   return (
     <group ref={rootRef}>

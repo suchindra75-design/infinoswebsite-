@@ -12,6 +12,9 @@ export const RENDER_SETTINGS = {
 } as const
 
 export function applyRenderSettings(gl: THREE.WebGLRenderer) {
+  // in production, three.js does not read back every program's compile log (a synchronous wait on the GPU process per
+  // program); development keeps the checks so shader errors are still reported
+  gl.debug.checkShaderErrors = process.env.NODE_ENV !== 'production'
   gl.toneMapping = RENDER_SETTINGS.toneMapping
   gl.toneMappingExposure = RENDER_SETTINGS.toneMappingExposure
   gl.outputColorSpace = RENDER_SETTINGS.outputColorSpace

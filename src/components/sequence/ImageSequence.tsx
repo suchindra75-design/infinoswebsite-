@@ -243,19 +243,25 @@ export function ImageSequence() {
     const markOpeningReady = () => {
       if (!useExperienceStore.getState().openingReady) useExperienceStore.setState({ openingReady: true })
     }
+    // Touch screens load the opening frames spread across the whole reveal first (every 16th, 8th, then 4th frame):
+    // once those have arrived every moment of the reveal has a frame within two of it (FrameSet.nearest), so the story
+    // can open without waiting for all 72 (about 3.5 MB on a phone); the rest fill in behind. Desktop keeps the
+    // complete sequential preload.
+    const touch = window.matchMedia('(hover: none) and (pointer: coarse)').matches
+    const openingNeeds = (def: SequenceDef) => (touch ? Math.ceil(def.frames / 4) + 2 : def.frames)
     const onFetched = (set: FrameSet) => {
       if (set.id === 'reveal') {
-        const progress = set.fetched / set.def.frames
+        const progress = Math.min(1, set.fetched / openingNeeds(set.def))
         useExperienceStore.setState({ openingProgress: progress })
         if (progress >= 1 && set.bitmaps.has(0)) markOpeningReady()
-        if (progress >= 1) sets.open.start()
+        if (set.fetched >= set.def.frames) sets.open.start()
       }
     }
     const onDecoded = (set: FrameSet, index: number) => {
       if (index === 0 && !useExperienceStore.getState().sequenceReady[set.id]) {
         const ready = useExperienceStore.getState().sequenceReady
         useExperienceStore.setState({ sequenceReady: { ...ready, [set.id]: true } })
-        if (set.id === 'reveal' && set.fetched >= set.def.frames) markOpeningReady()
+        if (set.id === 'reveal' && set.fetched >= openingNeeds(set.def)) markOpeningReady()
       }
       requestFrame()
     }
@@ -265,7 +271,7 @@ export function ImageSequence() {
       const w = variant === 'desktop' ? def.render?.width ?? 2560 : def.render?.mobileWidth ?? 1600
       const h = variant === 'desktop' ? def.render?.height ?? 1600 : def.render?.mobileHeight ?? 1000
       const maxBitmaps = Math.max(6, Math.min(40, Math.floor(budget / (w * h * 4))))
-      sets[id] = new FrameSet(id, def, variant, id === 'reveal' ? 'sequential' : 'progressive', maxBitmaps, small ? 2 : 3, onFetched, onDecoded)
+      sets[id] = new FrameSet(id, def, variant, id === 'reveal' && !touch ? 'sequential' : 'progressive', maxBitmaps, small ? 2 : 3, onFetched, onDecoded)
     }
 
     // Safety nets: after 9 s continue once frame 0 is decoded (the frame-accuracy guard keeps the exact live model

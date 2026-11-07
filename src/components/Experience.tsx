@@ -19,7 +19,6 @@ import { cameraAt } from '@/motion/cameraTrack'
 import { filmLayout, projectToFilm } from '@/motion/sequences'
 import { compositionAt, layoutMode } from '@/motion/composition'
 import { PHONE_QUERY, isPhoneLayout } from '@/motion/phoneLayout'
-import { PhoneActionBar, PhoneProductPage } from '@/components/sections/PhoneProductPage'
 
 export function Experience() {
   const narrativeRef = useRef<HTMLDivElement>(null)
@@ -43,8 +42,6 @@ export function Experience() {
     return () => phoneQuery.removeEventListener('change', onPhoneChange)
   }, [])
 
-  const phone = useExperienceStore((s) => s.phone)
-
   return (
     <SmoothScrollProvider>
       <IntroSequence />
@@ -55,11 +52,9 @@ export function Experience() {
       <ProductViewer />
       <div ref={narrativeRef} className="narrative-spacer" aria-hidden="true" />
       <ScrollChapterController targetRef={narrativeRef} />
-      {/* the coolant showcase follows the main product animation (phones: a product-page block instead) */}
-      {!phone && <CoolantShowcase />}
+      {/* the coolant showcase follows the main product animation */}
+      <CoolantShowcase />
       <main className="site-content">
-        {/* phones (concept C): the story's later chapters, the zones and the coolants as product-page blocks */}
-        {phone && <PhoneProductPage />}
         {/* the three central ideas, in order: transportation (applications) · technology · impact — then the range */}
         <PositioningSection />
         <ApplicationsSection />
@@ -72,7 +67,6 @@ export function Experience() {
         <EcosystemSection />
         <ContactSection />
       </main>
-      {phone && <PhoneActionBar />}
     </SmoothScrollProvider>
   )
 }

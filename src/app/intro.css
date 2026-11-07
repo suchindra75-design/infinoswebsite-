@@ -829,3 +829,15 @@ html.intro-lock body {
     letter-spacing: 0.24em;
   }
 }
+
+/* touch screens play the intro 1.5x faster (IntroSequence COMPACT_RATE): the two hand-over effects that start with the
+   product phase (not part of the choreography's clock) follow the same tempo */
+@media (hover: none) and (pointer: coarse) {
+  .intro--product .intro-bg {
+    transition-duration: 0.73s;
+  }
+
+  .intro--product .intro-iris {
+    animation-duration: 0.83s;
+  }
+}

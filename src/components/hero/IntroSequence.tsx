@@ -23,6 +23,15 @@ export const INTRO_TIMING = {
   maxWait: 10,
 }
 
+/**
+ * Touch screens play the same choreography 1.5x faster, timed from the moment it starts running. On a phone the page
+ * becomes interactive later than on a desktop, and with the desktop's clock (absolute, from page load) the loader and
+ * the logo were already part-way through when they appeared — the opening jumped, then felt slow. Desktop (mouse and
+ * trackpad) keeps its clock and tempo.
+ */
+const COMPACT_RATE = 1.5
+const clock = { originMs: 0, rate: 1 }
+
 const set = (introPhase: IntroPhase) => useExperienceStore.setState({ introPhase })
 
 /* Logo geometry, measured from the INFINOS artwork (units of the 411 x 327 outer rectangle). */
@@ -66,10 +75,11 @@ export function IntroSequence() {
     let productStart = -1
     let raf = 0
 
-    // Phase state machine on the wall clock (seconds since page load). Visuals are compositor animations (intro.css),
+    // Phase state machine on the intro's clock (intro.css time). Visuals are compositor animations (intro.css),
     // so a busy main thread (e.g. the 3D model compiling during the loader) cannot stall them.
     const tick = () => {
-      const now = performance.now() / 1000
+      // the choreography's own clock: seconds of intro time (intro.css delays), on touch screens from its start
+      const now = ((performance.now() - clock.originMs) / 1000) * clock.rate
       const st = useExperienceStore.getState()
       if (productStart < 0) {
         if (now >= T.logoAt && st.introPhase === 'loading') set('logo')
@@ -102,14 +112,23 @@ export function IntroSequence() {
   }, [])
 
   // Start the choreography (data-run is set imperatively, so React re-renders never touch it). Its delays are absolute
-  // (seconds since page load): every intro animation is started at time 0 of the document timeline, which is
-  // navigation start — the same origin as performance.now().
+  // intro time: on desktop every animation starts at time 0 of the document timeline (navigation start, the origin of
+  // performance.now()); on touch screens at this moment, played COMPACT_RATE times faster (the state machine above
+  // reads the same clock).
   useLayoutEffect(() => {
     const root = rootRef.current
     if (!root) return
     const reduced = useExperienceStore.getState().reducedMotion || window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    const compact = window.matchMedia('(hover: none) and (pointer: coarse)').matches
+    clock.originMs = compact ? performance.now() : 0
+    clock.rate = compact ? COMPACT_RATE : 1
     root.dataset.run = reduced ? 'reduced' : 'motion'
-    if (typeof root.getAnimations === 'function') for (const a of root.getAnimations({ subtree: true })) a.startTime = 0
+    if (typeof root.getAnimations === 'function')
+      for (const a of root.getAnimations({ subtree: true })) {
+        // the rate first: changing it afterwards would move the start time to keep the current time
+        a.playbackRate = clock.rate
+        a.startTime = clock.originMs
+      }
   }, [])
 
   const product = phase === 'product' || phase === 'ready'

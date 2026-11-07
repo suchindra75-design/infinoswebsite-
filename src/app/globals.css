@@ -3815,338 +3815,88 @@ html.stage-covered .ed * {
   }
 }
 
-/* ══ Phones: approved mobile concept C, "Product page first" (docs/design/mobile-concepts/board.html;
-   motion/phoneLayout.ts uses this same media query). The scroll story is shorter and ends inside the open sequence;
-   product-page blocks (PhoneProductPage) and a fixed action bar follow. Nothing here applies to tablets or desktop. */
-
-.pp {
-  padding: 56px 0 8px;
-  color: var(--text);
+/* ══ Touch screens: the product stage is sized to the LARGE viewport. When a phone browser's address bar slides in or
+   out, a stage pinned to the visible viewport is resized after the animation — and both canvases inside it are
+   reallocated and redrawn, a hitch on every change of scroll direction. At the large viewport it never resizes; the
+   frame loop reads its size from hooks/environment.ts stageSize(), so the frames, the live model, the studio and the
+   callouts stay registered. Desktop (mouse and trackpad) is unchanged. */
+@media (hover: none) and (pointer: coarse) {
+  .stage {
+    bottom: auto;
+    height: 100vh;
+    height: 100lvh;
+  }
 }
 
-.pp + .pp {
-  padding-top: 40px;
-}
-
-.pp-kicker {
-  margin: 0 var(--ed-gutter) 14px;
-  font-family: var(--font-mono), monospace;
-  font-size: 0.62rem;
-  letter-spacing: 0.22em;
-  text-transform: uppercase;
-  color: var(--faint);
-}
-
-.pp-title {
-  margin: 0 var(--ed-gutter);
-  font-family: var(--font-body), sans-serif;
-  font-weight: 400;
-  font-size: clamp(1.55rem, 7vw, 1.9rem);
-  line-height: 1.15;
-  letter-spacing: -0.01em;
-  color: var(--text-strong);
-}
-
-.pp-text {
-  margin: 14px var(--ed-gutter) 0;
-  font-size: 0.92rem;
-  line-height: 1.55;
-  color: var(--muted);
-}
-
-.pp-note {
-  margin: 10px var(--ed-gutter) 0;
-  font-family: var(--font-mono), monospace;
-  font-size: 0.58rem;
-  letter-spacing: 0.06em;
-  line-height: 1.6;
-  color: var(--faint);
-}
-
-/* the feature reel: native horizontal scroll with snap (no script, no animation) */
-.pp-reel {
-  display: flex;
-  gap: 12px;
-  margin: 0;
-  padding: 2px var(--ed-gutter) 18px;
-  list-style: none;
-  overflow-x: auto;
-  scroll-snap-type: x mandatory;
-  scroll-padding-inline: var(--ed-gutter);
-  overscroll-behavior-x: contain;
-  scrollbar-width: none;
-}
-
-.pp-reel::-webkit-scrollbar {
-  display: none;
-}
-
-.pp-card {
-  flex: 0 0 min(76vw, 300px);
-  scroll-snap-align: start;
-  padding: 8px 8px 18px;
-  border-radius: 18px;
-  background: var(--white);
-  box-shadow: 0 1px 2px rgba(23, 27, 31, 0.06), 0 8px 24px rgba(23, 27, 31, 0.05);
-}
-
-.pp-card-im {
-  position: relative;
-  height: 190px;
-  overflow: hidden;
-  border-radius: 12px;
-  background: linear-gradient(180deg, var(--stone-w0) 0%, var(--stone-w1) 46%, var(--stone-f1) 100%);
-}
-
-.pp-card-im img {
-  display: block;
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-}
-
-.pp-card-index {
-  margin: 14px 8px 6px;
-  font-family: var(--font-mono), monospace;
-  font-size: 0.56rem;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  color: var(--faint);
-}
-
-.pp-card-title {
-  margin: 0 8px;
-  font-family: var(--font-body), sans-serif;
-  font-weight: 500;
-  font-size: 1.08rem;
-  line-height: 1.25;
-  color: var(--text-strong);
-}
-
-.pp-card-body {
-  display: -webkit-box;
-  margin: 8px 8px 0;
-  overflow: hidden;
-  font-size: 0.84rem;
-  line-height: 1.5;
-  color: var(--muted);
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 5;
-}
-
-/* the temperature-zone figure (hidden in the phone story until now) */
-.pp-zones {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
-  margin: 18px var(--ed-gutter) 0;
-}
-
-.pp-zone {
-  padding: 12px 14px 14px;
-  border: 1px solid var(--line-mid);
-  border-radius: 14px;
-  background: rgba(255, 255, 255, 0.45);
-}
-
-.pp-zone-name {
-  display: flex;
-  align-items: center;
-  gap: 7px;
-  font-family: var(--font-mono), monospace;
-  font-size: 0.54rem;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--faint);
-}
-
-.pp-zone-name i {
-  flex: none;
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-}
-
-.pp-zone-temp {
-  margin-top: 6px;
-  font-size: 1.45rem;
-  font-weight: 500;
-  color: var(--text-strong);
-  white-space: nowrap;
-}
-
-.pp-zone-chamber {
-  margin-top: 2px;
-  font-size: 0.8rem;
-  color: var(--muted);
-}
-
-.pp-facts {
-  margin: 22px var(--ed-gutter) 0;
-  border-top: 1px solid var(--line);
-}
-
-.pp-facts div {
-  display: flex;
-  justify-content: space-between;
-  gap: 16px;
-  padding: 12px 0;
-  border-bottom: 1px solid var(--line);
-  font-size: 0.86rem;
-}
-
-.pp-facts dt {
-  flex: none;
-  color: var(--faint);
-}
-
-.pp-facts dd {
-  margin: 0;
-  text-align: right;
-  color: var(--text-strong);
-}
-
-/* the coolant family as a static block (the 3D showcase stays on larger screens) */
-.pp-coolant-im {
-  margin: 18px var(--ed-gutter) 0;
-  overflow: hidden;
-  border-radius: 18px;
-  background: linear-gradient(180deg, var(--stone-w0) 0%, var(--stone-f1) 100%);
-}
-
-.pp-coolant-im img {
-  display: block;
-  width: 100%;
-  height: auto;
-  aspect-ratio: 4 / 3;
-  object-fit: cover;
-}
-
-.pp-chips {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin: 14px var(--ed-gutter) 0;
-}
-
-.pp-chip {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  min-height: 40px;
-  padding: 0 16px;
-  border: 1px solid var(--line-mid);
-  border-radius: 999px;
-  font-family: var(--font-mono), monospace;
-  font-size: 0.62rem;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  color: var(--text);
-}
-
-.pp-chip i {
-  width: 10px;
-  height: 10px;
-  border: 1px solid rgba(23, 27, 31, 0.25);
-  border-radius: 50%;
-}
-
-.pp-chip[aria-pressed='true'] {
-  border-color: var(--text-strong);
-  background: var(--text-strong);
-  color: var(--white);
-}
-
-.pp-link {
-  margin: 18px var(--ed-gutter) 0;
-  padding: 10px 0;
-  font-size: 0.9rem;
-  color: var(--text-strong);
-  text-decoration: underline;
-  text-underline-offset: 4px;
-}
-
-/* the action bar: Contact and the 360° view, always one tap away */
-.pp-bar {
-  position: fixed;
-  left: 12px;
-  right: 12px;
-  bottom: calc(12px + env(safe-area-inset-bottom, 0px));
-  z-index: 45;
-  display: flex;
-  gap: 8px;
-  padding: 7px;
-  border-radius: 20px;
-  background: rgba(23, 27, 31, 0.95);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.22);
-  opacity: 0;
-  transform: translateY(16px);
-  transition: opacity 0.45s ease, transform 0.45s ease;
-  pointer-events: none;
-}
-
-.pp-bar--shown {
-  opacity: 1;
-  transform: none;
-  pointer-events: auto;
-}
-
-.pp-bar-btn {
-  flex: 1;
-  min-height: 46px;
-  border-radius: 14px;
-  font-size: 0.92rem;
-  color: var(--white);
-}
-
-.pp-bar-btn--primary {
-  background: var(--white);
-  color: var(--graphite);
-}
-
+/* ══ Phones: the complete desktop story, composed for a tall screen. Same chapters, frames, studio, typography and
+   animation as on desktop; the layout around them is arranged so nothing floats over the product or the copy.
+   (motion/phoneLayout.ts uses this same media query.) */
 @media (max-aspect-ratio: 23/20) and (max-width: 699px) {
-  /* the short story: chapters 01–05 (motion/phoneLayout.ts PHONE_STORY_END) in about six screens */
+  /* every chapter, in a little less scrolling than on desktop (1400vh): the story keeps its proportions */
   .narrative-spacer {
-    height: 600vh;
+    height: 1100vh;
   }
 
-  /* one solid bar: the open bag's lid reaches the top of its frames, so it passes under the bar, never under the logo */
+  /* one solid bar: the open bag's lid reaches the top of its frames, so it passes under the bar, never under the logo.
+     (.nav.nav--scrolled: studio.css loads after this file and sets its ivory glass on .nav--scrolled) */
   .nav,
   .nav.nav--scrolled {
     background: rgb(23, 27, 31);
     border-bottom: 1px solid var(--line);
   }
 
-  /* (.nav.nav--scrolled: studio.css loads after this file and sets its ivory glass on .nav--scrolled) */
   html[data-ink='dark'] .nav,
   html[data-ink='dark'] .nav.nav--scrolled {
     background: rgb(232, 229, 222);
     border-bottom: 1px solid rgba(17, 20, 23, 0.1);
   }
 
-  /* the action bar replaces the floating 360° button; the chapter counter gives way to a cleaner frame */
-  .viewer-launch,
+  /* the 360° view lives in the bar, beside the menu, instead of floating over the bag */
+  .viewer-launch {
+    top: calc((var(--nav-height) - 34px) / 2);
+    right: calc(var(--ed-gutter) + 40px);
+    left: auto;
+    bottom: auto;
+    min-height: 34px;
+    padding: 0 13px;
+    gap: 7px;
+    font-size: 0.56rem;
+    letter-spacing: 0.18em;
+  }
+
+  /* the chapter progress becomes the hairline along the bar's lower edge: the index is already in each kicker */
   .ed-progress {
+    top: var(--nav-height);
+    right: 0;
+    left: 0;
+    bottom: auto;
+  }
+
+  .ed-progress-index,
+  .ed-progress-total,
+  .ed-progress-name {
     display: none;
   }
 
-  /* the chapter text and its scrim stay clear of the action bar */
+  .ed-progress-track {
+    width: 100%;
+    height: 2px;
+    background: transparent;
+  }
+
+  /* the overlay follows the visible viewport (only the stage is sized to the large one); the chapter text keeps clear
+     of the home indicator */
   .ed-chapter[data-side='below'] {
-    bottom: 76px;
-    height: 40svh;
+    bottom: env(safe-area-inset-bottom, 0px);
   }
 
   /* the hero's hint sits under the bar: the lower part of the screen belongs to the chapter text */
   .rotate-hint {
-    top: calc(var(--nav-height) + 16px);
+    top: calc(var(--nav-height) + 18px);
     bottom: auto;
   }
 
-  .site-content {
-    padding-bottom: 84px;
-  }
-
-  /* the range: swipeable cards instead of a long stack */
+  /* the range: the three variants side by side as on desktop, swiped instead of stacked three screens deep */
   .sx-range {
     display: flex;
     gap: 14px;

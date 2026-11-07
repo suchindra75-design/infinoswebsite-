@@ -12,6 +12,7 @@ import { useExperienceStore } from '@/state/experienceStore'
 import { openProductViewer } from '@/components/viewer/ProductViewer'
 import { PILLARS, ZONES } from '@/content/platform'
 import { StoryFigure } from './Figures'
+import { stageSize } from '@/hooks/environment'
 
 /**
  * Editorial layer over the product stage: one chapter headline at a time, set in the negative space the composition
@@ -82,8 +83,8 @@ export function StoryOverlay() {
     }
 
     const render = () => {
-      const W = window.innerWidth
-      const H = window.innerHeight
+      // the stage's size, not the window's: on touch screens it is the large viewport (hooks/environment.ts)
+      const { W, H } = stageSize()
       if (`${W}x${H}` !== size) {
         size = `${W}x${H}`
         layout(W, H)

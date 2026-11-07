@@ -8,6 +8,7 @@ import { compositionAt, layoutMode, type Composition } from '@/motion/compositio
 import { filmLayout, projectToFilm, type Vec3 } from '@/motion/sequences'
 import { addRenderer } from '@/motion/frameLoop'
 import { studioLightAt } from '@/motion/studioLight'
+import { stageSize } from '@/hooks/environment'
 
 /** the floor meets the wall this far behind the bag, along the camera's view (metres) */
 const COVE_DISTANCE = 3.4
@@ -100,8 +101,8 @@ export function StudioEnvironment() {
     }
 
     return addRenderer(() => {
-      const W = window.innerWidth
-      const H = window.innerHeight
+      // the stage's size, not the window's: on touch screens it is the large viewport (hooks/environment.ts)
+      const { W, H } = stageSize()
       if (`${W}x${H}` !== size) {
         size = `${W}x${H}`
         coveAtEnd(W, H)

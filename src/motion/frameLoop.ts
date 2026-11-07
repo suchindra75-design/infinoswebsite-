@@ -28,8 +28,13 @@ export function requestFrame() {
   dirty = true
 }
 
-/** one render of the live 3D scene even while it is hidden (shader compile / texture upload before it is needed) */
+/** one render of the live 3D scene even while it is hidden (texture upload before it is needed) */
 export const warmUp = { pending: false }
+/**
+ * The product's shader programs have finished compiling in the background (ProductModel: compileAsync). Until then the
+ * live canvas is not drawn at all: a draw would make three.js wait on the main thread for every program to compile.
+ */
+export const liveScene = { compiled: false }
 export function requestWarmRender() {
   warmUp.pending = true
   dirty = true

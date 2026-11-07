@@ -13,7 +13,7 @@ import { applyRenderSettings } from './renderSettings'
 import { useExperienceStore } from '@/state/experienceStore'
 import { FILM, sequenceFirstCamera } from '@/motion/sequences'
 import { heroInteractionWeight } from '@/motion/cameraTrack'
-import { addRenderer, requestFrame, warmUp } from '@/motion/frameLoop'
+import { addRenderer, liveScene, requestFrame, warmUp } from '@/motion/frameLoop'
 import { liveLayerActive } from './liveLayer'
 import { contactShadowOpacity, forwardShadowWeight } from '@/motion/studioLight'
 
@@ -161,6 +161,8 @@ const SHADOW_MASK = `float getShadowMask() {
 function FrameLoopBridge() {
   const get = useThree((s) => s.get)
   useEffect(() => addRenderer((now) => {
+    // nothing is drawn until the product's programs have compiled in the background (frameLoop.ts liveScene)
+    if (!liveScene.compiled) return
     if (!liveLayerActive(useExperienceStore.getState()) && !warmUp.pending) return
     warmUp.pending = false
     advance(now, true, get())
@@ -178,6 +180,8 @@ export function ProductCanvasInner() {
       // variance shadow maps: smooth, noise-free penumbrae for the rear light's floor shadow (ShadowCatcher)
       shadows="variance"
       frameloop="never"
+      // the stage is fixed: no re-measuring on scroll (R3F's default listens to scroll to track a moving canvas)
+      resize={{ scroll: false }}
       // 1.5 device pixels per CSS pixel is visually indistinguishable here (the frames carry the fine detail) and
       // halves the fill cost of a full-screen canvas on 2x/3x displays
       dpr={[1, 1.5]}
