@@ -9,6 +9,8 @@ const ProductCanvas = dynamic(() => import('./ProductCanvasInner').then((m) => m
   ssr: false,
 })
 
+const coarsePointer = () => typeof window !== 'undefined' && window.matchMedia('(hover: none) and (pointer: coarse)').matches
+
 const ModelLoadIndicator = dynamic(() => import('./ModelLoadIndicator'), { ssr: false })
 
 /**
@@ -34,8 +36,11 @@ export function ProductScene() {
   const stageFade = intro === 'loading' || intro === 'logo' || intro === 'outro' ? 0 : 1
   // The live model is first needed at the reveal -> hero handover, so it loads and compiles from the product reveal
   // on (its compile can then never stall the loader or the logo). If the opening frames are not ready when the logo
-  // starts, it mounts at once instead, so it can stand in for them at 4 s.
-  const mountModel = intro === 'product' || intro === 'ready' || (intro !== 'loading' && !openingReady)
+  // starts, it mounts at once instead, so it can stand in for them at 4 s — except on touch screens: there its 4 MB
+  // download would compete with the few opening frames still missing on a mobile connection, and its texture uploads
+  // and shader compiles would land on the logo animation (the GPU is shared with the compositor). Phones wait for the
+  // frames instead (IntroSequence maxWait still bounds the wait).
+  const mountModel = intro === 'product' || intro === 'ready' || (intro !== 'loading' && !openingReady && !coarsePointer())
 
   return (
     <div className="stage-canvas" style={{ opacity: stageFade, visibility: stageFade <= 0.001 ? 'hidden' : 'visible' }}>

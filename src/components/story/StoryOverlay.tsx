@@ -29,13 +29,14 @@ const actLabel = (act: number) => (act ? `${PILLARS[act - 1].numeral} · ${PILLA
 const ZONE_MARKS = STORY.flatMap((c, chapter) => (c.zones ?? []).map((z) => ({ ...z, chapter })))
 const EDGE = 0.008 // callout fade width (global progress)
 
-function chapterVisibility(i: number, p: number) {
+function chapterVisibility(i: number, p: number, phone: boolean) {
   const r = STORY_RANGES[i]
   const len = r.end - r.start
   const d = Math.min(0.018, len * 0.22)
-  // chapter 01 appears while the product glides from the centre into its composition
+  // chapter 01 appears while the product glides from the centre into its composition (on phones, once it has risen
+  // clear of the text: composition.ts PHONE_SETTLE)
   const enter = STORY[i].enter ?? r.start
-  const fadeIn = i === 0 ? smoothstep(0.022, 0.068, p) : smoothstep(enter, enter + d, p)
+  const fadeIn = i === 0 ? (phone ? smoothstep(0.036, 0.07, p) : smoothstep(0.022, 0.068, p)) : smoothstep(enter, enter + d, p)
   const fadeOut = i === STORY.length - 1 ? 1 : 1 - smoothstep(r.end - d, r.end, p)
   return { fadeIn, fadeOut, opacity: Math.min(fadeIn, fadeOut) }
 }
@@ -99,7 +100,7 @@ export function StoryOverlay() {
       // chapter text (+ the scrim on its side, so the text always reads, even over a close-up)
       const scrim = { left: 0, right: 0, below: 0 }
       for (let i = 0; i < STORY.length; i++) {
-        const v = chapterVisibility(i, p)
+        const v = chapterVisibility(i, p, mode === 'phone')
         const el = chapterRefs.current[i]
         const side = (el?.dataset.side ?? 'left') as keyof typeof scrim
         // the hero's explore card (below this layer) takes chapter 01's place while a hotspot is open
@@ -139,7 +140,7 @@ export function StoryOverlay() {
         }
         if (phone) phoneShown = true
         pose ??= cameraAt(chapter.phase, cp)
-        l ??= filmLayout(W, H, pose, compositionAt(p, mode as LayoutMode, comp))
+        l ??= filmLayout(W, H, pose, compositionAt(p, mode as LayoutMode, comp, W, H))
         const [fx, fy] = projectToFilm(pose, anchorWorld(c.component, c.point, st.stages))
         const x = fx * l.w - l.ox
         const y = fy * l.h - l.oy
@@ -167,7 +168,7 @@ export function StoryOverlay() {
           return
         }
         pose ??= cameraAt(chapter.phase, cp)
-        l ??= filmLayout(W, H, pose, compositionAt(p, mode as LayoutMode, comp))
+        l ??= filmLayout(W, H, pose, compositionAt(p, mode as LayoutMode, comp, W, H))
         const [ax, ay] = projectToFilm(pose, anchorWorld(z.component, z.top, st.stages))
         const [bx, by] = projectToFilm(pose, anchorWorld(z.component, z.bottom, st.stages))
         const x1 = ax * l.w - l.ox, y1 = ay * l.h - l.oy, x2 = bx * l.w - l.ox, y2 = by * l.h - l.oy

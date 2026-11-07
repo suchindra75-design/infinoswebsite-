@@ -8,6 +8,7 @@ import { compositionAt, layoutMode, maxScale, type Composition } from '@/motion/
 import { addRenderer, requestFrame } from '@/motion/frameLoop'
 import { SEQUENCES, filmLayout, sequenceFrame, sequenceGain, type SequenceDef, type SequenceId } from '@/motion/sequences'
 import { extendFilmEdges } from './filmEdges'
+import { PHONE_QUERY } from '@/motion/phoneLayout'
 
 type Variant = 'desktop' | 'mobile'
 
@@ -248,13 +249,14 @@ export function ImageSequence() {
     // can open without waiting for all 72 (about 3.5 MB on a phone); the rest fill in behind. Desktop keeps the
     // complete sequential preload.
     const touch = window.matchMedia('(hover: none) and (pointer: coarse)').matches
+    const phoneLayout = window.matchMedia(PHONE_QUERY)
     const openingNeeds = (def: SequenceDef) => (touch ? Math.ceil(def.frames / 4) + 2 : def.frames)
     const onFetched = (set: FrameSet) => {
       if (set.id === 'reveal') {
         const progress = Math.min(1, set.fetched / openingNeeds(set.def))
         useExperienceStore.setState({ openingProgress: progress })
         if (progress >= 1 && set.bitmaps.has(0)) markOpeningReady()
-        if (set.fetched >= set.def.frames) sets.open.start()
+        if (set.fetched >= set.def.frames && !phoneLayout.matches) sets.open.start()
       }
     }
     const onDecoded = (set: FrameSet, index: number) => {
@@ -307,7 +309,9 @@ export function ImageSequence() {
       }
       const { progress, sequenceId, sequenceCover } = useExperienceStore.getState()
       const set = sequenceId ? sets[sequenceId as SequenceId] : undefined
-      if (progress > 0.12) sets.open.start()
+      // phones play the open chapters on the live model (chapters.ts framesFor): their frames load only if the
+      // screen turns to a layout that shows them
+      if (progress > 0.12 && !phoneLayout.matches) sets.open.start()
       if (!set || set.failed || sequenceCover <= 0.001) {
         setLayers(0)
         return
@@ -329,7 +333,7 @@ export function ImageSequence() {
       lastKey = key
       // same framing as the live camera: pose subject placed by the editorial composition
       const pose = cameraAt(chapter.phase, cp)
-      const l = filmLayout(cw, ch, pose, compositionAt(progress, layoutMode(cw, ch), comp))
+      const l = filmLayout(cw, ch, pose, compositionAt(progress, layoutMode(cw, ch), comp, cw, ch))
       // whole device pixels: the shadow continued past the film edge (filmEdges.ts) then meets the frame without a
       // half-covered row between them (a sub-pixel shift, invisible, and well inside the live layer's alignment)
       const x = Math.round(-l.ox * dpr)

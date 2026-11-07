@@ -845,6 +845,13 @@ button {
 }
 .rotate-hint--visible { opacity: 1; }
 
+.rotate-hint-touch { display: none; }
+
+@media (hover: none) and (pointer: coarse) {
+  .rotate-hint-pointer { display: none; }
+  .rotate-hint-touch { display: inline; }
+}
+
 /* ── 360° viewer ── */
 
 html.viewer-lock,
@@ -3884,10 +3891,53 @@ html.stage-covered .ed * {
     background: transparent;
   }
 
-  /* the overlay follows the visible viewport (only the stage is sized to the large one); the chapter text keeps clear
-     of the home indicator */
+  /* The chapter text is one composed block at the foot of the screen: kicker, headline, body, note. The overlay follows
+     the visible viewport (only the stage is sized to the large one), so the block rides just above the browser's
+     bars and the home indicator; it never grows above 38svh, and the product is composed above that line
+     (composition.ts phone zone), so text and product never meet. */
   .ed-chapter[data-side='below'] {
-    bottom: env(safe-area-inset-bottom, 0px);
+    top: auto;
+    bottom: calc(env(safe-area-inset-bottom, 0px) + 26px);
+    height: auto;
+    max-height: 38svh;
+    justify-content: flex-end;
+  }
+
+  .ed-kicker {
+    margin-bottom: 12px;
+    font-size: 0.62rem;
+    letter-spacing: 0.2em;
+  }
+
+  .ed-headline {
+    font-size: clamp(1.75rem, 8.4vw, 2.3rem);
+    line-height: 1.06;
+  }
+
+  .ed-body {
+    margin-top: 12px;
+    font-size: 0.94rem;
+    line-height: 1.5;
+  }
+
+  /* the qualifications (status, "shown:") stay legible: never below 9.6 px */
+  .ed-note {
+    margin-top: 12px;
+    font-size: 0.6rem;
+    letter-spacing: 0.1em;
+    line-height: 1.6;
+  }
+
+  .ed-cta {
+    gap: 8px;
+    margin-top: 18px;
+  }
+
+  .ed-cta-btn {
+    min-height: 44px;
+    padding: 0 14px;
+    font-size: 0.8rem;
+    white-space: nowrap;
   }
 
   /* the hero's hint sits under the bar: the lower part of the screen belongs to the chapter text */
@@ -3896,25 +3946,70 @@ html.stage-covered .ed * {
     bottom: auto;
   }
 
-  /* the range: the three variants side by side as on desktop, swiped instead of stacked three screens deep */
-  .sx-range {
-    display: flex;
-    gap: 14px;
-    margin: 0 calc(-1 * var(--ed-gutter));
-    padding: 0 var(--ed-gutter) 6px;
-    overflow-x: auto;
-    scroll-snap-type: x mandatory;
-    scroll-padding-inline: var(--ed-gutter);
-    overscroll-behavior-x: contain;
-    scrollbar-width: none;
+  /* coolant showcase: the family line reads as a headline, and the selector is a comfortable touch target */
+  .cx-family-headline {
+    font-size: 1.45rem;
   }
 
-  .sx-range::-webkit-scrollbar {
-    display: none;
+  .cx-pick {
+    min-height: 40px;
+    padding: 0 13px;
+    font-size: 0.62rem;
+    letter-spacing: 0.14em;
+  }
+
+  .cx-hint {
+    font-size: 0.6rem;
+    letter-spacing: 0.2em;
+  }
+
+  /* labels drawn over the product stay readable at arm's length (≥ 9.6 px) */
+  .ed-zone-label,
+  .ed-callout-label,
+  .hotspot-label,
+  .fx-tag,
+  .cx-info-row dt {
+    font-size: 0.6rem;
+  }
+
+  /* exploded overview: the layer labels sit in the free band right of the stack, wrapping onto two lines */
+  .layer-label {
+    gap: 8px;
+    white-space: normal;
+  }
+
+  .layer-label-rule {
+    flex: none;
+    width: 14px;
+  }
+
+  .layer-label-text {
+    flex: none;
+    width: 112px;
+    font-size: 0.6rem;
+    letter-spacing: 0.12em;
+    line-height: 1.5;
+  }
+
+  /* the range: the three variants one above the other, each whole — read in turn like the desktop's three columns,
+     with a hairline between them instead of cards (no sideways row with a clipped neighbour) */
+  .sx-range {
+    gap: 0;
   }
 
   .sx-range-item {
-    flex: 0 0 min(80vw, 320px);
-    scroll-snap-align: start;
+    padding: 34px 0 38px;
+    border-top: 1px solid var(--line);
+  }
+
+  .sx-range-item:first-child {
+    border-top: 0;
+    padding-top: 8px;
+  }
+
+  .sx-range-img,
+  .sx-range-illu {
+    height: 230px;
+    margin-bottom: 22px;
   }
 }

@@ -43,3 +43,26 @@ export function stageSize(): { W: number; H: number } {
   }
   return stage.W && stage.H ? stage : { W: window.innerWidth, H: window.innerHeight }
 }
+
+/**
+ * The small viewport height (100svh: the visible height with the browser's bars shown) in CSS px. The fixed story
+ * overlay follows the visible viewport, so on a phone its bottom-anchored chapter text is highest when the address
+ * bar is shown; the phone composition keeps the product above that position, so the two never meet whatever the bars
+ * do. Measured from a probe element and cached; it changes only with the window size, never while scrolling.
+ */
+const small = { H: 0, observed: false }
+export function smallViewportHeight(): number {
+  if (typeof window === 'undefined') return 0
+  if (!small.observed && document.body) {
+    small.observed = true
+    const probe = document.createElement('div')
+    probe.setAttribute('aria-hidden', 'true')
+    probe.style.cssText = 'position:fixed;left:0;top:0;width:1px;height:100vh;height:100svh;visibility:hidden;pointer-events:none;'
+    document.body.appendChild(probe)
+    small.H = probe.getBoundingClientRect().height
+    new ResizeObserver(([e]) => {
+      small.H = e.contentRect.height
+    }).observe(probe)
+  }
+  return small.H || window.innerHeight
+}

@@ -275,20 +275,30 @@ html[data-ink='dark'] .rotate-hint {
     0 0 10px rgba(226, 223, 216, 0.95);
 }
 
-/* the chapter figures, drawn for a dark backdrop */
-html[data-ink='dark'] .fx-line {
+/* the chapter figures, drawn for a dark backdrop, inked for the lit studio — and for the light sections. The graphite
+   and slate sections (range, technology) keep the light lines they were drawn with: this rule once reached them too,
+   and their illustrations disappeared into the dark surface. */
+html[data-ink='dark'] .ed .fx-line,
+.tone-ivory .fx-line,
+.tone-white .fx-line {
   stroke: rgba(17, 20, 23, 0.5);
 }
 
-html[data-ink='dark'] .fx-arrow {
+html[data-ink='dark'] .ed .fx-arrow,
+.tone-ivory .fx-arrow,
+.tone-white .fx-arrow {
   background: rgba(17, 20, 23, 0.45);
 }
 
-html[data-ink='dark'] .fx-arrow::after {
+html[data-ink='dark'] .ed .fx-arrow::after,
+.tone-ivory .fx-arrow::after,
+.tone-white .fx-arrow::after {
   border-color: rgba(17, 20, 23, 0.45);
 }
 
-html[data-ink='dark'] .fx-monitor {
+html[data-ink='dark'] .ed .fx-monitor,
+.tone-ivory .fx-monitor,
+.tone-white .fx-monitor {
   background: linear-gradient(180deg, rgba(252, 250, 246, 0.72), rgba(238, 235, 229, 0.72));
   border-color: rgba(17, 20, 23, 0.14);
 }

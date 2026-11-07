@@ -832,6 +832,18 @@ html.intro-lock body {
 
 /* touch screens play the intro 1.5x faster (IntroSequence COMPACT_RATE): the two hand-over effects that start with the
    product phase (not part of the choreography's clock) follow the same tempo */
+/* Tall screens: the dive through the core is cut short. The mark is wider than tall, so on a portrait screen the core
+   covers the height only once the coral bars and gold frame have grown far past the screen sides — for several frames
+   they crossed the screen as broad flat bands. Here the mark fades during the first part of the push, so the camera
+   moves through the core while only the warp lines carry the speed. */
+@media (max-aspect-ratio: 1/1) {
+  .intro[data-run='motion'] .lg-dive {
+    animation:
+      lg-dive 0.5s cubic-bezier(0.7, 0, 0.84, 0) 3.48s forwards,
+      lg-out 0.2s cubic-bezier(0.4, 0, 1, 1) 3.48s forwards;
+  }
+}
+
 @media (hover: none) and (pointer: coarse) {
   .intro--product .intro-bg {
     transition-duration: 0.73s;

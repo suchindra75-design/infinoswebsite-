@@ -144,6 +144,10 @@ function ProductModelInner() {
     const finalBox = new THREE.Box3().setFromObject(root)
     // finalBox is in WORLD units but the label offset is applied in root-local (model) units -> divide by the auto-scale
     setLabelOffset(Math.max(0.6, (finalBox.max.x - finalBox.min.x) * 0.5 * 1.15) / root.scale.x)
+    // development-only: the posed product parts, for QA and tools/phone_composition.mjs (stripped from production)
+    if (process.env.NODE_ENV !== 'production') {
+      ;(window as unknown as { __infinosParts?: () => THREE.Object3D[] }).__infinosParts = () => [...wrapperRefs.current.values()]
+    }
     // Compile the product's shader programs in the background first (KHR_parallel_shader_compile, where available):
     // a plain first render makes three.js wait on the main thread until every program is compiled and linked — about
     // twenty physically based materials, which froze the intro and the first scroll for seconds on phones. Only then

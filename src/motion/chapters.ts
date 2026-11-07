@@ -94,6 +94,18 @@ function sameStages(a: StageAmounts, b: StageAmounts) {
   return (Object.keys(a) as (keyof StageAmounts)[]).every((k) => Math.abs(a[k] - b[k]) < 0.0005)
 }
 
+/**
+ * The photoreal sequence a chapter shows on this layout. Phones play the opening chapters (03–05) on the live model:
+ * the open sequence's frames are composed for a wide screen — 81 of its 120 frames crop the raised lid at the top of
+ * the film and its first frames are a tight close-up of the front emblem — so on a tall screen they could only show
+ * fragments of the bag. The live scene follows the identical camera path and opening stages, renders the whole bag
+ * at any framing (composition.ts phone track), and the phone never downloads or decodes those 120 frames.
+ */
+export function framesFor(chapter: Chapter, phone: boolean): SequenceId | undefined {
+  if (phone && chapter.sequence === 'open') return undefined
+  return chapter.sequence
+}
+
 export function chapterAt(progress: number): Chapter {
   return CHAPTERS.find((c) => progress >= c.start && progress < c.end) ?? CHAPTERS[CHAPTERS.length - 1]
 }
@@ -104,9 +116,10 @@ export function applyScrollProgress(progress: number): void {
   const chapterProgress = Math.min(1, Math.max(0, (clamped - chapter.start) / (chapter.end - chapter.start)))
   const explodedAmount = computeExplodedAmount(chapter.phase, chapterProgress)
   const stages = computeStages(chapter.phase, chapterProgress)
-  const sequenceCover = computeSequenceCover(chapter, chapterProgress)
-
   const state = useExperienceStore.getState()
+  const sequence = framesFor(chapter, state.phone)
+  const sequenceCover = sequence ? computeSequenceCover(chapter, chapterProgress) : 0
+
   const phaseChanged = state.phase !== chapter.phase
   const patch: Partial<typeof state> = {}
 
@@ -116,7 +129,7 @@ export function applyScrollProgress(progress: number): void {
   if (!sameStages(state.stages, stages)) patch.stages = stages
   if (Math.abs(state.sequenceCover - sequenceCover) > 0.001 || (sequenceCover === 0) !== (state.sequenceCover === 0))
     patch.sequenceCover = sequenceCover
-  if (state.sequenceId !== (chapter.sequence ?? null)) patch.sequenceId = chapter.sequence ?? null
+  if (state.sequenceId !== (sequence ?? null)) patch.sequenceId = sequence ?? null
   if (phaseChanged) {
     patch.phase = chapter.phase
     // leaving the interactive hero: the drag yaw is already weighted to zero at the boundary, so clearing it is seamless

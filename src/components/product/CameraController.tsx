@@ -38,7 +38,7 @@ export function CameraController() {
     const camera = state.camera as THREE.PerspectiveCamera
     camera.position.set(p.pos[0], p.pos[1], p.pos[2])
     // editorial framing (composition.ts) — the identical film rectangle the image-sequence canvas draws with
-    const l = filmLayout(size.width, size.height, p, compositionAt(progress, layoutMode(size.width, size.height), comp))
+    const l = filmLayout(size.width, size.height, p, compositionAt(progress, layoutMode(size.width, size.height), comp, size.width, size.height))
     camera.fov = p.fov
     camera.setViewOffset(l.w, l.h, l.ox, l.oy, size.width, size.height)
     camera.updateProjectionMatrix()

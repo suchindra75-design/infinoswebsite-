@@ -29,11 +29,13 @@ export function LayerLabel({
     <Html
       portal={htmlPortal}
       position={[labelSide === 'left' ? -offsetX : offsetX, 0, 0]}
-      center
+      // centred on its point on wide screens; on narrow ones the label starts AT the point (beside the stack) and
+      // only its height is centred, so it never reaches back over the product
+      center={!isMobile}
       wrapperClass="layer-label-html"
       zIndexRange={[10, 0]}
     >
-      <div className={`layer-label layer-label--${labelSide}`} style={{ opacity: visible ? 1 : 0 }}>
+      <div className={`layer-label layer-label--${labelSide}`} style={{ opacity: visible ? 1 : 0, transform: isMobile ? 'translateY(-50%)' : undefined }}>
         <span className="layer-label-rule" />
         <span className="layer-label-text">{label}</span>
       </div>

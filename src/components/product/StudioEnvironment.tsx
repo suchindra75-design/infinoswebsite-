@@ -90,7 +90,7 @@ export function StudioEnvironment() {
     let size = ''
     const coveAtEnd = (W: number, H: number) => {
       const pose = cameraAt('overview', 1)
-      const l = filmLayout(W, H, pose, compositionAt(1, layoutMode(W, H), comp))
+      const l = filmLayout(W, H, pose, compositionAt(1, layoutMode(W, H), comp, W, H))
       let hx = pose.target[0] - pose.pos[0]
       let hz = pose.target[2] - pose.pos[2]
       const hl = Math.hypot(hx, hz) || 1
@@ -111,7 +111,7 @@ export function StudioEnvironment() {
       const chapter = chapterAt(p)
       const cp = Math.min(1, Math.max(0, (p - chapter.start) / (chapter.end - chapter.start)))
       const pose = cameraAt(chapter.phase, cp)
-      const l = filmLayout(W, H, pose, compositionAt(p, layoutMode(W, H), comp))
+      const l = filmLayout(W, H, pose, compositionAt(p, layoutMode(W, H), comp, W, H))
       const screen = (v: Vec3) => {
         const [fx, fy] = projectToFilm(pose, v)
         return [fx * l.w - l.ox, fy * l.h - l.oy]

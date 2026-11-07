@@ -19,6 +19,7 @@ import { cameraAt } from '@/motion/cameraTrack'
 import { filmLayout, projectToFilm } from '@/motion/sequences'
 import { compositionAt, layoutMode } from '@/motion/composition'
 import { PHONE_QUERY, isPhoneLayout } from '@/motion/phoneLayout'
+import { requestFrame } from '@/motion/frameLoop'
 
 export function Experience() {
   const narrativeRef = useRef<HTMLDivElement>(null)
@@ -36,7 +37,7 @@ export function Experience() {
     // development-only test hook: the timeline is pure, so QA can sample it exactly (stripped from production builds)
     if (process.env.NODE_ENV !== 'production') {
       Object.assign(window, {
-        __infinos: { applyScrollProgress, chapterAt, computeStages, computeExplodedAmount, cameraAt, filmLayout, projectToFilm, compositionAt, layoutMode, store: useExperienceStore },
+        __infinos: { applyScrollProgress, requestFrame, chapterAt, computeStages, computeExplodedAmount, cameraAt, filmLayout, projectToFilm, compositionAt, layoutMode, store: useExperienceStore },
       })
     }
     return () => phoneQuery.removeEventListener('change', onPhoneChange)

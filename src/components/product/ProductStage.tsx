@@ -80,7 +80,9 @@ export function ProductStage() {
       <StudioEnvironment />
       <ProductScene />
       <p className={`rotate-hint ${phase === 'hero' ? 'rotate-hint--visible' : ''}`} aria-hidden="true">
-        DRAG TO ROTATE · TAP A MARKER TO EXPLORE
+        <span className="rotate-hint-pointer">DRAG TO ROTATE · TAP A MARKER TO EXPLORE</span>
+        {/* touch screens: a vertical swipe scrolls the story, so the bag turns from its markers (and the 360° view) */}
+        <span className="rotate-hint-touch">TAP A MARKER TO EXPLORE</span>
       </p>
       <HotspotCard />
     </div>
