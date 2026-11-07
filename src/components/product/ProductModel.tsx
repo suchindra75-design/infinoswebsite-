@@ -64,6 +64,11 @@ function ProductModelInner() {
       for (const m of Array.isArray(mesh.material) ? mesh.material : [mesh.material]) {
         const std = m as THREE.MeshStandardMaterial
         std.fog = false // the product is never fogged; only the studio floor fades into the background
+        // Transparent + double-sided (the stitching, embroidery, emblem and mesh decals): three.js would draw these in
+        // two passes, back faces then front faces, and flag the material changed before each one (needsUpdate), so every
+        // frame re-derived their shader programs (~12 % of the story's CPU time on a throttled phone profile). They are
+        // thin decals, so one pass draws them the same way.
+        if (std.transparent && std.side === THREE.DoubleSide) std.forceSinglePass = true
         for (const tex of [std.map, std.normalMap, std.emissiveMap]) {
           if (tex) { tex.anisotropy = aniso; tex.needsUpdate = true }
         }
