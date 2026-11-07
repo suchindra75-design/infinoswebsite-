@@ -132,6 +132,20 @@ html[data-studio='lit'] .studio-unlit {
   opacity: 0;
 }
 
+/* Phones: while the browser's address bar slides away, the fixed stage is resized only after the animation, and for
+   that moment the page behind it showed as a black band at the bottom. Behind the lit studio the page is the floor's
+   own stone, so the gap reads as more floor. (Every section after the story paints its own background.) */
+html[data-studio='lit'],
+html[data-studio='lit'] body {
+  background-color: var(--stone-f1);
+}
+
+/* Until the intro has finished, scrolling is paused, and a swipe down on a phone triggered the browser's
+   pull-to-refresh, which reloaded the page and replayed the intro. After the intro, the browser's default returns. */
+html:not([data-studio='lit']) {
+  overscroll-behavior-y: none;
+}
+
 html[data-studio='lit'] .studio-pool i,
 html[data-studio='lit'] .studio-wash i {
   opacity: 1;
