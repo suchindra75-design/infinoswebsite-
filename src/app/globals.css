@@ -60,7 +60,7 @@
 /* surfaces: each supporting section declares one tone (components/sections) */
 .tone-graphite {
   --bg: var(--graphite);
-  background: var(--graphite);
+  background: var(--cold-room-light), var(--graphite);
 }
 
 .tone-slate {
@@ -68,7 +68,15 @@
   --faint: #93a9ba;
   --accent: var(--steel-light);
   --accent-strong: #c4dbea;
-  background: linear-gradient(180deg, #17222c 0%, var(--slate) 40%, #0e1820 100%);
+  background: var(--cold-room-light), linear-gradient(180deg, #17222c 0%, var(--slate) 40%, #0e1820 100%);
+}
+
+/* every midnight surface is the same cold room as the coolant showcase and the range pedestal: one cool pool of light
+   falling from above, a little deeper at the sides */
+:root {
+  --cold-room-light:
+    radial-gradient(110vw 70vh at 50% 0%, rgba(86, 128, 160, 0.17) 0%, rgba(86, 128, 160, 0.05) 50%, rgba(86, 128, 160, 0) 75%),
+    linear-gradient(90deg, rgba(4, 10, 16, 0.32) 0%, rgba(4, 10, 16, 0) 22%, rgba(4, 10, 16, 0) 78%, rgba(4, 10, 16, 0.32) 100%);
 }
 
 .tone-ivory,
@@ -1180,7 +1188,25 @@ html.viewer-lock body {
   justify-content: center;
   width: min(34vw, 500px);
   will-change: opacity, transform;
+  /* the frame loop writes the entrance (--i, 0 → 1) and the exit (--o, 1 → 0); each composition moves with them.
+     --a, --b and --c are the same entrance, staggered for the parts of a chapter (head, body, actions) */
+  --a: clamp(0, var(--i, 1) * 1.6, 1);
+  --b: clamp(0, (var(--i, 1) - 0.2) * 1.6, 1);
+  --c: clamp(0, (var(--i, 1) - 0.4) * 1.67, 1);
+  transform: translate3d(0, calc((1 - var(--i, 1)) * 26px - (1 - var(--o, 1)) * 18px), 0);
 }
+
+/* the head (kicker, headline) and the rest of a chapter are grouped for the phone compositions; elsewhere they are
+   transparent to the layout */
+.ed-head,
+.ed-rest {
+  display: contents;
+}
+
+.ed-strip {
+  display: none;
+}
+
 
 .ed-chapter[data-side='left'] {
   left: var(--ed-gutter);
@@ -4392,5 +4418,853 @@ html.stage-covered .ed * {
 
   .sx-family-name {
     font-size: 0.95rem;
+  }
+}
+
+/* ══ Phones: eight chapters, eight compositions (story.ts PhoneVariant). One language — the light numeral, the mono
+   chapter name, the light headline, hairlines — arranged differently for what each chapter shows. The product zone
+   follows the text (StoryOverlay.tsx measures it, composition.ts fits the bag into what is left), and each chapter
+   enters with its own movement, written as two numbers per frame (--i, --o) ══ */
+@media (max-aspect-ratio: 23/20) and (max-width: 699px) {
+  .ed-head,
+  .ed-rest {
+    display: block;
+  }
+
+  /* the text never lies over the bag here (each composition keeps them apart), so no scrim washes the product */
+  .ed-scrim {
+    display: none;
+  }
+
+  .ed-chapter[data-side='below'] {
+    transform: translate3d(0, calc((var(--o, 1) - 1) * 18px), 0);
+  }
+
+  .ed-chapter.is-live .ed-head,
+  .ed-chapter.is-live .ed-rest {
+    will-change: transform, opacity;
+  }
+
+  .ed-head {
+    opacity: var(--a);
+  }
+
+  .ed-rest {
+    opacity: var(--b);
+  }
+
+  /* ── 01 cover: the whole bag, the headline at display size at its foot; the copy rises in two steps ── */
+  .ed-chapter[data-variant='cover'] .ed-headline {
+    font-size: clamp(2.35rem, 11.2vw, 3.1rem);
+    line-height: 0.98;
+    letter-spacing: -0.035em;
+  }
+
+  .ed-chapter[data-variant='cover'] .ed-head {
+    transform: translate3d(0, calc((1 - var(--a)) * 38px), 0);
+  }
+
+  .ed-chapter[data-variant='cover'] .ed-rest {
+    transform: translate3d(0, calc((1 - var(--b)) * 26px), 0);
+  }
+
+  /* ── 02 annotated: a technical plate. The text hangs from the bar, ruled off below; the bag stands under it with
+     its two zone brackets. It drops in from the bar and leaves the same way ── */
+  .ed-chapter[data-side='below'][data-variant='annotated'],
+  .ed-chapter[data-side='below'][data-variant='offset'] {
+    top: calc(var(--nav-height) + 18px);
+    bottom: auto;
+    max-height: none;
+    justify-content: flex-start;
+    transform: translate3d(0, calc((var(--o, 1) - 1) * 30px), 0);
+  }
+
+  .ed-chapter[data-variant='annotated'] .ed-head {
+    transform: translate3d(0, calc((var(--a) - 1) * 22px), 0);
+  }
+
+  .ed-chapter[data-variant='annotated'] .ed-rest {
+    padding-bottom: 16px;
+    transform: translate3d(0, calc((var(--b) - 1) * 12px), 0);
+  }
+
+  .ed-chapter[data-variant='annotated'] .ed-rest::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 1px;
+    background: var(--line-strong);
+    transform: scaleX(var(--c));
+    transform-origin: left;
+  }
+
+  .ed-chapter[data-variant='annotated'] .ed-rest {
+    position: relative;
+  }
+
+  /* ── 03 immersive: the bag opens at full size over the word PCM (StageType.tsx); the copy is a short caption on a
+     hairline at the foot, drawn up from below while the text slides in from the left ── */
+  .ed-chapter[data-side='below'][data-variant='immersive'] {
+    right: 16%;
+    padding-left: 16px;
+  }
+
+  .ed-chapter[data-variant='immersive']::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 4px;
+    bottom: 2px;
+    width: 1px;
+    background: var(--steel-dark);
+    transform: scaleY(var(--a));
+    transform-origin: bottom;
+  }
+
+  .ed-chapter[data-variant='immersive'] .ed-headline {
+    font-size: clamp(1.6rem, 7.2vw, 2rem);
+  }
+
+  .ed-chapter[data-variant='immersive'] .ed-body {
+    font-size: 0.88rem;
+  }
+
+  .ed-chapter[data-variant='immersive'] .ed-head {
+    transform: translate3d(calc((var(--a) - 1) * 40px), 0, 0);
+  }
+
+  .ed-chapter[data-variant='immersive'] .ed-rest {
+    transform: translate3d(calc((var(--b) - 1) * 40px), 0, 0);
+  }
+
+  /* ── 04 split: the headline above, the body below, and between them the bag as its front drops and the inner box
+     slides out. The two halves arrive from opposite edges and part again on the way out ── */
+  .ed-chapter[data-side='below'][data-variant='split'] {
+    top: calc(var(--nav-height) + 18px);
+    bottom: calc(env(safe-area-inset-bottom, 0px) + 26px);
+    max-height: none;
+    justify-content: space-between;
+    transform: none;
+  }
+
+  .ed-chapter[data-variant='split'] .ed-headline {
+    font-size: clamp(2.1rem, 10vw, 2.7rem);
+    line-height: 1;
+  }
+
+  .ed-chapter[data-variant='split'] .ed-head {
+    transform: translate3d(0, calc((var(--a) - 1) * 30px + (var(--o, 1) - 1) * 24px), 0);
+  }
+
+  .ed-chapter[data-variant='split'] .ed-rest {
+    opacity: var(--a);
+    transform: translate3d(0, calc((1 - var(--a)) * 30px + (1 - var(--o, 1)) * 24px), 0);
+  }
+
+  /* ── 05 column: custody as a ledger. A tall numeral column, the text beside it, and the monitoring chain as a strip
+     of three steps; the numeral settles from a larger size while the text slides in beside it ── */
+  .ed-chapter[data-side='below'][data-variant='column'] {
+    display: grid;
+    grid-template-columns: 96px 1fr;
+    grid-template-areas: 'num name' 'num title' 'num rest';
+    align-content: end;
+    column-gap: 4px;
+  }
+
+  .ed-chapter[data-variant='column'] .ed-head,
+  .ed-chapter[data-variant='column'] .ed-kicker {
+    display: contents;
+  }
+
+  .ed-chapter[data-variant='column'] .ed-kicker-index {
+    grid-area: num;
+    align-self: start;
+    font-size: 4.4rem;
+    line-height: 0.8;
+    letter-spacing: -0.08em;
+    opacity: var(--a);
+    transform: scale(calc(1.45 - 0.45 * var(--a)));
+    transform-origin: left top;
+  }
+
+  .ed-chapter[data-variant='column'] .ed-kicker-name {
+    grid-area: name;
+    margin-bottom: 12px;
+    padding-left: 0;
+    border-left: 0;
+    font-family: var(--font-mono), monospace;
+    font-size: 0.6rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--faint);
+  }
+
+  .ed-chapter[data-variant='column'] .ed-headline {
+    grid-area: title;
+  }
+
+  .ed-chapter[data-variant='column'] .ed-kicker-name,
+  .ed-chapter[data-variant='column'] .ed-headline {
+    opacity: var(--a);
+    transform: translate3d(calc((1 - var(--a)) * 30px), 0, 0);
+  }
+
+  .ed-chapter[data-variant='column'] .ed-rest {
+    grid-area: rest;
+    transform: translate3d(calc((1 - var(--b)) * 30px), 0, 0);
+  }
+
+  .ed-strip {
+    display: flex;
+    margin: 14px 0 0;
+    padding: 0;
+    list-style: none;
+    border-top: 1px solid var(--line-strong);
+  }
+
+  .ed-strip li {
+    flex: 1;
+    padding: 9px 8px 0 0;
+    font-family: var(--font-mono), monospace;
+    font-size: 0.56rem;
+    line-height: 1.45;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .ed-strip li::before {
+    content: '';
+    display: block;
+    width: 5px;
+    height: 5px;
+    margin: -12px 0 8px;
+    border-radius: 50%;
+    background: var(--steel);
+  }
+
+  /* ── 06 statement: the headline is set very large behind the bag (StageType.tsx); here it stays for assistive
+     technology only, and the body rises at the foot ── */
+  .ed-chapter[data-variant='statement'] .ed-headline {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+
+  .ed-chapter[data-variant='statement'] .ed-kicker {
+    margin-bottom: 10px;
+  }
+
+  .ed-chapter[data-variant='statement'] .ed-head {
+    transform: translate3d(0, calc((1 - var(--a)) * 20px), 0);
+  }
+
+  .ed-chapter[data-variant='statement'] .ed-rest {
+    transform: translate3d(0, calc((1 - var(--b)) * 20px), 0);
+  }
+
+  /* ── 07 offset: the display close-up. The copy is a narrow column high on the right; the bag stands low on the left,
+     its display callout pointing back towards the text. It slides in from the right edge ── */
+  .ed-chapter[data-side='below'][data-variant='offset'] {
+    left: 30%;
+  }
+
+  .ed-chapter[data-variant='offset'] .ed-kicker {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .ed-chapter[data-variant='offset'] .ed-kicker-name {
+    padding-left: 0;
+    border-left: 0;
+  }
+
+  .ed-chapter[data-variant='offset'] .ed-headline {
+    font-size: clamp(1.6rem, 7.4vw, 2rem);
+  }
+
+  .ed-chapter[data-variant='offset'] .ed-body {
+    font-size: 0.86rem;
+  }
+
+  .ed-chapter[data-variant='offset'] .ed-head {
+    transform: translate3d(calc((1 - var(--a)) * 44px), 0, 0);
+  }
+
+  .ed-chapter[data-variant='offset'] .ed-rest {
+    transform: translate3d(calc((1 - var(--b)) * 44px), 0, 0);
+  }
+
+  /* ── 08 finale: the exploded bag with its layers named, the closing line and the three actions at the foot; the
+     actions arrive last ── */
+  .ed-chapter[data-variant='finale'] .ed-head {
+    transform: translate3d(0, calc((1 - var(--a)) * 30px), 0);
+  }
+
+  .ed-chapter[data-variant='finale'] .ed-rest {
+    transform: translate3d(0, calc((1 - var(--b)) * 22px), 0);
+  }
+
+  .ed-chapter[data-variant='finale'] .ed-cta {
+    opacity: var(--c);
+    transform: translate3d(0, calc((1 - var(--c)) * 16px), 0);
+  }
+}
+
+/* ══ Type behind the product (StageType.tsx): phones only, between the studio and the bag ══ */
+.stage-type {
+  display: none;
+}
+
+@media (max-aspect-ratio: 23/20) and (max-width: 699px) {
+  .stage-type {
+    display: block;
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    pointer-events: none;
+  }
+
+  .stage-type p {
+    position: absolute;
+    margin: 0;
+    font-family: var(--font-body), sans-serif;
+    font-weight: 300;
+    will-change: transform, opacity;
+  }
+
+  /* 03: the letters as a pale shadow in the stone, deeper than the wall and lighter than any text */
+  .stage-type-pcm {
+    left: 50%;
+    top: calc(var(--nav-height) + 2svh);
+    font-size: 47vw;
+    line-height: 0.82;
+    letter-spacing: -0.06em;
+    white-space: nowrap;
+    color: transparent;
+    background: linear-gradient(180deg, rgba(63, 111, 146, 0.3) 0%, rgba(63, 111, 146, 0.06) 90%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  /* 06: the headline itself, set to the width of the screen in the graphite ink; the bag stands over its last word */
+  .stage-type-statement {
+    left: var(--ed-gutter);
+    right: var(--ed-gutter);
+    top: calc(var(--nav-height) + 8px);
+    font-size: 21vw;
+    line-height: 0.9;
+    letter-spacing: -0.055em;
+    color: #13212c;
+  }
+
+  .stage-type-statement span {
+    display: block;
+    will-change: transform, opacity;
+  }
+
+  .stage-type-statement span:nth-child(2),
+  .stage-type-statement span:nth-child(4) {
+    color: var(--steel-dark);
+  }
+}
+
+
+/* ══ Applications: the route a sample travels. A continuous line in the two zone colours runs down the left; each stop
+   is set at display size, and the applications are filed under the stop they serve, as a timetable ══ */
+.ax-journey {
+  position: relative;
+  margin: 0;
+  padding: 0 0 0 clamp(34px, 5vw, 64px);
+  list-style: none;
+}
+
+.ax-journey::before {
+  content: '';
+  position: absolute;
+  left: 4px;
+  top: 14px;
+  bottom: 14px;
+  width: 1px;
+  background: linear-gradient(180deg, var(--zone1), var(--zone2));
+  transform-origin: top;
+}
+
+.ax-stop {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+  column-gap: clamp(32px, 6vw, 96px);
+  padding: clamp(28px, 5vh, 48px) 0;
+  border-top: 1px solid var(--line);
+}
+
+.ax-stop:last-child {
+  border-bottom: 1px solid var(--line);
+}
+
+/* the stop's node on the line */
+.ax-stop::before {
+  content: '';
+  position: absolute;
+  left: calc(-1 * clamp(34px, 5vw, 64px));
+  top: calc(clamp(28px, 5vh, 48px) + 14px);
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--bg);
+  border: 1px solid var(--accent);
+}
+
+.ax-stop-head {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  column-gap: 16px;
+  align-content: start;
+}
+
+.ax-stop-n {
+  grid-row: span 2;
+  padding-top: 0.55em;
+  font-family: var(--font-mono), monospace;
+  font-size: var(--fs-label);
+  letter-spacing: 0.2em;
+  color: var(--accent);
+}
+
+.ax-stop-name {
+  margin: 0;
+  font-family: var(--font-body), sans-serif;
+  font-weight: 300;
+  font-size: clamp(2.1rem, 4.4vw, 3.8rem);
+  line-height: 1;
+  letter-spacing: -0.045em;
+  color: var(--text-strong);
+}
+
+.ax-stop-where {
+  margin: 12px 0 0;
+  font-family: var(--font-mono), monospace;
+  font-size: var(--fs-label);
+  letter-spacing: 0.16em;
+  line-height: 1.7;
+  text-transform: uppercase;
+  color: var(--faint);
+}
+
+.ax-uses {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ax-uses li {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 3fr);
+  column-gap: 24px;
+  padding: 14px 0;
+}
+
+.ax-uses li + li {
+  border-top: 1px solid var(--line);
+}
+
+.ax-use-name {
+  margin: 0;
+  font-family: var(--font-body), sans-serif;
+  font-weight: 450;
+  font-size: var(--fs-h3);
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  color: var(--text-strong);
+}
+
+.ax-uses p {
+  margin: 0;
+  color: var(--muted);
+}
+
+.ax-beyond {
+  max-width: 34em;
+  margin: clamp(48px, 8vh, 88px) 0 0 auto;
+  font-family: var(--font-body), sans-serif;
+  font-weight: 300;
+  font-size: clamp(1.3rem, 2.1vw, 1.9rem);
+  line-height: 1.3;
+  letter-spacing: -0.02em;
+  color: var(--text-strong);
+}
+
+.ax-beyond .sx-label {
+  display: block;
+  margin-bottom: 16px;
+}
+
+/* the line draws itself as the route scrolls by, where the browser supports scroll-driven animation */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .ax-journey::before {
+      animation: ax-draw linear both;
+      animation-timeline: view();
+      animation-range: entry 10% cover 60%;
+    }
+  }
+}
+
+@keyframes ax-draw {
+  from {
+    transform: scaleY(0);
+  }
+  to {
+    transform: scaleY(1);
+  }
+}
+
+/* ══ Impact: the one published figure at the scale of a headline, its qualification set beside it; the other aims as
+   ruled lines; the three goals as numerals ══ */
+.ix-lead {
+  display: grid;
+  grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+  column-gap: clamp(32px, 6vw, 96px);
+  align-items: end;
+  padding: clamp(32px, 6vh, 64px) 0;
+  border-top: 1px solid var(--line-mid);
+}
+
+.ix-figure {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 10px 16px;
+  margin: 0;
+}
+
+.ix-figure-value {
+  flex-basis: 100%;
+  font-family: var(--font-body), sans-serif;
+  font-weight: 200;
+  font-size: clamp(5.4rem, 15vw, 12rem);
+  line-height: 0.86;
+  letter-spacing: -0.06em;
+  color: transparent;
+  background: linear-gradient(180deg, var(--text-strong) 10%, var(--steel-dark) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.ix-figure-label {
+  font-family: var(--font-mono), monospace;
+  font-size: var(--fs-label);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.ix-lead-copy p {
+  margin: 12px 0 0;
+}
+
+.ix-qualifier {
+  padding-top: 14px;
+  border-top: 1px solid var(--line);
+  font-family: var(--font-mono), monospace;
+  font-size: var(--fs-label);
+  letter-spacing: 0.1em;
+  line-height: 1.8;
+  text-transform: uppercase;
+  color: var(--faint);
+}
+
+.ix-aims {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ix-aims li {
+  display: grid;
+  grid-template-columns: 56px minmax(0, 6fr) minmax(0, 5fr);
+  column-gap: clamp(20px, 3vw, 48px);
+  align-items: baseline;
+  padding: clamp(22px, 4vh, 36px) 0;
+  border-top: 1px solid var(--line);
+}
+
+.ix-aim-n {
+  font-family: var(--font-mono), monospace;
+  font-size: var(--fs-label);
+  letter-spacing: 0.2em;
+  color: var(--accent);
+}
+
+.ix-aim-title {
+  margin: 0;
+  font-family: var(--font-body), sans-serif;
+  font-weight: 300;
+  font-size: clamp(1.6rem, 2.8vw, 2.5rem);
+  line-height: 1.08;
+  letter-spacing: -0.035em;
+  color: var(--text-strong);
+}
+
+.ix-aims p {
+  margin: 0;
+  color: var(--muted);
+}
+
+.ix-sdgs {
+  margin-top: clamp(40px, 7vh, 72px);
+  padding-top: 24px;
+  border-top: 1px solid var(--line-mid);
+}
+
+.ix-sdgs ul {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: clamp(16px, 4vw, 56px);
+  margin: 20px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ix-sdgs li {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.ix-sdg-n {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  font-family: var(--font-body), sans-serif;
+  font-weight: 200;
+  font-size: clamp(3.4rem, 7vw, 6rem);
+  line-height: 0.9;
+  letter-spacing: -0.05em;
+  color: var(--steel-dark);
+}
+
+.ix-sdg-n small {
+  padding-top: 0.5em;
+  font-family: var(--font-mono), monospace;
+  font-size: 0.56rem;
+  font-weight: 500;
+  letter-spacing: 0.2em;
+  color: var(--faint);
+}
+
+.ix-sdg-t {
+  font-size: 0.92rem;
+  line-height: 1.4;
+  color: var(--text);
+}
+
+/* ══ Company: in the story's own glacier room. The name at display size, the positioning as one statement, and where
+   today's products sit inside the company's field, drawn as three nested rooms ══ */
+.sx--company {
+  background:
+    radial-gradient(70% 60% at 0% 20%, rgba(250, 252, 255, 0.7) 0%, rgba(250, 252, 255, 0) 70%),
+    linear-gradient(180deg, var(--stone-w0, #d2dce2) 0%, var(--stone-cove, #ecf1f4) 62%, var(--stone-f0, #e0e7eb) 100%);
+}
+
+.cox-mark {
+  margin: 0;
+  font-family: var(--font-body), sans-serif;
+  font-weight: 300;
+  font-size: clamp(5.2rem, 23vw, 13rem);
+  line-height: 0.82;
+  letter-spacing: -0.07em;
+  color: transparent;
+  background: linear-gradient(180deg, var(--text-strong) 30%, var(--steel-dark) 120%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.cox-statement {
+  max-width: 24em;
+  margin: clamp(28px, 5vh, 48px) 0 0;
+  font-family: var(--font-body), sans-serif;
+  font-weight: 300;
+  font-size: clamp(1.4rem, 2.6vw, 2.3rem);
+  line-height: 1.22;
+  letter-spacing: -0.025em;
+  color: var(--muted);
+}
+
+.cox-statement em {
+  font-style: normal;
+  color: var(--text-strong);
+}
+
+.cox-body {
+  display: grid;
+  grid-template-columns: minmax(0, 6fr) minmax(0, 5fr);
+  column-gap: clamp(32px, 6vw, 96px);
+  align-items: center;
+  margin-top: clamp(48px, 8vh, 96px);
+}
+
+.cox-rings {
+  margin: 0;
+}
+
+.cox-ring {
+  position: relative;
+  padding: 58px 22px 22px;
+  border: 1px solid var(--line-mid);
+  border-radius: 28px;
+}
+
+.cox-ring--1 {
+  background: rgba(255, 255, 255, 0.28);
+}
+
+.cox-ring--2 {
+  margin-top: 14px;
+  border-color: rgba(63, 111, 146, 0.4);
+  background: rgba(255, 255, 255, 0.36);
+  border-radius: 22px;
+}
+
+.cox-ring--3 {
+  margin-top: 14px;
+  padding: 58px 22px 34px;
+  border-color: var(--steel-dark);
+  background: linear-gradient(180deg, #13212c, #0b151d);
+  border-radius: 16px;
+}
+
+.cox-ring-label {
+  position: absolute;
+  left: 22px;
+  right: 22px;
+  top: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 0.92rem;
+  line-height: 1.3;
+  color: var(--text-strong);
+}
+
+.cox-ring-label b {
+  font-family: var(--font-mono), monospace;
+  font-size: 0.6rem;
+  font-weight: 500;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+/* the innermost room is the product itself: the midnight of the product pages */
+.cox-ring--3 > .cox-ring-label {
+  position: static;
+  color: #e6ecf0;
+  font-size: 1.15rem;
+}
+
+.cox-ring--3 > .cox-ring-label b {
+  color: var(--steel-light);
+}
+
+.cox-ring--1 > .cox-ring-label {
+  position: static;
+  margin: -40px 0 18px;
+}
+
+.cox-ring--2 > .cox-ring-label {
+  position: static;
+  margin: -40px 0 4px;
+}
+
+.cox-colophon {
+  margin: 32px 0 0;
+}
+
+.cox-colophon div {
+  display: grid;
+  grid-template-columns: 9.5em 1fr;
+  gap: 16px;
+  padding: 14px 0;
+  border-top: 1px solid var(--line);
+}
+
+.cox-colophon dt {
+  font-family: var(--font-mono), monospace;
+  font-size: var(--fs-label);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--faint);
+}
+
+.cox-colophon dd {
+  margin: 0;
+  color: var(--text-strong);
+}
+
+.cox-colophon a {
+  color: inherit;
+}
+
+@media (max-width: 900px) {
+  .ax-stop,
+  .ix-lead,
+  .cox-body {
+    grid-template-columns: 1fr;
+  }
+
+  .ax-uses {
+    margin-top: 18px;
+  }
+
+  .ax-uses li {
+    grid-template-columns: 1fr;
+    row-gap: 6px;
+  }
+
+  .ix-lead-copy {
+    margin-top: 28px;
+  }
+
+  .ix-aims li {
+    grid-template-columns: 40px 1fr;
+    row-gap: 10px;
+  }
+
+  .ix-aims p {
+    grid-column: 2;
+  }
+
+  .cox-copy {
+    margin-top: 40px;
+  }
+
+  .ax-beyond {
+    margin-left: 0;
+  }
+}
+
+@media (max-width: 600px) {
+  .ix-sdgs ul {
+    gap: 12px;
+  }
+
+  .ix-sdg-t {
+    font-size: 0.8rem;
+  }
+
+  .cox-colophon div {
+    grid-template-columns: 1fr;
+    gap: 4px;
   }
 }

@@ -314,111 +314,177 @@ export function RangeSection() {
   )
 }
 
+/** where the applications sit along the route a sample travels (content/platform.ts APPLICATIONS) */
+const JOURNEY = [
+  { stop: 'Collection', where: 'At home, and where infrastructure is thin', apps: ['home', 'remote'] },
+  { stop: 'In transit', where: 'Across collection networks', apps: ['pathology'] },
+  { stop: 'Laboratory · hospital', where: 'Where the samples are analysed', apps: ['labs', 'hospitals'] },
+]
+
 export function ApplicationsSection() {
   return (
-    <section className="sx tone-ivory" id="applications">
+    <section className="sx tone-ivory sx--apps" id="applications">
       <div className="sx-inner">
         <Head
           kicker={`${PILLARS[0].numeral} · ${PILLARS[0].title}`}
           title="Wherever samples travel."
           lede="Today’s INFINOS products are developed for healthcare and diagnostics: portable collection and transport for diagnostic samples and other temperature-sensitive healthcare materials — picked up at the patient’s home and carried to the laboratory or hospital."
         />
-        <figure className="sx-route" aria-label="Home to laboratory or hospital">
-          {['Home collection', 'In transit', 'Laboratory / hospital'].map((s, i) => (
-            <span className={`sx-route-stop ${i === 1 ? 'sx-route-stop--mid' : ''}`} key={s}>
-              <i />
-              {s}
-            </span>
-          ))}
-        </figure>
-        <ol className="sx-apps">
-          {APPLICATIONS.map((a, i) => (
-            <li key={a.id}>
-              <span className="sx-index">{String(i + 1).padStart(2, '0')}</span>
-              <h3 className="sx-h3">{a.name}</h3>
-              <p>{a.detail}</p>
+        {/* the route a sample travels, with each application filed at the stop it serves */}
+        <ol className="ax-journey" aria-label="From collection to the laboratory or hospital">
+          {JOURNEY.map((j, i) => (
+            <li className="ax-stop" key={j.stop}>
+              <div className="ax-stop-head">
+                <span className="ax-stop-n" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
+                <h3 className="ax-stop-name">{j.stop}</h3>
+                <p className="ax-stop-where">{j.where}</p>
+              </div>
+              <ul className="ax-uses">
+                {j.apps.map((id) => {
+                  const a = APPLICATIONS.find((x) => x.id === id)
+                  if (!a) return null
+                  return (
+                    <li key={a.id}>
+                      <h4 className="ax-use-name">{a.name}</h4>
+                      <p>{a.detail}</p>
+                    </li>
+                  )
+                })}
+              </ul>
             </li>
           ))}
         </ol>
-        <p className="sx-foot">{OTHER_USES}</p>
-      </div>
-    </section>
-  )
-}
-
-export function ImpactSection() {
-  return (
-    <section className="sx tone-white" id="impact">
-      <div className="sx-inner">
-        <Head
-          kicker={`${PILLARS[2].numeral} · ${PILLARS[2].title}`}
-          title="Integrity, sustainability, access."
-          lede="In today’s diagnostic products, INFINOS aims to protect sample integrity, move samples with less single-use waste and extend diagnostic collection — aligned with three UN Sustainable Development Goals."
-        />
-        <div className="sx-impact">
-          {IMPACT.map((item) => {
-            const f = item.figure && FIGURES[item.figure].publish ? FIGURES[item.figure] : null
-            return (
-              <article key={item.id} className="sx-impact-item">
-                {f && (
-                  <p className="sx-figure-line">
-                    <span className="sx-figure-value">{f.value}</span>
-                    <span>{f.label}</span>
-                    <StatusTag status={f.status} />
-                  </p>
-                )}
-                <h3 className="sx-h3">{item.title}</h3>
-                <p>{item.detail}</p>
-              </article>
-            )
-          })}
-        </div>
-        <div className="sx-sdgs" aria-label="UN Sustainable Development Goals">
-          {SDGS.map((g) => (
-            <div className="sx-sdg" key={g.n}>
-              <span className="sx-sdg-n">SDG {g.n}</span>
-              <span className="sx-sdg-t">{g.title}</span>
-            </div>
-          ))}
-        </div>
-        <p className="sx-foot">
-          The ~500 t figure is a projection at scale from INFINOS planning material, not an achieved result. Performance figures are published
-          only once supporting test evidence is available.
+        <p className="ax-beyond">
+          <span className="sx-label">Beyond diagnostic samples</span>
+          {OTHER_USES}
         </p>
       </div>
     </section>
   )
 }
 
-export function CompanySection() {
+export function ImpactSection() {
+  const lead = IMPACT.find((i) => i.figure && FIGURES[i.figure].publish)
+  const f = lead?.figure ? FIGURES[lead.figure] : null
+  const rest = IMPACT.filter((i) => i !== lead)
   return (
-    <section className="sx tone-ivory" id="company">
+    <section className="sx tone-white sx--impact" id="impact">
       <div className="sx-inner">
         <Head
-          kicker="Company"
-          title={POSITIONING.company}
-          lede={`${POSITIONING.companyLine} ${POSITIONING.currentLine}`}
+          kicker={`${PILLARS[2].numeral} · ${PILLARS[2].title}`}
+          title="Integrity, sustainability, access."
+          lede="In today’s diagnostic products, INFINOS aims to protect sample integrity, move samples with less single-use waste and extend diagnostic collection — aligned with three UN Sustainable Development Goals."
         />
-        <dl className="sx-meta">
-          <div>
-            <dt>Company</dt>
-            <dd>{POSITIONING.legalName}</dd>
+        {/* the one published figure, at the scale of a headline, with its qualification beside it — never apart */}
+        {lead && f && (
+          <div className="ix-lead">
+            <p className="ix-figure">
+              <span className="ix-figure-value">{f.value}</span>
+              <span className="ix-figure-label">{f.label}</span>
+              <StatusTag status={f.status} />
+            </p>
+            <div className="ix-lead-copy">
+              <h3 className="sx-h3">{lead.title}</h3>
+              <p>{lead.detail}</p>
+              <p className="ix-qualifier">
+                The ~500 t figure is a projection at scale from INFINOS planning material, not an achieved result. Performance figures are
+                published only once supporting test evidence is available.
+              </p>
+            </div>
           </div>
-          <div>
-            <dt>Focus</dt>
-            <dd>{POSITIONING.category}</dd>
+        )}
+        <ol className="ix-aims">
+          {rest.map((item, i) => (
+            <li key={item.id}>
+              <span className="ix-aim-n" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
+              <h3 className="ix-aim-title">{item.title}</h3>
+              <p>{item.detail}</p>
+            </li>
+          ))}
+        </ol>
+        <div className="ix-sdgs" aria-label="UN Sustainable Development Goals">
+          <p className="sx-label">Aligned with the UN Sustainable Development Goals</p>
+          <ul>
+            {SDGS.map((g) => (
+              <li key={g.n}>
+                <span className="ix-sdg-n">
+                  <small>SDG</small>
+                  {g.n}
+                </span>
+                <span className="ix-sdg-t">{g.title}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
+    </section>
+  )
+}
+
+/** the text with one phrase in it set as emphasis (matched without regard to case); unchanged when it is absent */
+function emphasise(text: string, phrase: string) {
+  const at = text.toLowerCase().indexOf(phrase.toLowerCase())
+  if (at < 0) return text
+  return (
+    <>
+      {text.slice(0, at)}
+      <em>{text.slice(at, at + phrase.length)}</em>
+      {text.slice(at + phrase.length)}
+    </>
+  )
+}
+
+export function CompanySection() {
+  const field = INDUSTRIES.find((ind) => ind.scope === 'current')
+  return (
+    <section className="sx tone-ivory sx--company" id="company">
+      <div className="sx-inner">
+        <p className="sx-kicker">Company</p>
+        <h2 className="cox-mark">{POSITIONING.company}</h2>
+        {/* the positioning, as one statement: the company first, then what it builds today */}
+        <p className="cox-statement">{emphasise(POSITIONING.companyLine, POSITIONING.category)}</p>
+        <div className="cox-body">
+          {/* where today's products sit inside the company's field: the category, the industry, the current products */}
+          <figure className="cox-rings" aria-label="INFINOS positioning">
+            <div className="cox-ring cox-ring--1">
+              <span className="cox-ring-label">
+                <b>Focus</b>
+                {POSITIONING.category}
+              </span>
+              <div className="cox-ring cox-ring--2">
+                <span className="cox-ring-label">
+                  <b>Industry today</b>
+                  {field?.name ?? 'Healthcare & diagnostics'}
+                </span>
+                <div className="cox-ring cox-ring--3">
+                  <span className="cox-ring-label">
+                    <b>Current products</b>
+                    {POSITIONING.currentFocus}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </figure>
+          <div className="cox-copy">
+            <p className="sx-lede">{POSITIONING.currentLine}</p>
+            <dl className="cox-colophon">
+              <div>
+                <dt>Company</dt>
+                <dd>{POSITIONING.legalName}</dd>
+              </div>
+              <div>
+                <dt>Current products</dt>
+                <dd>{POSITIONING.currentFocus}</dd>
+              </div>
+              <div>
+                <dt>Web</dt>
+                <dd>
+                  <a href={CONTACT.websiteUrl} rel="noopener">{CONTACT.website}</a>
+                </dd>
+              </div>
+            </dl>
           </div>
-          <div>
-            <dt>Current products</dt>
-            <dd>{POSITIONING.currentFocus}</dd>
-          </div>
-          <div>
-            <dt>Web</dt>
-            <dd>
-              <a href={CONTACT.websiteUrl} rel="noopener">{CONTACT.website}</a>
-            </dd>
-          </div>
-        </dl>
+        </div>
       </div>
     </section>
   )

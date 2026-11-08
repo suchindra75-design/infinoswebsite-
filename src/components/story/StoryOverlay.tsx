@@ -5,14 +5,14 @@ import { STORY } from '@/content/story'
 import { STORY_RANGES, chapterAt, smoothstep } from '@/motion/chapters'
 import { cameraAt } from '@/motion/cameraTrack'
 import { anchorWorld } from '@/motion/anchors'
-import { compositionAt, layoutMode, type Composition, type LayoutMode } from '@/motion/composition'
-import { addRenderer } from '@/motion/frameLoop'
+import { compositionAt, layoutMode, PHONE_TOP, setPhoneZones, type Composition, type LayoutMode, type PhoneZone } from '@/motion/composition'
+import { addRenderer, requestFrame } from '@/motion/frameLoop'
 import { filmLayout, projectToFilm } from '@/motion/sequences'
 import { useExperienceStore } from '@/state/experienceStore'
 import { openProductViewer } from '@/components/viewer/ProductViewer'
 import { PILLARS, ZONES } from '@/content/platform'
 import { StoryFigure } from './Figures'
-import { stageSize } from '@/hooks/environment'
+import { smallViewportHeight, stageSize } from '@/hooks/environment'
 
 /**
  * Editorial layer over the product stage: one chapter headline at a time, set in the negative space the composition
@@ -29,7 +29,10 @@ const actLabel = (act: number) => (act ? `${PILLARS[act - 1].numeral} · ${PILLA
 const ZONE_MARKS = STORY.flatMap((c, chapter) => (c.zones ?? []).map((z) => ({ ...z, chapter })))
 const EDGE = 0.008 // callout fade width (global progress)
 
-function chapterVisibility(i: number, p: number, phone: boolean) {
+/** phone variants whose text hangs from the top of the screen (the rest stand on its foot; split spans both) */
+const TOP_VARIANTS = new Set(['annotated', 'offset'])
+
+export function chapterVisibility(i: number, p: number, phone: boolean) {
   const r = STORY_RANGES[i]
   const len = r.end - r.start
   const d = Math.min(0.018, len * 0.22)
@@ -56,6 +59,19 @@ export function StoryOverlay() {
     if (!root) return
     const comp: Composition = { x: 0.5, y: 0.5, s: 1 }
     const last = new Map<HTMLElement, string>()
+    // chapter text: opacity plus its entrance (--i) and exit (--o) as custom properties; each composition turns them
+    // into its own movement in CSS (globals.css .ed-chapter[data-variant]), so the frame loop writes two numbers
+    const writeChapter = (el: HTMLElement | null, opacity: number, i: number, o: number) => {
+      if (!el) return
+      const key = `${opacity.toFixed(3)}|${i.toFixed(3)}|${o.toFixed(3)}`
+      if (last.get(el) === key) return
+      last.set(el, key)
+      el.style.opacity = opacity.toFixed(3)
+      el.style.setProperty('--i', i.toFixed(3))
+      el.style.setProperty('--o', o.toFixed(3))
+      el.style.visibility = opacity < 0.005 ? 'hidden' : 'visible'
+      el.classList.toggle('is-live', opacity >= 0.005)
+    }
     const write = (el: HTMLElement | null, opacity: number, transform: string) => {
       if (!el) return
       const key = `${opacity.toFixed(3)}|${transform}`
@@ -81,7 +97,52 @@ export function StoryOverlay() {
         const c = compositionAt((r.start + r.end) / 2, mode as LayoutMode)
         el.dataset.side = mode !== 'landscape' ? 'below' : c.x > 0.52 ? 'left' : c.x < 0.48 ? 'right' : 'left'
       })
+      measure(W, H)
     }
+
+    // phones: where each chapter's text sits, and so the zone it leaves the product (composition.ts phoneZoneAt).
+    // Heights come from layout (offsetHeight ignores the transforms); bottom-anchored text is placed on the small
+    // viewport, where it rides highest.
+    const measure = (W: number, H: number) => {
+      if (mode !== 'phone') return
+      const Hs = Math.min(H, smallViewportHeight() || H)
+      const gap = 14
+      const zones: PhoneZone[] = STORY.map((c, i) => {
+        const el = chapterRefs.current[i]
+        const z = { t: PHONE_TOP, b: Hs * 0.62 - 42, l: 18, r: W - 18 }
+        if (!el) return z
+        const cs = getComputedStyle(el)
+        const top = parseFloat(cs.top) || PHONE_TOP
+        const bottom = parseFloat(cs.bottom) || 26
+        if (c.phone === 'split') {
+          const head = el.querySelector<HTMLElement>('.ed-head')?.offsetHeight ?? 0
+          const rest = el.querySelector<HTMLElement>('.ed-rest')?.offsetHeight ?? 0
+          z.t = top + head + gap
+          z.b = Hs - bottom - rest - gap
+        } else if (TOP_VARIANTS.has(c.phone)) {
+          z.t = top + el.offsetHeight + gap
+          z.b = Hs - 28
+          if (c.phone === 'offset') {
+            z.l = 10
+            z.r = W * 0.84
+          }
+        } else {
+          const textTop = Hs - bottom - el.offsetHeight
+          z.b = textTop - gap
+          // the statement's headline is set large behind the product (StageType.tsx): the bag stands over its last line
+          if (c.phone === 'statement') z.t = PHONE_TOP + (z.b - PHONE_TOP) * 0.4
+        }
+        return z
+      })
+      setPhoneZones(W, H, zones, STORY_RANGES.slice(0, -1).map((r) => r.end))
+      requestFrame()
+    }
+    // text heights change when the web fonts arrive, and whenever the copy reflows
+    const ro = new ResizeObserver(() => {
+      const { W, H } = stageSize()
+      if (mode) measure(W, H)
+    })
+    chapterRefs.current.forEach((el) => el && ro.observe(el))
 
     const render = () => {
       // the stage's size, not the window's: on touch screens it is the large viewport (hooks/environment.ts)
@@ -106,7 +167,7 @@ export function StoryOverlay() {
         // the hero's explore card (below this layer) takes chapter 01's place while a hotspot is open
         const o = i === 0 && st.hotspot ? 0 : v.opacity
         scrim[side] = Math.max(scrim[side], shown ? o : 0)
-        write(el, o, `translate3d(0, ${((1 - v.fadeIn) * 26 - (1 - v.fadeOut) * 18).toFixed(1)}px, 0)`)
+        writeChapter(el, o, v.fadeIn, v.fadeOut)
       }
       for (const k of ['left', 'right', 'below'] as const) write(scrimRefs.current[k], scrim[k], 'none')
 
@@ -184,7 +245,12 @@ export function StoryOverlay() {
       })
     }
 
-    return addRenderer(render, 10)
+    const off = addRenderer(render, 10)
+    document.fonts?.ready.then(() => { size = '' ; requestFrame() })
+    return () => {
+      off()
+      ro.disconnect()
+    }
   }, [])
 
   return (
@@ -198,14 +264,25 @@ export function StoryOverlay() {
           ref={(el) => { chapterRefs.current[i] = el }}
           className="ed-chapter"
           data-chapter={c.id}
+          data-variant={c.phone}
           style={{ opacity: 0, visibility: 'hidden' }}
         >
-          <p className="ed-kicker">
-            <span className="ed-kicker-index">{c.index}</span>
-            <span className="ed-kicker-name">{c.name}</span>
-          </p>
-          <h2 className="ed-headline">{c.headline}</h2>
+          <div className="ed-head">
+            <p className="ed-kicker">
+              <span className="ed-kicker-index">{c.index}</span>
+              <span className="ed-kicker-name">{c.name}</span>
+            </p>
+            <h2 className="ed-headline">{c.headline}</h2>
+          </div>
+          <div className="ed-rest">
           <p className="ed-body">{c.body}</p>
+          {c.strip && (
+            <ol className="ed-strip" aria-label="Monitoring chain">
+              {c.strip.map((s) => (
+                <li key={s}>{s}</li>
+              ))}
+            </ol>
+          )}
           {c.figure && (
             <div className="ed-figure">
               <StoryFigure id={c.figure} />
@@ -226,6 +303,7 @@ export function StoryOverlay() {
               </button>
             </div>
           )}
+          </div>
         </section>
       ))}
       {CALLOUTS.map((c, i) => (

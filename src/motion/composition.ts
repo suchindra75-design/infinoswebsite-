@@ -112,18 +112,62 @@ const PHONE_OPENING = { x: 0.5, y: 0.5, s: 0.8 }
 const PHONE_SETTLE = 0.045
 const PHONE_MAX_S = 1.15
 /** the nav bar (64 px) and a margin below it */
-const PHONE_TOP = 64 + 22
+export const PHONE_TOP = 64 + 22
 const phoneRect = [0, 0, 0, 0, 0, 0]
 
 /**
  * Share of the screen width kept free on the right for labels drawn beside the product: the temperature-zone brackets
- * of chapter 02 (story.ts zones, 0.247–0.297) and the layer labels of the exploded overview (ComponentLabels.tsx).
- * Eased in and out with the composition, so the product glides aside before they appear.
+ * of chapter 02 (story.ts zones, 0.247–0.297), the display callout of chapter 07 and the layer labels of the exploded
+ * overview (ComponentLabels.tsx). Eased in and out with the composition, so the product glides aside before they appear.
  */
 function phoneAside(p: number) {
   const zones = smoothstep(0.228, 0.247, p) * (1 - smoothstep(0.297, 0.312, p))
   const overview = smoothstep(0.83, 0.865, p)
   return Math.max(zones * 0.3, overview * 0.4)
+}
+
+/**
+ * The product zone of every chapter on this phone (StoryOverlay.tsx measures the chapter text and publishes where it
+ * sits): each chapter has its own composition (story.ts PhoneVariant), so the product is fitted above, below or between
+ * the text. Pixels of the stage; `null` until the overlay has measured (the default zone sits above a foot block).
+ */
+export interface PhoneZone {
+  t: number
+  b: number
+  l: number
+  r: number
+}
+let phoneZones: { key: string; zones: PhoneZone[]; bounds: number[] } | null = null
+
+/** the overlay's measurement: one zone per story chapter, for a stage of W x H, with the chapter boundaries */
+export function setPhoneZones(W: number, H: number, zones: PhoneZone[], bounds: number[]) {
+  phoneZones = { key: `${W}x${H}`, zones, bounds }
+}
+
+/** half-width (progress) of the glide from one chapter's zone into the next, centred on the boundary */
+const ZONE_GLIDE = 0.013
+const zoneTmp: PhoneZone = { t: 0, b: 0, l: 0, r: 0 }
+
+function phoneZoneAt(p: number, W: number, H: number, Hs: number): PhoneZone {
+  if (!phoneZones || phoneZones.key !== `${W}x${H}`) {
+    zoneTmp.l = 18
+    zoneTmp.r = W - 18
+    zoneTmp.t = PHONE_TOP
+    zoneTmp.b = Math.max(zoneTmp.t + 160, Hs * 0.62 - 26 - 16)
+    return zoneTmp
+  }
+  const { zones, bounds } = phoneZones
+  // the chapter whose zone applies, and the glide into the next one around each boundary
+  let i = 0
+  while (i < bounds.length && p >= bounds[i] + ZONE_GLIDE) i++
+  const a = zones[Math.min(i, zones.length - 1)]
+  const next = zones[Math.min(i + 1, zones.length - 1)]
+  const t = i < bounds.length ? smoothstep(bounds[i] - ZONE_GLIDE, bounds[i] + ZONE_GLIDE, p) : 0
+  zoneTmp.t = a.t + (next.t - a.t) * t
+  zoneTmp.b = a.b + (next.b - a.b) * t
+  zoneTmp.l = a.l + (next.l - a.l) * t
+  zoneTmp.r = a.r + (next.r - a.r) * t
+  return zoneTmp
 }
 
 function phoneComposition(progress: number, W: number, H: number, out: Composition): Composition {
@@ -134,14 +178,14 @@ function phoneComposition(progress: number, W: number, H: number, out: Compositi
   const b = PHONE_RECTS[i + 1]
   for (let k = 0; k < 6; k++) phoneRect[k] = a[k] + (b[k] - a[k]) * t
   const [x0, y0, x1, y1, sx, sy] = phoneRect
-  // the zone: side margins, under the bar, above the chapter text. globals.css anchors the text to the bottom of the
-  // visible viewport (26 px clear of it) and caps it at 38svh, so it never reaches above 62svh − 26 px — measured on
-  // the small viewport, where it sits highest (address bar shown)
+  // the zone this chapter leaves the product: under the bar and above a foot block, below a top block, between a
+  // headline and its body... — measured on the small viewport, where bottom-anchored text sits highest (address bar shown)
   const Hs = Math.min(H, smallViewportHeight() || H)
-  const zl = 18
-  const zr = W - 18 - phoneAside(progress) * W
-  const zt = PHONE_TOP
-  const zb = Math.max(zt + 160, Hs * 0.62 - 26 - 16)
+  const z = phoneZoneAt(progress, W, H, Hs)
+  const zl = z.l
+  const zr = Math.min(z.r, W - 18 - phoneAside(progress) * W)
+  const zt = z.t
+  const zb = Math.max(zt + 150, z.b)
   const base = Math.min(H, W * 1.6)
   const fill = 0.94
   const s = Math.min(PHONE_MAX_S, (fill * (zr - zl)) / ((x1 - x0) * 1.6 * base), (fill * (zb - zt)) / ((y1 - y0) * base))

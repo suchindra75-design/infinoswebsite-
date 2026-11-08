@@ -5,6 +5,7 @@ import { ProductScene } from './ProductScene'
 import { StudioEnvironment } from './StudioEnvironment'
 import { HOTSPOTS } from '@/content/hotspots'
 import { useExperienceStore } from '@/state/experienceStore'
+import { StageType } from '@/components/story/StageType'
 
 function HotspotCard() {
   const hotspot = useExperienceStore((s) => s.hotspot)
@@ -78,6 +79,8 @@ export function ProductStage() {
       onPointerCancel={onPointerUp}
     >
       <StudioEnvironment />
+      {/* phones: large type between the studio and the bag (chapters 03 and 06) */}
+      <StageType />
       <ProductScene />
       <p className={`rotate-hint ${phase === 'hero' ? 'rotate-hint--visible' : ''}`} aria-hidden="true">
         <span className="rotate-hint-pointer">DRAG TO ROTATE · TAP A MARKER TO EXPLORE</span>

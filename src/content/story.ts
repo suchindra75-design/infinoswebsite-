@@ -32,6 +32,20 @@ export interface ZoneMark {
 
 export type FigureId = 'coolant' | 'compartments' | 'safety' | 'sustain' | 'monitor'
 
+/**
+ * Phone composition of a chapter (globals.css .ed-chapter[data-variant], composition.ts phone zones). Each chapter is
+ * arranged for what it shows:
+ * - cover: the product at full size, the headline set large at the foot (the first impression)
+ * - annotated: text under the bar, the product below it with its zone brackets (a technical plate)
+ * - immersive: the product fills the screen over large type, a short ruled caption at the foot (the opening)
+ * - split: headline above, body below, the product between them (three successive features)
+ * - column: a numeral column beside the text, and the handover chain as a strip (custody)
+ * - statement: the headline set very large behind the product (StageType.tsx), the body at the foot
+ * - offset: text in a right-hand column at the top, the product low and to the left (the display close-up)
+ * - finale: the exploded product with its layer labels, text and actions at the foot
+ */
+export type PhoneVariant = 'cover' | 'annotated' | 'immersive' | 'split' | 'column' | 'statement' | 'offset' | 'finale'
+
 export interface StoryChapter {
   id: string
   index: string
@@ -49,6 +63,9 @@ export interface StoryChapter {
   callouts: Callout[]
   zones?: ZoneMark[]
   cta?: boolean
+  phone: PhoneVariant
+  /** a short sequence shown as a strip on phones (only confirmed elements) */
+  strip?: string[]
 }
 
 // chamber edge used for the zone brackets: the back-right vertical edge — the bag's right-hand silhouette in the
@@ -59,6 +76,7 @@ const EDGE_Z = -0.2
 export const STORY: StoryChapter[] = [
   {
     id: 'overview',
+    phone: 'cover',
     act: 1,
     index: '01',
     // positioning correction: the company is cold-chain technology; the product shown is its current, diagnostic one
@@ -70,6 +88,7 @@ export const STORY: StoryChapter[] = [
   },
   {
     id: 'architecture',
+    phone: 'annotated',
     act: 1,
     index: '02',
     name: 'Dual-temperature architecture',
@@ -84,6 +103,7 @@ export const STORY: StoryChapter[] = [
   },
   {
     id: 'cooling',
+    phone: 'immersive',
     act: 2,
     index: '03',
     name: 'PCM thermal management',
@@ -98,6 +118,7 @@ export const STORY: StoryChapter[] = [
   },
   {
     id: 'compartments',
+    phone: 'split',
     act: 2,
     index: '04',
     name: 'Intelligent compartments',
@@ -113,6 +134,7 @@ export const STORY: StoryChapter[] = [
   },
   {
     id: 'monitoring',
+    phone: 'column',
     act: 2,
     index: '05',
     name: 'Smart monitoring & chain of custody',
@@ -120,6 +142,8 @@ export const STORY: StoryChapter[] = [
     body: 'INFINOS combines sensors and a monitoring application, with chain-of-custody functionality for sample handovers.',
     note: 'Data logging is part of the Smart Diagnostics Flexible Container.',
     figure: 'monitor',
+    // the confirmed monitoring chain (PlatformSections.tsx ArchitectureFigure): no protocols, no counts
+    strip: ['Sensors', 'Monitoring application', 'Chain of custody'],
     callouts: [
       { label: 'Reflective lining', short: 'Reflective lining', component: 'innerBoxLid', point: [0, 0.22, 0.05], window: [0.548, 0.612], side: 'right', phone: true },
       { label: 'Sample rack · 12 × (3 + 4)', component: 'rack', point: [-0.04, 0.07, 0.03], window: [0.575, 0.616], side: 'right' },
@@ -127,6 +151,7 @@ export const STORY: StoryChapter[] = [
   },
   {
     id: 'sustainability',
+    phone: 'statement',
     act: 3,
     index: '06',
     name: 'Sustainable cold chain',
@@ -137,6 +162,7 @@ export const STORY: StoryChapter[] = [
   },
   {
     id: 'safety',
+    phone: 'offset',
     act: 3,
     index: '07',
     name: 'Safety & sample integrity',
@@ -150,6 +176,7 @@ export const STORY: StoryChapter[] = [
   },
   {
     id: 'system',
+    phone: 'finale',
     act: 0,
     index: '08',
     name: 'The complete INFINOS system',
