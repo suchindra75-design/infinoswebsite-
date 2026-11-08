@@ -21,7 +21,7 @@ html.intro-lock body {
 .intro {
   --coral: #cd6256;
   --gold: #f3b953;
-  --ink: #15181c;
+  --ink: #0b141c;
   /* logo mark: 411 x 327 artwork units */
   --mw: clamp(200px, min(40vmin, 62vw), 400px);
   --mh: calc(var(--mw) * 0.79562);
@@ -43,7 +43,7 @@ html.intro-lock body {
   position: absolute;
   inset: 0;
   background:
-    radial-gradient(70% 55% at 50% 52%, rgba(40, 46, 52, 0.7) 0%, rgba(26, 30, 35, 0.5) 45%, rgba(21, 24, 28, 0) 80%),
+    radial-gradient(70% 55% at 50% 52%, rgba(28, 44, 58, 0.7) 0%, rgba(16, 30, 42, 0.5) 45%, rgba(11, 21, 30, 0) 80%),
     var(--ink);
 }
 
@@ -82,21 +82,21 @@ html.intro-lock body {
 /* distant city lights (the old "clouds", re-imagined as bokeh) */
 .ld-sky--far {
   background-image:
-    radial-gradient(circle at 8% 34%, rgba(234, 231, 223, 0.22) 0 0.35vmin, rgba(234, 231, 223, 0.07) 1.2vmin, transparent 2.6vmin),
+    radial-gradient(circle at 8% 34%, rgba(230, 236, 240, 0.22) 0 0.35vmin, rgba(230, 236, 240, 0.07) 1.2vmin, transparent 2.6vmin),
     radial-gradient(circle at 23% 41%, rgba(255, 255, 255, 0.16) 0 0.3vmin, transparent 2vmin),
-    radial-gradient(circle at 37% 30%, rgba(132, 150, 163, 0.2) 0 0.4vmin, rgba(132, 150, 163, 0.06) 1.4vmin, transparent 3vmin),
-    radial-gradient(circle at 52% 44%, rgba(234, 231, 223, 0.16) 0 0.3vmin, transparent 2.2vmin),
+    radial-gradient(circle at 37% 30%, rgba(111, 147, 173, 0.2) 0 0.4vmin, rgba(111, 147, 173, 0.06) 1.4vmin, transparent 3vmin),
+    radial-gradient(circle at 52% 44%, rgba(230, 236, 240, 0.16) 0 0.3vmin, transparent 2.2vmin),
     radial-gradient(circle at 66% 33%, rgba(255, 255, 255, 0.14) 0 0.35vmin, transparent 2.4vmin),
-    radial-gradient(circle at 81% 39%, rgba(132, 150, 163, 0.18) 0 0.3vmin, transparent 2.4vmin),
-    radial-gradient(circle at 94% 29%, rgba(234, 231, 223, 0.18) 0 0.35vmin, transparent 2.6vmin);
+    radial-gradient(circle at 81% 39%, rgba(111, 147, 173, 0.18) 0 0.3vmin, transparent 2.4vmin),
+    radial-gradient(circle at 94% 29%, rgba(230, 236, 240, 0.18) 0 0.35vmin, transparent 2.6vmin);
 }
 
 .ld-sky--near {
   background-image:
-    radial-gradient(circle at 14% 22%, rgba(132, 150, 163, 0.1) 0 3vmin, transparent 9vmin),
-    radial-gradient(circle at 47% 78%, rgba(234, 231, 223, 0.08) 0 4vmin, transparent 11vmin),
+    radial-gradient(circle at 14% 22%, rgba(111, 147, 173, 0.1) 0 3vmin, transparent 9vmin),
+    radial-gradient(circle at 47% 78%, rgba(230, 236, 240, 0.08) 0 4vmin, transparent 11vmin),
     radial-gradient(circle at 76% 18%, rgba(255, 255, 255, 0.05) 0 3vmin, transparent 10vmin),
-    radial-gradient(circle at 92% 72%, rgba(132, 150, 163, 0.08) 0 3.5vmin, transparent 10vmin);
+    radial-gradient(circle at 92% 72%, rgba(111, 147, 173, 0.08) 0 3.5vmin, transparent 10vmin);
 }
 
 .ld-streaks {
@@ -115,11 +115,11 @@ html.intro-lock body {
 }
 
 .ld-streak--c {
-  background: linear-gradient(90deg, rgba(132, 150, 163, 0.55), rgba(132, 150, 163, 0));
+  background: linear-gradient(90deg, rgba(111, 147, 173, 0.55), rgba(111, 147, 173, 0));
 }
 
 .ld-streak--y {
-  background: linear-gradient(90deg, rgba(234, 231, 223, 0.5), rgba(234, 231, 223, 0));
+  background: linear-gradient(90deg, rgba(230, 236, 240, 0.5), rgba(230, 236, 240, 0));
 }
 
 .ld-road {
@@ -132,8 +132,8 @@ html.intro-lock body {
   -webkit-mask-image: linear-gradient(90deg, transparent, #000 18%, #000 82%, transparent);
   mask-image: linear-gradient(90deg, transparent, #000 18%, #000 82%, transparent);
   background:
-    linear-gradient(90deg, rgba(234, 231, 223, 0.4), rgba(132, 150, 163, 0.45)) top / 100% 1px no-repeat,
-    linear-gradient(180deg, rgba(234, 231, 223, 0.07), rgba(21, 24, 28, 0) 60%);
+    linear-gradient(90deg, rgba(230, 236, 240, 0.4), rgba(111, 147, 173, 0.45)) top / 100% 1px no-repeat,
+    linear-gradient(180deg, rgba(230, 236, 240, 0.07), rgba(11, 21, 30, 0) 60%);
 }
 
 .ld-lanes {
@@ -210,8 +210,8 @@ html.intro-lock body {
 }
 
 .ld-trail span:nth-child(1) { top: 18%; width: 70%; background: linear-gradient(270deg, rgba(255, 255, 255, 0.7), transparent); }
-.ld-trail span:nth-child(2) { top: 42%; width: 95%; background: linear-gradient(270deg, rgba(132, 150, 163, 0.85), transparent); }
-.ld-trail span:nth-child(3) { top: 61%; width: 55%; background: linear-gradient(270deg, rgba(234, 231, 223, 0.8), transparent); }
+.ld-trail span:nth-child(2) { top: 42%; width: 95%; background: linear-gradient(270deg, rgba(111, 147, 173, 0.85), transparent); }
+.ld-trail span:nth-child(3) { top: 61%; width: 55%; background: linear-gradient(270deg, rgba(230, 236, 240, 0.8), transparent); }
 .ld-trail span:nth-child(4) { top: 82%; width: 85%; background: linear-gradient(270deg, rgba(255, 255, 255, 0.45), transparent); }
 
 /* the road's light collapses to the centre point the logo ignites from */
@@ -222,7 +222,7 @@ html.intro-lock body {
   top: calc(50% + var(--vh) * 0.405 - 1px);
   height: 2px;
   opacity: 0;
-  background: linear-gradient(90deg, transparent 6%, rgba(132, 150, 163, 0.75) 34%, #fff4dc 50%, rgba(234, 231, 223, 0.75) 66%, transparent 94%);
+  background: linear-gradient(90deg, transparent 6%, rgba(111, 147, 173, 0.75) 34%, #fff4dc 50%, rgba(230, 236, 240, 0.75) 66%, transparent 94%);
   box-shadow: 0 0 14px rgba(255, 210, 150, 0.55);
 }
 
@@ -238,7 +238,7 @@ html.intro-lock body {
   font-family: var(--font-mono), monospace;
   font-size: 0.56rem;
   letter-spacing: 0.32em;
-  color: rgba(236, 232, 223, 0.55);
+  color: rgba(231, 237, 241, 0.55);
   white-space: nowrap;
 }
 
@@ -373,7 +373,7 @@ html.intro-lock body {
   height: 64vmin;
   margin: -32vmin 0 0 -32vmin;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(255, 248, 232, 0.95) 0 2.5%, rgba(234, 231, 223, 0.5) 8%, rgba(132, 150, 163, 0.2) 22%, transparent 52%);
+  background: radial-gradient(circle, rgba(255, 248, 232, 0.95) 0 2.5%, rgba(230, 236, 240, 0.5) 8%, rgba(111, 147, 173, 0.2) 22%, transparent 52%);
   opacity: 0;
 }
 
@@ -385,7 +385,7 @@ html.intro-lock body {
   width: 96vw;
   height: 2px;
   margin: -1px 0 0 -48vw;
-  background: linear-gradient(90deg, transparent, rgba(132, 150, 163, 0.55) 24%, #fff6e6 50%, rgba(234, 231, 223, 0.55) 76%, transparent);
+  background: linear-gradient(90deg, transparent, rgba(111, 147, 173, 0.55) 24%, #fff6e6 50%, rgba(230, 236, 240, 0.55) 76%, transparent);
   box-shadow: 0 0 18px rgba(255, 205, 150, 0.55);
   opacity: 0;
 }
@@ -402,7 +402,7 @@ html.intro-lock body {
   right: -30%;
   top: 100%;
   height: 46%;
-  background: radial-gradient(50% 60% at 50% 0%, rgba(234, 231, 223, 0.2), rgba(132, 150, 163, 0.07) 45%, transparent 75%);
+  background: radial-gradient(50% 60% at 50% 0%, rgba(230, 236, 240, 0.2), rgba(111, 147, 173, 0.07) 45%, transparent 75%);
 }
 
 .lg-dive {
@@ -448,7 +448,7 @@ html.intro-lock body {
 
 .lg-trace {
   background: linear-gradient(90deg, transparent, #fff 14%, #fff 86%, transparent);
-  box-shadow: 0 0 10px 1px rgba(255, 220, 170, 0.85), 0 0 34px 5px rgba(132, 150, 163, 0.45);
+  box-shadow: 0 0 10px 1px rgba(255, 220, 170, 0.85), 0 0 34px 5px rgba(111, 147, 173, 0.45);
   opacity: 0;
 }
 
@@ -507,7 +507,7 @@ html.intro-lock body {
 
 .lg-spark {
   border-radius: 50%;
-  background: radial-gradient(circle, #fff 0 5%, rgba(255, 228, 175, 0.9) 9%, rgba(234, 231, 223, 0.32) 22%, transparent 50%);
+  background: radial-gradient(circle, #fff 0 5%, rgba(255, 228, 175, 0.9) 9%, rgba(230, 236, 240, 0.32) 22%, transparent 50%);
   opacity: 0;
 }
 
@@ -565,7 +565,7 @@ html.intro-lock body {
   letter-spacing: 0.3em;
   line-height: 1.7;
   text-transform: uppercase;
-  color: rgba(236, 232, 223, 0.62);
+  color: rgba(231, 237, 241, 0.62);
 }
 
 .lg-warp {
@@ -588,11 +588,11 @@ html.intro-lock body {
 }
 
 .lg-warp span:nth-child(3n) {
-  background: linear-gradient(90deg, rgba(234, 231, 223, 0), rgba(234, 231, 223, 0.8));
+  background: linear-gradient(90deg, rgba(230, 236, 240, 0), rgba(230, 236, 240, 0.8));
 }
 
 .lg-warp span:nth-child(3n + 1) {
-  background: linear-gradient(90deg, rgba(132, 150, 163, 0), rgba(132, 150, 163, 0.8));
+  background: linear-gradient(90deg, rgba(111, 147, 173, 0), rgba(111, 147, 173, 0.8));
 }
 
 .intro[data-run] .intro-logo { animation: lg-presence 2s linear 2s both; }
@@ -747,7 +747,7 @@ html.intro-lock body {
   width: 40vmax;
   height: 40vmax;
   margin: -20vmax 0 0 -20vmax;
-  background: radial-gradient(circle, rgba(21, 24, 28, 0) 0 13%, rgba(21, 24, 28, 0.72) 30%, var(--ink) 46%);
+  background: radial-gradient(circle, rgba(11, 21, 30, 0) 0 13%, rgba(11, 21, 30, 0.72) 30%, var(--ink) 46%);
   opacity: 0;
 }
 

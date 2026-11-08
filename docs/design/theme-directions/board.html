@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>INFINOS colour directions</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&family=IBM+Plex+Mono:wght@400;500&family=Roboto+Condensed:wght@700&display=block" rel="stylesheet">
+<style>
+/* Four colour directions, same six phone screens, same real product renders (transparent frames from public/). Only the
+   colour system changes from row to row. */
+* { box-sizing: border-box; margin: 0; }
+body { background: #d9d9d6; font-family: 'DM Sans', sans-serif; padding: 36px 40px 50px; width: 2200px; }
+h1 { font-weight: 400; font-size: 30px; letter-spacing: -0.02em; color: #111; }
+.sub { font: 13px 'IBM Plex Mono', monospace; color: #555; margin: 8px 0 26px; letter-spacing: 0.04em; }
+.row { display: grid; grid-template-columns: 250px repeat(6, 290px); gap: 14px; margin-bottom: 30px; align-items: start; }
+.meta h2 { font-weight: 500; font-size: 21px; letter-spacing: -0.02em; color: #111; }
+.meta p { font-size: 12.5px; line-height: 1.5; color: #333; margin-top: 8px; }
+.sw { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 12px; }
+.sw i { width: 34px; height: 34px; border-radius: 3px; box-shadow: inset 0 0 0 1px rgba(0,0,0,.12); position: relative; }
+.sw i::after { content: attr(data-n); position: absolute; top: 37px; left: 0; font: 8px 'IBM Plex Mono'; color: #555; white-space: nowrap; }
+.sw { padding-bottom: 14px; }
+.cap { font: 10px 'IBM Plex Mono', monospace; letter-spacing: .12em; text-transform: uppercase; color: #666; margin-bottom: 6px; }
+
+/* a phone screen */
+.ph { position: relative; width: 290px; height: 628px; overflow: hidden; border-radius: 22px; background: var(--studio); color: var(--ink); box-shadow: 0 18px 40px rgba(0,0,0,.18); }
+.ph.dark { background: var(--deep-bg); color: var(--deep-ink); }
+.ph img.f { position: absolute; max-width: none; }
+.nav { position: absolute; left: 0; right: 0; top: 0; height: 52px; display: flex; align-items: center; justify-content: space-between; padding: 0 18px; z-index: 3; }
+.mark { display: flex; align-items: center; gap: 8px; font: 700 13px 'Roboto Condensed'; letter-spacing: .26em; }
+.mark b { width: 18px; height: 14px; background: #cd6256; position: relative; }
+.mark b::before { content: ''; position: absolute; inset: 2px; background: #f3b953; }
+.mark b::after { content: ''; position: absolute; inset: 4px 4px; background: #000; }
+.mark small { font: 400 8px 'IBM Plex Mono'; letter-spacing: .3em; opacity: .6; }
+.menu { width: 18px; height: 7px; border-top: 1.5px solid currentColor; border-bottom: 1.5px solid currentColor; }
+.txt { position: absolute; left: 20px; right: 20px; bottom: 26px; z-index: 2; }
+.k { font: 8.5px 'IBM Plex Mono', monospace; letter-spacing: .2em; text-transform: uppercase; color: var(--accent); margin-bottom: 9px; }
+.ph.dark .k { color: var(--deep-accent); }
+.hl { font-weight: 300; font-size: 29px; line-height: 1.04; letter-spacing: -0.035em; }
+.bd { font-size: 11.5px; line-height: 1.5; color: var(--muted); margin-top: 9px; }
+.ph.dark .bd { color: var(--deep-muted); }
+.note { font: 8px 'IBM Plex Mono'; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); margin-top: 9px; opacity: .85; }
+.btns { display: flex; gap: 6px; margin-top: 13px; }
+.btn { font-size: 10px; padding: 9px 12px; border-radius: 99px; border: 1px solid var(--line); }
+.btn.p { background: var(--btn); color: var(--btn-ink); border-color: var(--btn); }
+.ph.dark .btn { border-color: var(--deep-line); }
+.ph.dark .btn.p { background: var(--deep-btn); color: var(--deep-btn-ink); border-color: var(--deep-btn); }
+.pill { position: absolute; z-index: 3; font: 8px 'IBM Plex Mono'; letter-spacing: .16em; text-transform: uppercase; padding: 6px 9px; border-radius: 99px; border: 1px solid var(--line); }
+/* zone brackets */
+.zone { position: absolute; z-index: 2; width: 1px; background: var(--anno); }
+.zone::before, .zone::after { content: ''; position: absolute; left: -4px; width: 9px; height: 1px; background: var(--anno); }
+.zone::before { top: 0 } .zone::after { bottom: 0 }
+.zl { position: absolute; z-index: 2; font: 8px 'IBM Plex Mono'; letter-spacing: .14em; text-transform: uppercase; color: var(--anno); line-height: 1.6; }
+.zl b { display: block; font: 400 17px 'DM Sans'; letter-spacing: -.02em; text-transform: none; color: var(--ink); }
+.ph.dark .zl b { color: var(--deep-ink); }
+.ph.dark .zl, .ph.dark .zone, .ph.dark .zone::before, .ph.dark .zone::after { color: var(--deep-anno); background: var(--deep-anno); }
+.ph.dark .zl { background: none; }
+/* coolant selector */
+.sel { position: absolute; left: 16px; right: 16px; bottom: 26px; display: flex; gap: 6px; z-index: 2; }
+.sel span { flex: 1; text-align: center; font: 8px 'IBM Plex Mono'; letter-spacing: .14em; text-transform: uppercase; padding: 10px 0; border-radius: 99px; border: 1px solid var(--line); }
+.ph.dark .sel span { border-color: var(--deep-line); }
+.sel span.on { background: var(--sel); color: var(--sel-ink); border-color: var(--sel); }
+.ctop { position: absolute; top: 74px; left: 20px; right: 20px; text-align: center; z-index: 2; }
+/* range */
+.rg { position: absolute; left: 20px; right: 20px; top: 352px; z-index: 2; }
+.rg .row2 { display: grid; grid-template-columns: 1fr 1fr 1fr; border-top: 1px solid var(--line); margin-top: 12px; }
+.ph.dark .rg .row2 { border-color: var(--deep-line); }
+.rg .row2 div { padding: 9px 6px 0 0; font-size: 9.5px; line-height: 1.35; }
+.rg .row2 div i { display: block; font: 7px 'IBM Plex Mono'; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); margin-bottom: 4px; font-style: normal; }
+.ph.dark .rg .row2 div i { color: var(--deep-muted); }
+.big { font-weight: 300; font-size: 38px; letter-spacing: -.04em; line-height: 1; }
+.mail { font-size: 15px; margin-top: 14px; border-bottom: 1px solid var(--deep-line); padding-bottom: 6px; display: inline-block; }
+.foot { position: absolute; left: 20px; right: 20px; bottom: 22px; font: 7.5px 'IBM Plex Mono'; letter-spacing: .16em; text-transform: uppercase; color: var(--deep-muted); display: flex; justify-content: space-between; border-top: 1px solid var(--deep-line); padding-top: 10px; }
+
+/* ── the four colour systems ── */
+.A { /* Arctic luxury: glacier atelier + midnight */
+  --studio: radial-gradient(70% 38% at 52% 34%, rgba(255,255,255,.75), rgba(255,255,255,0) 70%), linear-gradient(180deg, #e4eaee 0%, #edf1f3 46%, #dfe6ea 58%, #c9d3d9 100%);
+  --ink: #0d1822; --muted: #4c5a66; --accent: #4f7b9a; --line: rgba(13,24,34,.18); --anno: #3e6f93;
+  --btn: #0d1822; --btn-ink: #eef3f6; --sel: #0d1822; --sel-ink: #eef3f6;
+  --deep-bg: radial-gradient(80% 40% at 50% 38%, #1a2c3b 0%, #0d1822 70%); --deep-ink: #eef3f6; --deep-muted: #93a6b5; --deep-accent: #9cc2dc; --deep-line: rgba(238,243,246,.18); --deep-anno: #9cc2dc; --deep-btn: #eef3f6; --deep-btn-ink: #0d1822;
+}
+.B { /* Titanium engineering: brushed titanium + thermal orange */
+  --studio: repeating-linear-gradient(90deg, rgba(255,255,255,.035) 0 1px, rgba(0,0,0,.02) 1px 3px), radial-gradient(70% 38% at 52% 34%, rgba(255,255,255,.4), rgba(255,255,255,0) 70%), linear-gradient(180deg, #b9bdbf 0%, #c6c9ca 46%, #b2b6b8 58%, #8f9497 100%);
+  --ink: #141719; --muted: #3c4246; --accent: #b35a1c; --line: rgba(20,23,25,.22); --anno: #a8541a;
+  --btn: #141719; --btn-ink: #e9eaea; --sel: #d9772b; --sel-ink: #141719;
+  --deep-bg: linear-gradient(180deg, #24282b, #16191b); --deep-ink: #eceded; --deep-muted: #9aa0a4; --deep-accent: #e2894a; --deep-line: rgba(236,237,237,.16); --deep-anno: #e2894a; --deep-btn: #d9772b; --deep-btn-ink: #141719;
+}
+.C { /* Obsidian automotive: obsidian + champagne */
+  --studio: radial-gradient(60% 34% at 52% 36%, rgba(120,112,98,.32), rgba(0,0,0,0) 72%), linear-gradient(180deg, #0c0d0f 0%, #121315 50%, #0a0b0c 100%);
+  --ink: #f1ede5; --muted: #9b968c; --accent: #c7b28a; --line: rgba(241,237,229,.2); --anno: #c7b28a;
+  --btn: #c7b28a; --btn-ink: #0c0d0f; --sel: #c7b28a; --sel-ink: #0c0d0f;
+  --deep-bg: #070708; --deep-ink: #f1ede5; --deep-muted: #8e8a81; --deep-accent: #c7b28a; --deep-line: rgba(241,237,229,.16); --deep-anno: #c7b28a; --deep-btn: #c7b28a; --deep-btn-ink: #0c0d0f;
+}
+.D { /* Deep ocean & teal */
+  --studio: radial-gradient(60% 34% at 52% 36%, rgba(86,150,160,.28), rgba(0,0,0,0) 72%), linear-gradient(180deg, #0d2531 0%, #12303d 50%, #0a1d26 100%);
+  --ink: #e7f1f2; --muted: #93aeb5; --accent: #5cb8ad; --line: rgba(231,241,242,.2); --anno: #5cb8ad;
+  --btn: #5cb8ad; --btn-ink: #071820; --sel: #5cb8ad; --sel-ink: #071820;
+  --deep-bg: #071820; --deep-ink: #e7f1f2; --deep-muted: #86a2aa; --deep-accent: #5cb8ad; --deep-line: rgba(231,241,242,.16); --deep-anno: #5cb8ad; --deep-btn: #5cb8ad; --deep-btn-ink: #071820;
+}
+/* in the dark directions the "deep" screens are the same environment */
+</style>
+</head>
+<body>
+<h1>INFINOS — four colour directions, tested on the real product</h1>
+<p class="sub">Same six phone screens and the same renders (transparent Cycles frames, coolant fan, range render). Only the colour system changes.</p>
+
+<div id="rows"></div>
+
+<template id="screens">
+  <div><p class="cap">01 · Hero / reveal</p>
+  <div class="ph">
+    <div class="nav"><span class="mark"><b></b>INFINOS <small>TECH</small></span><span class="menu"></span></div>
+    <img class="f" src="../../../public/sequences/reveal/mobile/0071.webp" style="width:600px;left:-232px;top:0px">
+    <div class="txt"><p class="k">01 — Smart cold chain</p><p class="hl">The cold chain,<br>made smart.</p><p class="bd">Smart, temperature-controlled transportation for diagnostic samples, from homes to laboratories and hospitals.</p><p class="note">Shown: INFINOS Pro dual-chamber bag</p></div>
+  </div></div>
+
+  <div><p class="cap">02 · Open product</p>
+  <div class="ph">
+    <div class="nav"><span class="mark"><b></b>INFINOS <small>TECH</small></span><span class="menu"></span></div>
+    <img class="f" src="../../../public/sequences/open/mobile/0119.webp" style="width:500px;left:-112px;top:44px">
+    <div class="txt"><p class="k">04 — Intelligent compartments</p><p class="hl">A place for<br>every sample.</p><p class="bd">Zone 1 in the upper chamber, Zone 2 in the lower chamber, and a removable inner box.</p></div>
+  </div></div>
+
+  <div><p class="cap">03 · Temperature zones</p>
+  <div class="ph">
+    <div class="nav"><span class="mark"><b></b>INFINOS <small>TECH</small></span><span class="menu"></span></div>
+    <img class="f" src="../../../public/sequences/reveal/mobile/0071.webp" style="width:560px;left:-262px;top:10px">
+    <span class="zone" style="left:206px;top:118px;height:96px"></span><span class="zl" style="left:216px;top:136px">Zone 1<b>2–8 °C</b>Upper</span>
+    <span class="zone" style="left:206px;top:226px;height:102px"></span><span class="zl" style="left:216px;top:248px">Zone 2<b>e.g. −10 °C</b>Lower</span>
+    <div class="txt"><p class="k">02 — Dual-temperature architecture</p><p class="hl">Two zones,<br>by design.</p><p class="note">Simultaneous operation awaits validation</p></div>
+  </div></div>
+
+  <div><p class="cap">04 · Coolant showcase</p>
+  <div class="ph CO">
+    <div class="nav"><span class="mark"><b></b>INFINOS <small>TECH</small></span><span class="menu"></span></div>
+    <div class="ctop"><p class="k">INFINOS coolants</p><p class="hl" style="font-size:23px">Three variants.<br>One coolant family.</p></div>
+    <img class="f" src="../../../public/images/coolants-fan.webp" style="width:520px;left:-115px;top:150px">
+    <div class="sel"><span class="on">Organic</span><span>Inorganic</span><span>Eutectic</span></div>
+  </div></div>
+
+  <div><p class="cap">05 · Product range</p>
+  <div class="ph RG">
+    <div class="nav"><span class="mark"><b></b>INFINOS <small>TECH</small></span><span class="menu"></span></div>
+    <img class="f" src="../../../public/images/range-pro.webp" style="width:200px;left:45px;top:62px">
+    <div class="rg"><p class="k">Product range · 02 / 03</p><p class="hl" style="font-size:24px">INFINOS Pro<br>Dual-Chamber Bag</p>
+      <div class="row2"><div><i>Form</i>Dual compartment</div><div><i>Zones</i>Zone 1 · upper</div><div><i>Cooling</i>PCM-based</div></div></div>
+  </div></div>
+
+  <div><p class="cap">06 · Contact / close</p>
+  <div class="ph dark">
+    <div class="nav"><span class="mark"><b></b>INFINOS <small>TECH</small></span><span class="menu"></span></div>
+    <div class="txt" style="bottom:120px"><p class="k">Contact</p><p class="big">Talk to<br>INFINOS.</p><p class="bd">Healthcare and diagnostics teams: pilots, deployment and new applications.</p><p class="mail">contact@infinostech.com</p></div>
+    <div class="foot"><span>© 2026 Infinostech</span><span>Smart cold-chain technology</span></div>
+  </div></div>
+</template>
+
+<script>
+const D = [
+  ['A', 'A · Arctic luxury', 'Glacier-white atelier for the product, midnight for depth. Cold, clinical light — the product\'s red and black read at full strength; one cool accent for annotations only.', [['#e4eaee','wall'],['#c9d3d9','floor'],['#0d1822','midnight'],['#4c5a66','muted'],['#4f7b9a','glacier'],['#9cc2dc','ice']]],
+  ['B', 'B · Titanium engineering', 'Brushed titanium greys with the thermal orange of the bag\'s own lining as the one accent. Workshop precision.', [['#c6c9ca','titanium'],['#8f9497','alloy'],['#141719','graphite'],['#3c4246','muted'],['#d9772b','thermal'],['#24282b','deep']]],
+  ['C', 'C · Obsidian automotive', 'Near-black showroom with a champagne accent. Dramatic — but the bag\'s black lower chamber sinks into the floor.', [['#121315','obsidian'],['#070708','deep'],['#f1ede5','ivory'],['#9b968c','muted'],['#c7b28a','champagne'],['#2a2826','line']]],
+  ['D', 'D · Deep ocean & teal', 'Deep ocean blue with a teal accent: cold-chain by association, but red against teal fights and the black chamber loses its edge.', [['#12303d','ocean'],['#071820','abyss'],['#e7f1f2','foam'],['#93aeb5','muted'],['#5cb8ad','teal'],['#0d2531','deep']]],
+]
+const tpl = document.getElementById('screens').innerHTML
+for (const [cls, name, why, sw] of D) {
+  const row = document.createElement('div')
+  row.className = 'row ' + cls
+  row.innerHTML = `<div class="meta"><h2>${name}</h2><p>${why}</p><div class="sw">${sw.map(([c, n]) => `<i style="background:${c}" data-n="${n}"></i>`).join('')}</div></div>` + tpl
+  // dark directions: the coolant and range screens use the same environment
+  document.getElementById('rows').appendChild(row)
+}
+</script>
+</body>
+</html>

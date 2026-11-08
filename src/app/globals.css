@@ -3,31 +3,31 @@
    is never an interface colour. Semantic tokens below describe dark surfaces; a .tone-ivory / .tone-white section
    redefines them, so every component inside reads the right text, line and accent colours. */
 :root {
-  --graphite: #171b1f;
-  --graphite-deep: #111417;
-  --slate: #292f34;
-  --ivory: #eae7df;
-  --white: #f7f6f2;
-  --steel: #8496a3;
-  --steel-light: #a9b7c1;
-  --steel-dark: #4b5d6a;
+  --graphite: #0d1822;
+  --graphite-deep: #08121b;
+  --slate: #121d27;
+  --ivory: #e6ecf0;
+  --white: #f3f6f8;
+  --steel: #6f93ad;
+  --steel-light: #9cc2dc;
+  --steel-dark: #3f6f92;
 
   /* semantic — dark surfaces (contrast on graphite: 16.0 / 12.6 / 7.9 / 5.9 / 5.7 : 1) */
   --bg: var(--graphite);
-  --bg-2: #1c2125;
-  --surface: #1e2328;
-  --text-strong: #f7f6f2;
-  --text: #e1e4e6;
-  --muted: #a7b0b8;
-  --faint: #8e98a0;
-  --line: rgba(247, 246, 242, 0.1);
-  --line-mid: rgba(247, 246, 242, 0.16);
-  --line-strong: rgba(247, 246, 242, 0.24);
+  --bg-2: #122030;
+  --surface: #152536;
+  --text-strong: #f3f6f8;
+  --text: #dde7ee;
+  --muted: #a0b3c2;
+  --faint: #8499aa;
+  --line: rgba(244, 247, 249, 0.1);
+  --line-mid: rgba(244, 247, 249, 0.16);
+  --line-strong: rgba(244, 247, 249, 0.24);
   --border: var(--line);
   --border-strong: var(--line-strong);
   --accent: var(--steel);
   --accent-strong: var(--steel-light);
-  --cold: #7fa6c4;
+  --cold: #8fb8d6;
   --hot: #b8a58a;
   --nav-height: 64px;
 
@@ -36,9 +36,9 @@
      an edge vignette and fine grain against banding. Static: painted once, never animated. */
   --studio:
     url('/textures/grain.png') repeat 0 0 / var(--grain-size) var(--grain-size),
-    radial-gradient(130% 95% at 50% 46%, rgba(17, 20, 23, 0) 52%, rgba(12, 14, 16, 0.62) 100%),
-    radial-gradient(52% 46% at 50% 40%, rgba(214, 220, 224, 0.1) 0%, rgba(214, 220, 224, 0.045) 42%, rgba(214, 220, 224, 0) 78%),
-    linear-gradient(180deg, #1a1e22 0%, #23282d 36%, #2a3035 55%, #22272b 72%, #181b1f 100%);
+    radial-gradient(130% 95% at 50% 46%, rgba(11, 22, 32, 0) 52%, rgba(6, 12, 18, 0.62) 100%),
+    radial-gradient(52% 46% at 50% 40%, rgba(210, 224, 233, 0.1) 0%, rgba(210, 224, 233, 0.045) 42%, rgba(210, 224, 233, 0) 78%),
+    linear-gradient(180deg, #0e1a25 0%, #152431 36%, #1a2b3a 55%, #132230 72%, #0b151f 100%);
 
   /* grain at native density: one speck per device pixel on high-density screens */
   --grain-size: 160px;
@@ -65,23 +65,23 @@
 
 .tone-slate {
   --bg: var(--slate);
-  --faint: #99a3ab;
+  --faint: #93a9ba;
   --accent: var(--steel-light);
-  --accent-strong: #c6d1d9;
-  background: linear-gradient(180deg, #2b3136 0%, var(--slate) 40%, #262b30 100%);
+  --accent-strong: #c4dbea;
+  background: linear-gradient(180deg, #17222c 0%, var(--slate) 40%, #0e1820 100%);
 }
 
 .tone-ivory,
 .tone-white {
-  --text-strong: #171b1f;
-  --text: #2b3136;
-  --muted: #50585f;
-  --faint: #5f676e;
-  --line: rgba(23, 27, 31, 0.12);
-  --line-mid: rgba(23, 27, 31, 0.2);
-  --line-strong: rgba(23, 27, 31, 0.3);
+  --text-strong: #0d1822;
+  --text: #1d2e3d;
+  --muted: #485765;
+  --faint: #5b6a77;
+  --line: rgba(13, 24, 34, 0.12);
+  --line-mid: rgba(13, 24, 34, 0.2);
+  --line-strong: rgba(13, 24, 34, 0.3);
   --accent: var(--steel-dark);
-  --accent-strong: #33424d;
+  --accent-strong: #2c5675;
   --surface: #ffffff;
   color: var(--text);
 }
@@ -179,7 +179,7 @@ button {
 }
 
 .nav--scrolled {
-  background: rgba(23, 27, 31, 0.8);
+  background: rgba(13, 24, 34, 0.8);
   backdrop-filter: blur(14px) saturate(1.2);
   -webkit-backdrop-filter: blur(14px) saturate(1.2);
   border-bottom: 1px solid var(--border);
@@ -258,7 +258,9 @@ button {
   position: fixed;
   inset: 0;
   z-index: 35;
-  background: rgba(23, 27, 31, 0.97);
+  background:
+    radial-gradient(70% 40% at 80% 18%, rgba(86, 128, 160, 0.18), rgba(13, 24, 34, 0) 70%),
+    rgba(10, 19, 27, 0.985);
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -276,18 +278,23 @@ button {
 .mobile-menu-links {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 0;
 }
 
+/* the menu: a midnight panel, the sections set large and light, each on its own hairline */
 .mobile-menu-link {
   display: flex;
   align-items: baseline;
-  gap: 16px;
-  font-family: var(--font-display), sans-serif;
-  font-weight: 700;
-  font-size: clamp(2rem, 9vw, 3rem);
-  letter-spacing: 0.03em;
-  padding: 12px 0;
+  gap: 18px;
+  width: 100%;
+  font-family: var(--font-body), sans-serif;
+  font-weight: 300;
+  font-size: clamp(2rem, 9vw, 2.8rem);
+  letter-spacing: -0.035em;
+  color: var(--text-strong);
+  text-align: left;
+  padding: 14px 0 12px;
+  border-bottom: 1px solid var(--line);
   opacity: 0;
   transform: translateY(14px);
   transition: opacity 0.45s ease, transform 0.45s ease;
@@ -299,9 +306,10 @@ button {
 }
 
 .mobile-menu-index {
+  min-width: 2.6em;
   font-family: var(--font-mono), monospace;
-  font-size: 0.7rem;
-  color: var(--accent);
+  font-size: 0.66rem;
+  color: var(--steel-light);
   letter-spacing: 0.2em;
 }
 
@@ -326,7 +334,7 @@ button {
   z-index: 0;
   overflow: hidden;
   /* the atelier behind both product layers is drawn by StudioEnvironment (studio.css); this is its unlit state */
-  background: #15181c;
+  background: #0b141c;
 }
 
 .stage-canvas,
@@ -366,7 +374,7 @@ button {
   width: 14px;
   height: 14px;
   border-radius: 50%;
-  background: rgba(238, 241, 244, 0.95);
+  background: rgba(236, 243, 247, 0.95);
   box-shadow: 0 0 0 4px var(--line-mid);
 }
 
@@ -375,7 +383,7 @@ button {
   position: absolute;
   inset: -8px;
   border-radius: 50%;
-  border: 1px solid rgba(238, 241, 244, 0.45);
+  border: 1px solid rgba(236, 243, 247, 0.45);
   animation: hotspot-pulse 2.4s ease-out infinite;
 }
 
@@ -395,7 +403,7 @@ button {
   font-size: 0.58rem;
   letter-spacing: 0.22em;
   color: var(--text);
-  background: rgba(23, 27, 31, 0.78);
+  background: rgba(13, 24, 34, 0.78);
   border: 1px solid var(--border);
   padding: 5px 8px;
   border-radius: 3px;
@@ -413,7 +421,7 @@ button {
 
 .hotspot--active .hotspot-dot {
   background: var(--accent);
-  box-shadow: 0 0 0 4px rgba(132, 150, 163, 0.25);
+  box-shadow: 0 0 0 4px rgba(111, 147, 173, 0.25);
 }
 
 .hotspot:focus-visible {
@@ -429,7 +437,7 @@ button {
   top: calc(var(--nav-height) + clamp(24px, 6vh, 64px));
   width: min(340px, 80vw);
   padding: 22px 24px;
-  background: rgba(23, 27, 31, 0.8);
+  background: rgba(13, 24, 34, 0.8);
   border: 1px solid var(--border);
   border-radius: 4px;
   opacity: 0;
@@ -522,7 +530,7 @@ button {
   transform: translateY(-50%);
   min-width: 260px;
   padding: 22px 24px;
-  background: rgba(23, 27, 31, 0.72);
+  background: rgba(13, 24, 34, 0.72);
   border: 1px solid var(--border);
   border-radius: 4px;
   opacity: 0;
@@ -870,8 +878,8 @@ html.viewer-lock body {
   min-height: 46px;
   padding: 0 20px;
   border-radius: 999px;
-  border: 1px solid rgba(132, 150, 163, 0.7);
-  background: rgba(23, 27, 31, 0.82);
+  border: 1px solid rgba(111, 147, 173, 0.7);
+  background: rgba(13, 24, 34, 0.82);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   font-family: var(--font-mono), monospace;
@@ -884,7 +892,7 @@ html.viewer-lock body {
 
 .viewer-launch:hover,
 .viewer-launch:focus-visible {
-  background: rgba(132, 150, 163, 0.22);
+  background: rgba(111, 147, 173, 0.22);
   border-color: var(--accent);
 }
 
@@ -935,23 +943,23 @@ html.viewer-lock body {
   align-items: center;
   justify-content: space-between;
   gap: 16px;
-  padding: 16px clamp(16px, 4vw, 48px);
-  border-bottom: 1px solid var(--border);
+  padding: max(16px, env(safe-area-inset-top)) clamp(18px, 4vw, 48px) 14px;
 }
 
 .viewer-kicker {
   font-family: var(--font-mono), monospace;
-  font-size: 0.58rem;
-  letter-spacing: 0.3em;
-  color: var(--accent);
+  font-size: 0.6rem;
+  letter-spacing: 0.26em;
+  color: var(--steel-light);
 }
 
 .viewer-title {
-  font-family: var(--font-display), sans-serif;
-  font-weight: 700;
-  font-size: 1.1rem;
-  letter-spacing: 0.06em;
-  margin-top: 4px;
+  font-family: var(--font-body), sans-serif;
+  font-weight: 300;
+  font-size: clamp(1.25rem, 2.2vw, 1.7rem);
+  letter-spacing: -0.025em;
+  margin-top: 6px;
+  color: var(--text-strong);
 }
 
 .viewer-close {
@@ -979,6 +987,8 @@ html.viewer-lock body {
   flex: 1;
   min-height: 0;
   cursor: grab;
+  /* a cool pool of light under the product, as in the cold room */
+  background: radial-gradient(48% 40% at 50% 56%, rgba(86, 128, 160, 0.2) 0%, rgba(52, 84, 112, 0.08) 48%, rgba(13, 24, 34, 0) 78%);
 }
 
 .viewer-stage:active {
@@ -1026,27 +1036,27 @@ html.viewer-lock body {
   flex-wrap: wrap;
   align-items: center;
   justify-content: center;
-  gap: 10px 18px;
-  padding: 14px clamp(12px, 4vw, 48px) max(16px, env(safe-area-inset-bottom));
-  border-top: 1px solid var(--border);
+  gap: 6px 28px;
+  padding: 10px clamp(12px, 4vw, 48px) max(18px, env(safe-area-inset-bottom));
 }
 
+/* the instrument: borderless controls; the camera views are the primary row, separated by hairlines */
 .viewer-group {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 2px;
 }
 
 .viewer-btn {
   min-width: 44px;
   min-height: 44px;
   padding: 0 12px;
-  border: 1px solid var(--border-strong);
-  border-radius: 6px;
+  border: 1px solid transparent;
+  border-radius: 999px;
   font-family: var(--font-mono), monospace;
   font-size: 0.85rem;
-  color: var(--text);
-  transition: border-color 0.2s ease, background-color 0.2s ease;
+  color: var(--muted);
+  transition: color 0.2s ease, border-color 0.2s ease, background-color 0.2s ease;
 }
 
 .viewer-btn--text {
@@ -1056,13 +1066,20 @@ html.viewer-lock body {
 
 .viewer-btn:hover,
 .viewer-btn:focus-visible {
-  border-color: var(--accent);
-  background: rgba(132, 150, 163, 0.12);
+  color: var(--text-strong);
+  background: rgba(156, 194, 220, 0.1);
 }
 
 .viewer-btn--on {
-  border-color: var(--accent);
-  background: rgba(132, 150, 163, 0.2);
+  color: var(--text-strong);
+  border-color: rgba(156, 194, 220, 0.45);
+  background: rgba(156, 194, 220, 0.12);
+}
+
+.viewer-views {
+  padding: 3px;
+  border: 1px solid var(--line-mid);
+  border-radius: 999px;
 }
 
 .viewer-heading {
@@ -1139,19 +1156,19 @@ html.viewer-lock body {
 .ed-scrim--left {
   inset: 0 auto 0 0;
   width: 58vw;
-  background: linear-gradient(90deg, rgba(19, 22, 26, 0.86) 0%, rgba(19, 22, 26, 0.6) 38%, rgba(19, 22, 26, 0) 100%);
+  background: linear-gradient(90deg, rgba(10, 20, 30, 0.86) 0%, rgba(10, 20, 30, 0.6) 38%, rgba(10, 20, 30, 0) 100%);
 }
 
 .ed-scrim--right {
   inset: 0 0 0 auto;
   width: 58vw;
-  background: linear-gradient(270deg, rgba(19, 22, 26, 0.86) 0%, rgba(19, 22, 26, 0.6) 38%, rgba(19, 22, 26, 0) 100%);
+  background: linear-gradient(270deg, rgba(10, 20, 30, 0.86) 0%, rgba(10, 20, 30, 0.6) 38%, rgba(10, 20, 30, 0) 100%);
 }
 
 .ed-scrim--below {
   inset: auto 0 0 0;
   height: 62svh;
-  background: linear-gradient(0deg, rgba(19, 22, 26, 0.96) 0%, rgba(19, 22, 26, 0.9) 55%, rgba(19, 22, 26, 0) 100%);
+  background: linear-gradient(0deg, rgba(10, 20, 30, 0.96) 0%, rgba(10, 20, 30, 0.9) 55%, rgba(10, 20, 30, 0) 100%);
 }
 
 .ed-chapter {
@@ -1289,8 +1306,8 @@ html.viewer-lock body {
   width: 10px;
   height: 10px;
   border-radius: 50%;
-  border: 1px solid rgba(243, 241, 236, 0.95);
-  box-shadow: 0 0 0 4px rgba(243, 241, 236, 0.1), 0 0 12px rgba(0, 0, 0, 0.6);
+  border: 1px solid rgba(241, 245, 247, 0.95);
+  box-shadow: 0 0 0 4px rgba(241, 245, 247, 0.1), 0 0 12px rgba(0, 0, 0, 0.6);
 }
 
 .ed-callout-dot::after {
@@ -1306,7 +1323,7 @@ html.viewer-lock body {
   top: 0;
   width: 46px;
   height: 1px;
-  background: rgba(243, 241, 236, 0.6);
+  background: rgba(241, 245, 247, 0.6);
 }
 
 .ed-callout-label {
@@ -1318,7 +1335,7 @@ html.viewer-lock body {
   font-size: 0.62rem;
   letter-spacing: 0.2em;
   text-transform: uppercase;
-  color: rgba(243, 241, 236, 0.92);
+  color: rgba(241, 245, 247, 0.92);
   text-shadow: 0 1px 10px rgba(0, 0, 0, 0.85), 0 0 2px rgba(0, 0, 0, 0.6);
 }
 
@@ -1378,7 +1395,7 @@ html.viewer-lock body {
   min-height: 40px;
   padding: 0 18px;
   border-color: var(--line-strong);
-  background: rgba(23, 27, 31, 0.72);
+  background: rgba(13, 24, 34, 0.72);
   backdrop-filter: none;
   -webkit-backdrop-filter: none;
   box-shadow: none;
@@ -1388,7 +1405,7 @@ html.viewer-lock body {
 /* one solid graphite bar over every surface (the old fade to transparent read as a dark smear over the light sections);
    no backdrop blur over the moving WebGL canvas */
 .nav--scrolled {
-  background: rgba(23, 27, 31, 0.94);
+  background: rgba(13, 24, 34, 0.94);
   backdrop-filter: none;
   -webkit-backdrop-filter: none;
   border-bottom-color: var(--line);
@@ -1643,7 +1660,7 @@ html.viewer-lock body {
 
 .fx-line {
   fill: none;
-  stroke: rgba(238, 241, 244, 0.55);
+  stroke: rgba(236, 243, 247, 0.55);
   stroke-width: 1;
   vector-effect: non-scaling-stroke;
 }
@@ -1715,7 +1732,7 @@ html.viewer-lock body {
 }
 
 .fx-tag--inDevelopment {
-  border-color: rgba(132, 150, 163, 0.5);
+  border-color: rgba(111, 147, 173, 0.5);
   color: var(--accent-strong);
 }
 
@@ -1834,7 +1851,7 @@ html.viewer-lock body {
 .fx-arrow {
   width: 26px;
   height: 1px;
-  background: rgba(238, 241, 244, 0.5);
+  background: rgba(236, 243, 247, 0.5);
   position: relative;
 }
 
@@ -1843,7 +1860,7 @@ html.viewer-lock body {
   position: absolute;
   right: -1px;
   top: -3px;
-  border: solid rgba(238, 241, 244, 0.5);
+  border: solid rgba(236, 243, 247, 0.5);
   border-width: 0 1px 1px 0;
   width: 6px;
   height: 6px;
@@ -1868,7 +1885,7 @@ html.viewer-lock body {
   padding: 14px 16px 12px;
   border: 1px solid var(--line-mid);
   border-radius: 14px;
-  background: linear-gradient(180deg, rgba(41, 47, 52, 0.9), rgba(23, 27, 31, 0.9));
+  background: linear-gradient(180deg, rgba(26, 42, 56, 0.9), rgba(13, 24, 34, 0.9));
 }
 
 .fx--large.fx-monitor {
@@ -1973,7 +1990,7 @@ html.viewer-lock body {
   font-size: 0.58rem;
   letter-spacing: 0.16em;
   text-transform: uppercase;
-  color: rgba(243, 241, 236, 0.85);
+  color: rgba(241, 245, 247, 0.85);
   text-shadow: 0 1px 10px rgba(0, 0, 0, 0.85);
 }
 
@@ -2251,7 +2268,7 @@ html.viewer-lock body {
 
 /* the range is photographed in the studio: a soft light pool behind the render and the illustrations */
 .sx--range .sx-range-img {
-  background: radial-gradient(54% 44% at 50% 56%, rgba(214, 220, 224, 0.11) 0%, rgba(214, 220, 224, 0.04) 46%, rgba(214, 220, 224, 0) 74%);
+  background: radial-gradient(54% 44% at 50% 56%, rgba(210, 224, 233, 0.11) 0%, rgba(210, 224, 233, 0.04) 46%, rgba(210, 224, 233, 0) 74%);
 }
 
 .sx-range-illu {
@@ -2260,7 +2277,7 @@ html.viewer-lock body {
   align-items: center;
   justify-content: center;
   border-radius: 6px;
-  background: radial-gradient(60% 60% at 50% 45%, rgba(169, 183, 193, 0.1), rgba(169, 183, 193, 0) 70%);
+  background: radial-gradient(60% 60% at 50% 45%, rgba(156, 194, 220, 0.1), rgba(156, 194, 220, 0) 70%);
 }
 
 .sx-range-illu svg {
@@ -2302,6 +2319,253 @@ html.viewer-lock body {
   border-top: 1px solid var(--line);
   font-size: 0.92rem;
   color: var(--text);
+}
+
+/* two-zone readout (technology): one row per chamber, its colour as a short bar, the temperature set large */
+.sx-zones {
+  margin: 28px 0 22px;
+}
+
+.sx-zones > div {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: end;
+  gap: 16px;
+  padding: 16px 0 14px;
+  border-top: 1px solid var(--line);
+}
+
+.sx-zones > div:last-child {
+  border-bottom: 1px solid var(--line);
+}
+
+.sx-zones dt {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-family: var(--font-mono), monospace;
+  font-size: 0.66rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--zc);
+}
+
+.sx-zones dt::before {
+  content: '';
+  width: 22px;
+  height: 2px;
+  margin-bottom: 6px;
+  background: var(--zc);
+}
+
+.sx-zones dt span {
+  color: var(--faint);
+  letter-spacing: 0.14em;
+}
+
+.sx-zones dd {
+  margin: 0;
+  font-weight: 300;
+  font-size: clamp(2rem, 3.4vw, 2.8rem);
+  line-height: 1;
+  letter-spacing: -0.04em;
+  color: var(--text-strong);
+}
+
+.sx-zones dd small {
+  font-size: 0.42em;
+  letter-spacing: 0;
+  color: var(--muted);
+}
+
+/* ── range: the family, the featured variant, the others ── */
+.sx-family {
+  display: grid;
+  justify-items: center;
+  margin: clamp(40px, 7vh, 72px) auto clamp(48px, 8vh, 88px);
+  max-width: 640px;
+}
+
+.sx-family-base,
+.sx-family-node {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  text-align: center;
+}
+
+.sx-family-tag {
+  font-family: var(--font-mono), monospace;
+  font-size: 0.62rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--faint);
+}
+
+.sx-family-name {
+  font-size: clamp(1rem, 1.6vw, 1.2rem);
+  letter-spacing: -0.01em;
+  color: var(--text-strong);
+}
+
+/* the base and its stem */
+.sx-family-base {
+  padding-bottom: 30px;
+}
+
+.sx-family-base::before {
+  content: '';
+  width: 7px;
+  height: 7px;
+  margin-bottom: 6px;
+  border-radius: 50%;
+  background: var(--steel-light);
+  box-shadow: 0 0 0 5px rgba(156, 194, 220, 0.12);
+}
+
+.sx-family-base::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  width: 1px;
+  height: 22px;
+  background: var(--line-strong);
+}
+
+/* the branches: a hairline across, a short drop to each variant */
+.sx-family-branches {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  width: 100%;
+  padding-top: 26px;
+}
+
+.sx-family-branches::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 25%;
+  right: 25%;
+  height: 1px;
+  background: var(--line-strong);
+}
+
+.sx-family-node::before {
+  content: '';
+  position: absolute;
+  top: -26px;
+  left: 50%;
+  width: 1px;
+  height: 20px;
+  background: var(--line-strong);
+}
+
+.sx-family-node--featured .sx-family-tag {
+  color: var(--steel-light);
+}
+
+/* the featured variant: the real render on a pedestal of light */
+.sx-range-feature {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+  gap: clamp(32px, 6vw, 96px);
+  align-items: center;
+}
+
+.sx-range-stage {
+  position: relative;
+  display: grid;
+  place-items: center;
+  height: clamp(340px, 42vw, 560px);
+  background:
+    radial-gradient(46% 9% at 50% 88%, rgba(0, 0, 0, 0.5) 0%, rgba(0, 0, 0, 0) 100%),
+    radial-gradient(50% 50% at 50% 52%, rgba(120, 160, 190, 0.2) 0%, rgba(86, 128, 160, 0.07) 48%, rgba(13, 24, 34, 0) 75%);
+}
+
+.sx--range .sx-range-stage .sx-range-img {
+  /* positioned in the stage: a percentage height inside an auto grid row would fall back to the image's own 900 px */
+  position: absolute;
+  top: 7%;
+  left: 0;
+  width: 100%;
+  height: 82%;
+  margin: 0;
+  object-fit: contain;
+  background: none;
+}
+
+.sx-range-name {
+  margin: 0 0 16px;
+  font-weight: 300;
+  font-size: clamp(1.9rem, 3.2vw, 2.8rem);
+  line-height: 1.05;
+  letter-spacing: -0.035em;
+  color: var(--text-strong);
+}
+
+.sx-spec {
+  margin: 26px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.sx-spec li {
+  display: grid;
+  grid-template-columns: 2.8em 1fr;
+  padding: 14px 0;
+  border-top: 1px solid var(--line);
+  font-size: 0.95rem;
+  color: var(--text);
+}
+
+.sx-spec li:last-child {
+  border-bottom: 1px solid var(--line);
+}
+
+.sx-spec-index {
+  font-family: var(--font-mono), monospace;
+  font-size: 0.66rem;
+  letter-spacing: 0.14em;
+  line-height: 2.1;
+  color: var(--steel-light);
+}
+
+/* the other variants: the illustration beside the text, secondary to the product that can be seen */
+.sx-range-more {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: clamp(28px, 4vw, 64px);
+  margin-top: clamp(56px, 9vh, 104px);
+  padding-top: clamp(32px, 5vh, 48px);
+  border-top: 1px solid var(--line);
+}
+
+.sx-range-entry {
+  display: grid;
+  grid-template-columns: clamp(110px, 12vw, 160px) 1fr;
+  gap: clamp(18px, 2.4vw, 32px);
+  align-items: start;
+}
+
+/* the drawings stay labelled as illustrations (only the Pro is shown as a product) */
+.sx--range .sx-range-entry .sx-range-illu {
+  flex-direction: column;
+  gap: 8px;
+  height: auto;
+  margin: 0;
+}
+
+.sx-range-entry .sx-range-illu svg {
+  width: 100%;
+}
+
+.sx-range-entry .sx-range-illu figcaption {
+  position: static;
+  font-size: 0.56rem;
 }
 
 /* applications */
@@ -2486,6 +2750,42 @@ html.viewer-lock body {
   border-color: var(--accent);
 }
 
+.sx-contact-arrow {
+  display: inline-block;
+  margin-left: 0.35em;
+  color: var(--accent-strong);
+  transition: transform 0.3s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+.sx-contact-link:hover .sx-contact-arrow,
+.sx-contact-link:focus-visible .sx-contact-arrow {
+  transform: translate(3px, -3px);
+}
+
+/* the closing wordmark: the page ends on the brand, set edge to edge in ice and dissolving into the midnight below */
+.sx-closing-mark {
+  margin: clamp(70px, 12vh, 130px) 0 0;
+  overflow: hidden;
+  text-align: center;
+  white-space: nowrap;
+  font-family: var(--font-logo), 'Roboto Condensed', sans-serif;
+  font-weight: 700;
+  font-size: 25.5vw;
+  line-height: 0.82;
+  letter-spacing: -0.015em;
+  color: transparent;
+  /* the section's paragraph colour must not fill the letters: the gradient below is the fill */
+  -webkit-text-fill-color: transparent;
+  background: linear-gradient(180deg, rgba(156, 194, 220, 0.2) 0%, rgba(156, 194, 220, 0.06) 62%, rgba(156, 194, 220, 0) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  user-select: none;
+}
+
+.sx-closing-mark + .sx-footer {
+  margin-top: 0;
+}
+
 .sx-footer {
   max-width: 1180px;
   margin: clamp(80px, 14vh, 140px) auto 0;
@@ -2509,6 +2809,8 @@ html.viewer-lock body {
 }
 
 @media (max-width: 900px) {
+  .sx-range-feature,
+  .sx-range-more,
   .sx-row,
   .sx-range,
   .sx-apps,
@@ -2976,11 +3278,17 @@ html.viewer-lock body {
   opacity: 0;
 }
 
-/* exactly the product stage's studio as the story leaves it (studio.css --atelier): during the hand-over only the bag,
-   its labels and the chapter text dissolve — the studio itself never changes */
+/* The cold room. As the bag story ends, the glacier atelier dims into midnight: the coolants are what keeps the cold, so
+   they are shown where the cold is — a deep midnight cyclorama with a single cool pool of light. The packs' teal, white
+   and cream read at full strength here (on the pale atelier the white pack all but vanished), and the change of
+   environment marks the move from the product to its engineering. */
 .cx-backdrop {
-  background: var(--atelier);
-  background-color: #d8d6d0;
+  background:
+    url('/textures/grain.png') repeat 0 0 / var(--grain-size) var(--grain-size),
+    radial-gradient(120% 90% at 50% 48%, rgba(5, 11, 17, 0) 50%, rgba(5, 11, 17, 0.6) 100%),
+    radial-gradient(62% 44% at 50% 50%, rgba(86, 128, 160, 0.26) 0%, rgba(52, 84, 112, 0.12) 46%, rgba(13, 24, 34, 0) 78%),
+    linear-gradient(180deg, #0a141d 0%, #0f1f2c 48%, #132433 60%, #0b1620 100%);
+  background-color: #0d1822;
 }
 
 /* while the backdrop fully covers them, the fixed product stage and story overlay are hidden (motion/stageCover.ts):
@@ -2997,7 +3305,7 @@ html.stage-covered .ed * {
 /* a soft pool of studio light behind the fan; its centre is set from the camera framing */
 .cx-pool {
   background:
-    radial-gradient(ellipse 44% 46% at var(--cx-pool-x, 50%) var(--cx-pool-y, 46%), rgba(150, 168, 182, 0.16) 0%, rgba(132, 150, 163, 0.07) 50%, rgba(132, 150, 163, 0) 80%);
+    radial-gradient(ellipse 44% 46% at var(--cx-pool-x, 50%) var(--cx-pool-y, 46%), rgba(130, 165, 190, 0.16) 0%, rgba(111, 147, 173, 0.07) 50%, rgba(111, 147, 173, 0) 80%);
 }
 
 .cx-canvas {
@@ -3070,7 +3378,7 @@ html.stage-covered .ed * {
 /* the selected and hover states carry the coolant's own colour, matching the model */
 .cx-pick[aria-pressed='true'] {
   color: var(--text-strong);
-  border-color: rgba(238, 241, 244, 0.5);
+  border-color: rgba(236, 243, 247, 0.5);
   border-color: color-mix(in srgb, var(--cx-c) 80%, transparent);
   background: var(--line);
   background: color-mix(in srgb, var(--cx-c) 12%, transparent);
@@ -3695,7 +4003,7 @@ html.stage-covered .ed * {
   left: 12px;
   padding: 6px 10px;
   border-radius: 3px;
-  background: rgba(23, 27, 31, 0.8);
+  background: rgba(13, 24, 34, 0.8);
   font-family: var(--font-mono), monospace;
   font-size: var(--fs-label);
   letter-spacing: 0.16em;
@@ -3822,6 +4130,42 @@ html.stage-covered .ed * {
   }
 }
 
+/* 360° view on touch screens: pinch zooms, so the zoom buttons step aside; the views come first, the dial and the
+   options below them */
+@media (hover: none) and (pointer: coarse) {
+  .viewer-group[aria-label='Zoom'] {
+    display: none;
+  }
+}
+
+@media (max-width: 600px) {
+  .viewer-controls {
+    gap: 4px 10px;
+  }
+
+  .viewer-views {
+    order: -1;
+    flex-basis: 100%;
+    justify-content: space-between;
+  }
+
+  .viewer-views .viewer-btn {
+    flex: 1;
+    padding: 0 4px;
+    letter-spacing: 0.12em;
+  }
+
+  .viewer-group[aria-label='View options'] .viewer-btn {
+    padding: 0 8px;
+    letter-spacing: 0.12em;
+  }
+
+  .viewer-hint {
+    font-size: 0.58rem;
+    letter-spacing: 0.18em;
+  }
+}
+
 /* ══ Touch screens: the product stage is sized to the LARGE viewport. When a phone browser's address bar slides in or
    out, a stage pinned to the visible viewport is resized after the animation — and both canvases inside it are
    reallocated and redrawn, a hitch on every change of scroll direction. At the large viewport it never resizes; the
@@ -3844,18 +4188,36 @@ html.stage-covered .ed * {
     height: 1100vh;
   }
 
-  /* one solid bar: the open bag's lid reaches the top of its frames, so it passes under the bar, never under the logo.
-     (.nav.nav--scrolled: studio.css loads after this file and sets its ivory glass on .nav--scrolled) */
+  /* the bar is frosted glacier glass (midnight glass before the studio is lit). Nothing passes under it any more — the
+     product is composed below it (composition.ts) — and it tucks away while the visitor scrolls down (Nav.tsx) */
   .nav,
   .nav.nav--scrolled {
-    background: rgb(23, 27, 31);
+    background: rgba(11, 21, 30, 0.72);
+    backdrop-filter: blur(14px) saturate(1.3);
+    -webkit-backdrop-filter: blur(14px) saturate(1.3);
     border-bottom: 1px solid var(--line);
   }
 
   html[data-ink='dark'] .nav,
   html[data-ink='dark'] .nav.nav--scrolled {
-    background: rgb(232, 229, 222);
-    border-bottom: 1px solid rgba(17, 20, 23, 0.1);
+    background: rgba(238, 243, 246, 0.74);
+    border-bottom: 1px solid rgba(11, 22, 32, 0.08);
+  }
+
+  .nav,
+  .viewer-launch,
+  .ed-progress {
+    transition: transform 0.42s cubic-bezier(0.2, 0.7, 0.2, 1), opacity 0.3s ease;
+  }
+
+  html.nav-tucked .nav,
+  html.nav-tucked .viewer-launch {
+    transform: translateY(calc(-1 * var(--nav-height) - 2px));
+  }
+
+  /* the chapter hairline stays: it rises to the top edge with the bar */
+  html.nav-tucked .ed-progress {
+    transform: translateY(calc(-1 * var(--nav-height)));
   }
 
   /* the 360° view lives in the bar, beside the menu, instead of floating over the bag */
@@ -3903,10 +4265,32 @@ html.stage-covered .ed * {
     justify-content: flex-end;
   }
 
+  /* each chapter opens on its number, set large and light in glacier, the chapter's name beside it in mono */
   .ed-kicker {
-    margin-bottom: 12px;
-    font-size: 0.62rem;
+    align-items: flex-end;
+    gap: 14px;
+    margin-bottom: 14px;
+    font-size: 0.6rem;
     letter-spacing: 0.2em;
+  }
+
+  .ed-kicker-index {
+    font-family: var(--font-body), sans-serif;
+    font-weight: 300;
+    font-size: 2.6rem;
+    line-height: 0.78;
+    letter-spacing: -0.06em;
+  }
+
+  .ed-kicker-index::after {
+    display: none;
+  }
+
+  .ed-kicker-name {
+    padding-bottom: 1px;
+    padding-left: 14px;
+    border-left: 1px solid var(--line-strong);
+    line-height: 1.5;
   }
 
   .ed-headline {
@@ -3991,25 +4375,22 @@ html.stage-covered .ed * {
     line-height: 1.5;
   }
 
-  /* the range: the three variants one above the other, each whole — read in turn like the desktop's three columns,
-     with a hairline between them instead of cards (no sideways row with a clipped neighbour) */
-  .sx-range {
-    gap: 0;
+  /* the range on a phone: the family diagram, the featured variant stacked (render first), the others as rows */
+  .sx-range-feature,
+  .sx-range-more {
+    grid-template-columns: 1fr;
   }
 
-  .sx-range-item {
-    padding: 34px 0 38px;
-    border-top: 1px solid var(--line);
+  .sx-range-stage {
+    height: 330px;
   }
 
-  .sx-range-item:first-child {
-    border-top: 0;
-    padding-top: 8px;
+  .sx-range-entry {
+    grid-template-columns: 92px 1fr;
   }
 
-  .sx-range-img,
-  .sx-range-illu {
-    height: 230px;
-    margin-bottom: 22px;
+
+  .sx-family-name {
+    font-size: 0.95rem;
   }
 }

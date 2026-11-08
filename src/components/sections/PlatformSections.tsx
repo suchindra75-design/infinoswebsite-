@@ -132,6 +132,20 @@ export function TechnologySection() {
               {ZONES.zone1.name} at about {ZONES.zone1.temp} in the upper chamber and {ZONES.zone2.name} at an example {ZONES.zone2.temp} in the
               lower.
             </p>
+            {/* the two zones as a readout: each chamber with its own colour and temperature */}
+            <dl className="sx-zones">
+              {[ZONES.zone1, ZONES.zone2].map((z) => (
+                <div key={z.name} style={{ '--zc': z.colour } as React.CSSProperties}>
+                  <dt>
+                    {z.name}
+                    <span>{z.chamber}</span>
+                  </dt>
+                  <dd>
+                    <small>{z.prefix}</small> {z.temp}
+                  </dd>
+                </div>
+              ))}
+            </dl>
             <StatusTag status="example">−10 °C is an example configuration</StatusTag>{' '}
             <StatusTag status={ZONES.simultaneous}>Simultaneous operation · awaiting validation</StatusTag>
           </div>
@@ -221,7 +235,13 @@ function RangeVisual({ item }: { item: RangeItem }) {
   )
 }
 
+/** short names for the family diagram (the full names are in the variant entries below) */
+const RANGE_SHORT: Record<string, string> = { flexible: 'Flexible Container', pro: 'Pro Dual-Chamber', sensorial: 'Sensorial Container' }
+
 export function RangeSection() {
+  const base = RANGE.find((r) => r.visual === 'flexible')
+  const featured = RANGE.find((r) => r.visual === 'render')
+  const others = RANGE.filter((r) => r !== featured)
   return (
     <section className="sx tone-graphite sx--range" id="products">
       <div className="sx-inner">
@@ -230,18 +250,61 @@ export function RangeSection() {
           title="The INFINOS range."
           lede={`${POSITIONING.familyLine} The ${POSITIONING.physical}, shown in the story above and in the 360° view, is one of them.`}
         />
-        <div className="sx-range">
-          {RANGE.map((item) => (
-            <article className={`sx-range-item sx-range-item--${item.id}`} key={item.id}>
-              <RangeVisual item={item} />
-              <p className="sx-range-role">{item.role}</p>
-              <h3 className="sx-h3">{item.name}</h3>
-              <p className="sx-range-summary">{item.summary}</p>
-              <ul className="sx-points">
-                {item.points.map((p) => (
-                  <li key={p}>{p}</li>
+
+        {/* the family: one flexible form factor, the other variants built on it (platform.ts RANGE) */}
+        {base && (
+          <figure className="sx-family" aria-label="The INFINOS family: every variant is built on the flexible form factor">
+            <div className="sx-family-base">
+              <span className="sx-family-tag">Base form factor</span>
+              <span className="sx-family-name">{RANGE_SHORT[base.id]}</span>
+            </div>
+            <div className="sx-family-branches">
+              {RANGE.filter((r) => r !== base).map((r) => (
+                <div className={`sx-family-node ${r === featured ? 'sx-family-node--featured' : ''}`} key={r.id}>
+                  <span className="sx-family-tag">{r === featured ? 'Shown in 3D' : 'Variant'}</span>
+                  <span className="sx-family-name">{RANGE_SHORT[r.id]}</span>
+                </div>
+              ))}
+            </div>
+          </figure>
+        )}
+
+        {/* the variant you can see: the real render, on its own pedestal of light */}
+        {featured && (
+          <article className="sx-range-feature">
+            <div className="sx-range-stage">
+              <RangeVisual item={featured} />
+            </div>
+            <div className="sx-range-copy">
+              <p className="sx-range-role">{featured.role}</p>
+              <h3 className="sx-range-name">{featured.name}</h3>
+              <p className="sx-range-summary">{featured.summary}</p>
+              <ul className="sx-spec">
+                {featured.points.map((p, i) => (
+                  <li key={p}>
+                    <span className="sx-spec-index">{String(i + 1).padStart(2, '0')}</span>
+                    {p}
+                  </li>
                 ))}
               </ul>
+            </div>
+          </article>
+        )}
+
+        <div className="sx-range-more">
+          {others.map((item) => (
+            <article className={`sx-range-entry sx-range-item--${item.id}`} key={item.id}>
+              <RangeVisual item={item} />
+              <div>
+                <p className="sx-range-role">{item.role}</p>
+                <h3 className="sx-h3">{item.name}</h3>
+                <p className="sx-range-summary">{item.summary}</p>
+                <ul className="sx-points">
+                  {item.points.map((p) => (
+                    <li key={p}>{p}</li>
+                  ))}
+                </ul>
+              </div>
             </article>
           ))}
         </div>
@@ -370,6 +433,7 @@ export function ContactSection() {
         <p className="sx-lede">Healthcare and diagnostics teams, and businesses that move temperature-sensitive products: get in touch about pilots, deployment and new applications.</p>
         <a className="sx-contact-link" href={`mailto:${CONTACT.email}`}>
           {CONTACT.email}
+          <span className="sx-contact-arrow" aria-hidden="true">↗</span>
         </a>
         <p className="sx-contact-more">
           <a href={`mailto:${CONTACT.altEmail}`}>{CONTACT.altEmail}</a>
@@ -414,6 +478,8 @@ export function ContactSection() {
           )}
         </dl>
       </div>
+      {/* the closing image: the wordmark, set at the width of the page in ice, fading into the midnight */}
+      <p className="sx-closing-mark" aria-hidden="true">INFINOS</p>
       <footer className="sx-footer">
         <span>© {new Date().getFullYear()} {POSITIONING.legalName}</span>
         {COMPANY.social.length > 0 && (

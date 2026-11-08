@@ -4,26 +4,26 @@
    only the stone warming slightly through the day. */
 :root {
   /* the stone: wall top, wall low, cove, floor far, floor near (a warm tint deepens it later in the day: .studio-warm) */
-  --stone-w0: #c9c7c2;
-  --stone-w1: #d8d6d0;
-  --stone-cove: #e3e0da;
-  --stone-f0: #dad6cf;
-  --stone-f1: #bfbab2;
-  --daylight: 255, 253, 249;
+  --stone-w0: #d2dce2;
+  --stone-w1: #d4dde3;
+  --stone-cove: #ecf1f4;
+  --stone-f0: #e0e7eb;
+  --stone-f1: #c2ced6;
+  --daylight: 250, 252, 255;
   /* the atelier as the story leaves it (late-afternoon warmth, the overview's cove, the window light), drawn statically:
      the coolant showcase's backdrop dissolves in over the bag with exactly this room, so only the bag goes. Same layers
      and order as StudioEnvironment (wall, floor with its daylight patch, window, warmth, falloff); the cove is where the
      camera leaves it, measured on resize (--studio-cove-end) */
   --studio-cove-end: 66vh;
   --atelier:
-    radial-gradient(120% 100% at 50% 46%, rgba(112, 106, 98, 0) 52%, rgba(112, 106, 98, 0.26) 100%),
-    linear-gradient(rgba(196, 168, 128, 0.13), rgba(196, 168, 128, 0.13)),
+    radial-gradient(120% 100% at 50% 46%, rgba(64, 84, 102, 0) 52%, rgba(64, 84, 102, 0.26) 100%),
+    linear-gradient(rgba(150, 176, 196, 0.13), rgba(150, 176, 196, 0.13)),
     radial-gradient(60vw 90vh at -8vw 34vh, rgba(var(--daylight), 0.5) 0%, rgba(var(--daylight), 0.18) 45%, rgba(var(--daylight), 0) 100%),
     radial-gradient(70vw 30vh at 18vw calc(var(--studio-cove-end) + 18vh), rgba(var(--daylight), 0.28) 0%, rgba(var(--daylight), 0) 100%),
-    linear-gradient(180deg, rgba(216, 214, 208, 0) 0%, rgba(216, 214, 208, 0) calc(var(--studio-cove-end) - 40vh), var(--stone-w1) calc(var(--studio-cove-end) - 26vh), var(--stone-cove) calc(var(--studio-cove-end) - 1px), var(--stone-f0) calc(var(--studio-cove-end) + 4vh), var(--stone-f1) calc(var(--studio-cove-end) + 64vh), var(--stone-f1) 100%),
+    linear-gradient(180deg, rgba(214, 222, 228, 0) 0%, rgba(214, 222, 228, 0) calc(var(--studio-cove-end) - 40vh), var(--stone-w1) calc(var(--studio-cove-end) - 26vh), var(--stone-cove) calc(var(--studio-cove-end) - 1px), var(--stone-f0) calc(var(--studio-cove-end) + 4vh), var(--stone-f1) calc(var(--studio-cove-end) + 64vh), var(--stone-f1) 100%),
     linear-gradient(180deg, var(--stone-w0) 0%, var(--stone-w1) 100%);
   /* the unlit studio: exactly the intro's backdrop (intro.css .intro-bg), so the intro hands over unchanged */
-  --unlit: radial-gradient(70% 55% at 50% 52%, rgba(40, 46, 52, 0.7) 0%, rgba(26, 30, 35, 0.5) 45%, rgba(21, 24, 28, 0) 80%), #15181c;
+  --unlit: radial-gradient(70% 55% at 50% 52%, rgba(28, 44, 58, 0.7) 0%, rgba(16, 30, 42, 0.5) 45%, rgba(11, 21, 30, 0) 80%), #0b141c;
 }
 
 .studio,
@@ -58,7 +58,7 @@
   height: 110vh;
   background:
     radial-gradient(70vw 30vh at 18vw calc(40vh + 18vh), rgba(var(--daylight), 0.28) 0%, rgba(var(--daylight), 0) 100%),
-    linear-gradient(180deg, rgba(216, 214, 208, 0) 0%, var(--stone-w1) 14vh, var(--stone-cove) calc(40vh - 1px), var(--stone-f0) 44vh, var(--stone-f1) 104vh, var(--stone-f1) 100%);
+    linear-gradient(180deg, rgba(214, 222, 228, 0) 0%, var(--stone-w1) 14vh, var(--stone-cove) calc(40vh - 1px), var(--stone-f0) 44vh, var(--stone-f1) 104vh, var(--stone-f1) 100%);
 }
 
 .studio-underfloor {
@@ -70,7 +70,7 @@
 .studio-warm {
   inset: 0;
   opacity: 0;
-  background: rgba(196, 168, 128, 0.13);
+  background: rgba(150, 176, 196, 0.13);
 }
 
 /* daylight from the tall window on the left of the set: its spill on the wall */
@@ -82,7 +82,7 @@
 /* the edges of the set fall away softly, like a lit room photographed on a long lens */
 .studio-falloff {
   inset: 0;
-  background: radial-gradient(120% 100% at 50% 46%, rgba(112, 106, 98, 0) 52%, rgba(112, 106, 98, 0.26) 100%);
+  background: radial-gradient(120% 100% at 50% 46%, rgba(64, 84, 102, 0) 52%, rgba(64, 84, 102, 0.26) 100%);
 }
 
 /* light pool on the floor and wash on the wall: soft gradients drawn at 256 px, moved and scaled to the projected light
@@ -166,19 +166,17 @@ html[data-ink='dark'] .nav,
 html[data-ink='dark'] .viewer-launch,
 html[data-ink='dark'] .rotate-hint,
 html[data-ink='dark'] .hotspot-html,
-html[data-ink='dark'] .hotspot-card,
-html[data-ink='dark'] .mobile-menu,
-html[data-ink='dark'] .cx {
-  --text-strong: #111417;
-  --text: #20262b;
-  --muted: #353c42;
-  --faint: #4a535a;
-  --accent: #46586a;
-  --accent-strong: #2f3e4b;
-  --line: rgba(17, 20, 23, 0.14);
-  --line-mid: rgba(17, 20, 23, 0.22);
-  --line-strong: rgba(17, 20, 23, 0.34);
-  --bg: #dcd8d0;
+html[data-ink='dark'] .hotspot-card {
+  --text-strong: #08121b;
+  --text: #172636;
+  --muted: #3d4c59;
+  --faint: #4d5d6b;
+  --accent: #3f6f92;
+  --accent-strong: #2c5675;
+  --line: rgba(11, 22, 32, 0.14);
+  --line-mid: rgba(11, 22, 32, 0.22);
+  --line-strong: rgba(11, 22, 32, 0.34);
+  --bg: #dde5ea;
   --zone1: #2f78c0;
   --zone2: #2447a8;
 }
@@ -187,57 +185,76 @@ html[data-ink='dark'] .cx {
    from that side anyway); they matter when a camera move carries the bag behind the copy, which they wash out of the
    whole text column so the graphite ink keeps its contrast */
 html[data-ink='dark'] .ed-scrim--left {
-  background: linear-gradient(90deg, rgba(224, 221, 214, 0.93) 0%, rgba(224, 221, 214, 0.9) 64%, rgba(224, 221, 214, 0) 100%);
+  background: linear-gradient(90deg, rgba(219, 227, 232, 0.93) 0%, rgba(219, 227, 232, 0.9) 64%, rgba(219, 227, 232, 0) 100%);
 }
 
 html[data-ink='dark'] .ed-scrim--right {
-  background: linear-gradient(270deg, rgba(224, 221, 214, 0.93) 0%, rgba(224, 221, 214, 0.9) 64%, rgba(224, 221, 214, 0) 100%);
+  background: linear-gradient(270deg, rgba(219, 227, 232, 0.93) 0%, rgba(219, 227, 232, 0.9) 64%, rgba(219, 227, 232, 0) 100%);
 }
 
 html[data-ink='dark'] .ed-scrim--below {
-  background: linear-gradient(0deg, rgba(228, 224, 216, 0.97) 0%, rgba(228, 224, 216, 0.9) 55%, rgba(228, 224, 216, 0) 100%);
+  background: linear-gradient(0deg, rgba(222, 230, 235, 0.97) 0%, rgba(222, 230, 235, 0.9) 55%, rgba(222, 230, 235, 0) 100%);
 }
 
 /* the navigation over the lit stage: ivory glass, graphite ink */
 html[data-ink='dark'] .nav--scrolled {
-  background: rgba(232, 229, 222, 0.86);
-  border-bottom-color: rgba(17, 20, 23, 0.1);
+  background: rgba(228, 234, 238, 0.86);
+  border-bottom-color: rgba(11, 22, 32, 0.1);
 }
 
 html[data-ink='dark'] .nav-brand {
-  color: #111417;
+  color: #08121b;
 }
 
 html[data-ink='dark'] .nav-link {
   color: #2c3338;
 }
 
-html[data-ink='dark'] .mobile-menu {
-  background: rgba(234, 231, 224, 0.97);
+/* the menu is always the midnight panel; while it is open the bar above it takes its light ink */
+html.menu-open .nav,
+html.menu-open .nav.nav--scrolled {
+  background: transparent;
+  border-color: transparent;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+html.menu-open .nav-brand,
+html.menu-open .nav-burger {
+  color: #eef3f6;
+}
+
+html.menu-open .nav-burger span {
+  background: #eef3f6;
+}
+
+html.menu-open .viewer-launch {
+  opacity: 0;
+  pointer-events: none;
 }
 
 html[data-ink='dark'] .viewer-launch {
-  background: rgba(244, 242, 237, 0.7);
-  border-color: rgba(17, 20, 23, 0.28);
-  color: #20262b;
-  box-shadow: 0 8px 30px rgba(60, 52, 40, 0.12);
+  background: rgba(242, 246, 248, 0.7);
+  border-color: rgba(11, 22, 32, 0.28);
+  color: #172636;
+  box-shadow: 0 8px 30px rgba(24, 44, 62, 0.12);
 }
 
 /* callouts sit over the product as often as over the studio: on the lit set each label becomes a small graphite chip */
 html[data-ink='dark'] .ed-callout-line {
-  background: rgba(17, 20, 23, 0.6);
+  background: rgba(11, 22, 32, 0.6);
 }
 
 html[data-ink='dark'] .ed-callout-label {
-  color: #f2f0eb;
+  color: #eef3f6;
   text-shadow: none;
-  background: rgba(20, 23, 26, 0.84);
+  background: rgba(12, 22, 31, 0.84);
   padding: 4px 8px 4px 9px;
   border-radius: 2px;
 }
 
 html[data-ink='dark'] .ed-callout-dot::after {
-  background: #111417;
+  background: #08121b;
 }
 
 html[data-ink='dark'] .ed-zone-label {
@@ -247,32 +264,32 @@ html[data-ink='dark'] .ed-zone-label {
 
 /* the exploded view's 3D labels (phones) cross the product too: the same graphite chip */
 html[data-ink='dark'] .layer-label-rule {
-  background: rgba(17, 20, 23, 0.6);
+  background: rgba(11, 22, 32, 0.6);
 }
 
 html[data-ink='dark'] .layer-label-text {
-  color: #f2f0eb;
-  background: rgba(20, 23, 26, 0.84);
+  color: #eef3f6;
+  background: rgba(12, 22, 31, 0.84);
   padding: 4px 8px 4px 9px;
   border-radius: 2px;
 }
 
 /* hotspots: the white markers sit on the product; a fine graphite ring keeps the one beside it visible on the stone */
 html[data-ink='dark'] .hotspot-dot::after {
-  border-color: rgba(17, 20, 23, 0.34);
+  border-color: rgba(11, 22, 32, 0.34);
 }
 
 html[data-ink='dark'] .hotspot-dot {
-  box-shadow: 0 0 0 1px rgba(17, 20, 23, 0.16), 0 2px 8px rgba(40, 34, 26, 0.18);
+  box-shadow: 0 0 0 1px rgba(11, 22, 32, 0.16), 0 2px 8px rgba(16, 30, 42, 0.18);
 }
 
 /* the chapter index and the drag hint sit where a photoreal shadow (or, on phones, the bag itself) can pass behind
    them: a tight stone outline under a soft halo keeps them legible over it and is invisible on the bare floor */
 html[data-ink='dark'] .ed-progress,
 html[data-ink='dark'] .rotate-hint {
-  text-shadow: 1px 0 0 #e2dfd8, -1px 0 0 #e2dfd8, 0 1px 0 #e2dfd8, 0 -1px 0 #e2dfd8, 1px 1px 0 #e2dfd8,
-    -1px -1px 0 #e2dfd8, 1px -1px 0 #e2dfd8, -1px 1px 0 #e2dfd8, 0 0 3px rgba(226, 223, 216, 0.95),
-    0 0 10px rgba(226, 223, 216, 0.95);
+  text-shadow: 1px 0 0 #dde5ea, -1px 0 0 #dde5ea, 0 1px 0 #dde5ea, 0 -1px 0 #dde5ea, 1px 1px 0 #dde5ea,
+    -1px -1px 0 #dde5ea, 1px -1px 0 #dde5ea, -1px 1px 0 #dde5ea, 0 0 3px rgba(220, 228, 233, 0.95),
+    0 0 10px rgba(220, 228, 233, 0.95);
 }
 
 /* the chapter figures, drawn for a dark backdrop, inked for the lit studio — and for the light sections. The graphite
@@ -281,32 +298,32 @@ html[data-ink='dark'] .rotate-hint {
 html[data-ink='dark'] .ed .fx-line,
 .tone-ivory .fx-line,
 .tone-white .fx-line {
-  stroke: rgba(17, 20, 23, 0.5);
+  stroke: rgba(11, 22, 32, 0.5);
 }
 
 html[data-ink='dark'] .ed .fx-arrow,
 .tone-ivory .fx-arrow,
 .tone-white .fx-arrow {
-  background: rgba(17, 20, 23, 0.45);
+  background: rgba(11, 22, 32, 0.45);
 }
 
 html[data-ink='dark'] .ed .fx-arrow::after,
 .tone-ivory .fx-arrow::after,
 .tone-white .fx-arrow::after {
-  border-color: rgba(17, 20, 23, 0.45);
+  border-color: rgba(11, 22, 32, 0.45);
 }
 
 html[data-ink='dark'] .ed .fx-monitor,
 .tone-ivory .fx-monitor,
 .tone-white .fx-monitor {
-  background: linear-gradient(180deg, rgba(252, 250, 246, 0.72), rgba(238, 235, 229, 0.72));
-  border-color: rgba(17, 20, 23, 0.14);
+  background: linear-gradient(180deg, rgba(249, 251, 252, 0.72), rgba(233, 239, 242, 0.72));
+  border-color: rgba(11, 22, 32, 0.14);
 }
 
 html[data-ink='dark'] .ed-cta-btn--primary {
-  background: #111417;
+  background: #08121b;
   color: #f4f2ee;
-  border-color: #111417;
+  border-color: #08121b;
 }
 
 /* while the ink changes with the light, the opening's visible overlays cross-fade their colours */
@@ -319,23 +336,5 @@ html[data-ink-fade] .ed-progress * {
   transition: color 0.7s ease, background-color 0.7s ease, border-color 0.7s ease, opacity 0.6s ease, transform 0.6s ease;
 }
 
-/* ── The coolant showcase in the same atelier (its backdrop: --atelier above). Its light pool is daylight, and the
-   coolant picker reads on stone: the selected coolant is a graphite pill, every swatch has a fine ring (the white
-   coolant's swatch would otherwise vanish). */
-html[data-ink='dark'] .cx-pool {
-  background: radial-gradient(ellipse 44% 46% at var(--cx-pool-x, 50%) var(--cx-pool-y, 46%), rgba(var(--daylight), 0.34) 0%, rgba(var(--daylight), 0.14) 50%, rgba(var(--daylight), 0) 80%);
-}
-
-html[data-ink='dark'] .cx-pick {
-  background: rgba(244, 242, 237, 0.5);
-}
-
-html[data-ink='dark'] .cx-pick[aria-pressed='true'] {
-  color: #f2f0eb;
-  background: #15181b;
-  border-color: #15181b;
-}
-
-html[data-ink='dark'] .cx-swatch {
-  box-shadow: 0 0 0 1px rgba(17, 20, 23, 0.32);
-}
+/* ── The coolant showcase is not in the atelier: it is the cold room (globals.css .cx-backdrop, midnight). Its overlays
+   keep the light ink of the dark surfaces, whatever the studio's ink. */
