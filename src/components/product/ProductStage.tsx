@@ -17,7 +17,7 @@ function HotspotCard() {
     <aside className={`hotspot-card ${visible ? 'hotspot-card--visible' : ''}`} aria-live="polite" aria-hidden={!visible}>
       {h && (
         <>
-          <p className="hotspot-card-kicker">EXPLORE</p>
+          <p className="hotspot-card-kicker">Explore</p>
           <h3 className="hotspot-card-title">{h.label}</h3>
           <p className="hotspot-card-text">{h.text}</p>
           <button
@@ -83,9 +83,9 @@ export function ProductStage() {
       <StageType />
       <ProductScene />
       <p className={`rotate-hint ${phase === 'hero' ? 'rotate-hint--visible' : ''}`} aria-hidden="true">
-        <span className="rotate-hint-pointer">DRAG TO ROTATE · TAP A MARKER TO EXPLORE</span>
+        <span className="rotate-hint-pointer">Drag to rotate · Tap a marker to explore</span>
         {/* touch screens: a vertical swipe scrolls the story, so the bag turns from its markers (and the 360° view) */}
-        <span className="rotate-hint-touch">TAP A MARKER TO EXPLORE</span>
+        <span className="rotate-hint-touch">Tap a marker to explore</span>
       </p>
       <HotspotCard />
     </div>

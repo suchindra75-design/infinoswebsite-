@@ -137,11 +137,18 @@ export interface PhoneZone {
   l: number
   r: number
 }
-let phoneZones: { key: string; zones: PhoneZone[]; bounds: number[] } | null = null
+let phoneZones: { zones: PhoneZone[]; bounds: number[] } | null = null
 
-/** the overlay's measurement: one zone per story chapter, for a stage of W x H, with the chapter boundaries */
-export function setPhoneZones(W: number, H: number, zones: PhoneZone[], bounds: number[]) {
-  phoneZones = { key: `${W}x${H}`, zones, bounds }
+/**
+ * The overlay's measurement: one zone per story chapter, with the chapter boundaries. Every layer that composes the
+ * product (the live camera, the photoreal frames, the studio, the callouts) reads these same zones, whatever size it
+ * measured the stage at itself: they each measure it differently (a ResizeObserver, getBoundingClientRect, the
+ * canvas), and on a real phone those disagree in the last decimals — an exact size key made the canvases fall back to a
+ * default zone while the callouts used the measured one (the bag over the chapter text, the brackets below it). The
+ * overlay re-measures on every resize, so the zones always belong to the current screen.
+ */
+export function setPhoneZones(zones: PhoneZone[], bounds: number[]) {
+  phoneZones = { zones, bounds }
 }
 
 /** half-width (progress) of the glide from one chapter's zone into the next, centred on the boundary */
@@ -149,7 +156,7 @@ const ZONE_GLIDE = 0.013
 const zoneTmp: PhoneZone = { t: 0, b: 0, l: 0, r: 0 }
 
 function phoneZoneAt(p: number, W: number, H: number, Hs: number): PhoneZone {
-  if (!phoneZones || phoneZones.key !== `${W}x${H}`) {
+  if (!phoneZones) {
     zoneTmp.l = 18
     zoneTmp.r = W - 18
     zoneTmp.t = PHONE_TOP
@@ -168,6 +175,14 @@ function phoneZoneAt(p: number, W: number, H: number, Hs: number): PhoneZone {
   zoneTmp.l = a.l + (next.l - a.l) * t
   zoneTmp.r = a.r + (next.r - a.r) * t
   return zoneTmp
+}
+
+/** the bottom of the product zone at this progress (px of the stage) — the phone stage fades out below it */
+export function phoneZoneBottom(progress: number, W: number, H: number) {
+  const Hs = Math.min(H, smallViewportHeight() || H)
+  // the opening starts centred and full size (PHONE_OPENING): the fade follows the bag as it settles into its zone
+  const e = smoothstep(0, PHONE_SETTLE, progress)
+  return H + (phoneZoneAt(progress, W, H, Hs).b - H) * e
 }
 
 function phoneComposition(progress: number, W: number, H: number, out: Composition): Composition {

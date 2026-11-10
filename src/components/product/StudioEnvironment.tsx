@@ -17,8 +17,9 @@ const GLOW = 128
 /** the moving floor layer starts this far (in viewport heights) above the cove (studio.css .studio-floor) */
 const FLOOR_TOP = 0.4
 const FLOOR_HEIGHT = 1.1
-/** ms after the intro: the room (studio.css: 0.95 s delay + 1.9 s rise) is about half lit */
-const INK_AT = 1750
+/** ms after the product reveal starts: the room (studio.css: 0.3 s delay + 1.5 s rise) is about half lit — before
+ * the navigation appears (intro 'ready'), so it arrives in its final ink instead of changing colour on screen */
+const INK_AT = 950
 
 /**
  * The atelier behind the product (docs/PROPOSAL_ART_DIRECTION_R2.md, concept 2): a pale stone cyclorama lit by a tall
@@ -28,8 +29,9 @@ const INK_AT = 1750
  * product are projected through the same camera and editorial composition as the product, every frame the story moves.
  * Every layer is a static gradient that is only translated, scaled or faded, so scrolling never repaints it.
  *
- * First Light: the stage starts unlit, exactly the intro's own backdrop, so the intro hands over as it always has —
- * then, once it is done, the studio lights come up around the bag (studio.css). It runs once, on the compositor.
+ * First Light: the stage starts unlit, exactly the intro's own backdrop. The studio lights come up around the bag
+ * while it emerges from the intro (the product phase), as one movement: the reveal and the light are the same moment,
+ * not a dark pause followed by a second change (studio.css). It runs once, on the compositor.
  */
 export function StudioEnvironment() {
   const rootRef = useRef<HTMLDivElement>(null)
@@ -37,7 +39,7 @@ export function StudioEnvironment() {
   const reduced = useExperienceStore((s) => s.reducedMotion)
 
   // with reduced motion the lights are already up when the intro fades away (a fade, not a movement)
-  const lit = reduced || intro === 'ready'
+  const lit = reduced || intro === 'product' || intro === 'ready'
   useEffect(() => {
     const html = document.documentElement
     html.dataset.studio = lit ? 'lit' : 'unlit'

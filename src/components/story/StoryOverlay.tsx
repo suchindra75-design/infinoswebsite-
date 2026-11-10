@@ -5,7 +5,7 @@ import { STORY } from '@/content/story'
 import { STORY_RANGES, chapterAt, smoothstep } from '@/motion/chapters'
 import { cameraAt } from '@/motion/cameraTrack'
 import { anchorWorld } from '@/motion/anchors'
-import { compositionAt, layoutMode, PHONE_TOP, setPhoneZones, type Composition, type LayoutMode, type PhoneZone } from '@/motion/composition'
+import { compositionAt, layoutMode, PHONE_TOP, phoneZoneBottom, setPhoneZones, type Composition, type LayoutMode, type PhoneZone } from '@/motion/composition'
 import { addRenderer, requestFrame } from '@/motion/frameLoop'
 import { filmLayout, projectToFilm } from '@/motion/sequences'
 import { useExperienceStore } from '@/state/experienceStore'
@@ -85,6 +85,8 @@ export function StoryOverlay() {
     let size = ''
     let active = -1
     let labelWidths: number[] = []
+    let zoneBottom = ''
+    let stageLayer: HTMLElement | null = null
 
     // chapter text sides follow the composition: opposite the product on landscape screens, below it on portrait ones
     const layout = (W: number, H: number) => {
@@ -134,7 +136,7 @@ export function StoryOverlay() {
         }
         return z
       })
-      setPhoneZones(W, H, zones, STORY_RANGES.slice(0, -1).map((r) => r.end))
+      setPhoneZones(zones, STORY_RANGES.slice(0, -1).map((r) => r.end))
       requestFrame()
     }
     // text heights change when the web fonts arrive, and whenever the copy reflows
@@ -156,6 +158,18 @@ export function StoryOverlay() {
       const st = useExperienceStore.getState()
       const p = st.progress
       const shown = st.introPhase === 'ready'
+
+      // phones: the product layers fade out just below the bag's zone, so the long shadow of the photoreal frames never
+      // runs under the chapter text (globals.css .stage-canvas mask)
+      if (mode === 'phone') {
+        const zb = `${Math.round(phoneZoneBottom(p, W, H))}px`
+        // written on the stage layer that reads it: on the document root it would restyle the whole page each frame
+        stageLayer ??= document.querySelector<HTMLElement>('.stage-canvas')
+        if (zb !== zoneBottom && stageLayer) {
+          zoneBottom = zb
+          stageLayer.style.setProperty('--pz-b', zb)
+        }
+      }
       root.classList.toggle('ed--ready', shown)
 
       // chapter text (+ the scrim on its side, so the text always reads, even over a close-up)

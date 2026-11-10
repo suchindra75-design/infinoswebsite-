@@ -79,7 +79,7 @@ export function Nav() {
             </button>
           ))}
           <button className="nav-link nav-link--viewer" onClick={(e) => openProductViewer(e.currentTarget)} aria-haspopup="dialog">
-            360° VIEW
+            360° view
           </button>
         </nav>
 
@@ -117,10 +117,10 @@ export function Nav() {
             aria-haspopup="dialog"
           >
             <span className="mobile-menu-index">360</span>
-            360° VIEW
+            360° view
           </button>
         </nav>
-        <div className="mobile-menu-foot">INFINOS TECH — {BRAND.tagline.toUpperCase()}</div>
+        <div className="mobile-menu-foot">INFINOS Tech · {BRAND.tagline}</div>
       </div>
     </>
   )

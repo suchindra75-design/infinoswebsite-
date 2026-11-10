@@ -112,20 +112,20 @@
   background: radial-gradient(closest-side, rgba(var(--daylight), 0.3) 0%, rgba(var(--daylight), 0.1) 55%, rgba(var(--daylight), 0) 100%);
 }
 
-/* ── First Light. The intro ends on its dark backdrop and the bag emerges in it, lit by its key alone. Then the studio
-   lights come up around it: first the pool on the floor, then the room and the window, then the wash behind the bag. */
+/* ── First Light. The bag emerges from the intro's dark backdrop while the studio lights come up around it, in one
+   movement: first the pool on the floor, then the room and the window, then the wash behind the bag. */
 .studio-unlit {
   inset: 0;
   background: var(--unlit);
-  transition: opacity 1.9s cubic-bezier(0.45, 0.05, 0.25, 1) 0.95s;
+  transition: opacity 1.5s cubic-bezier(0.45, 0.05, 0.25, 1) 0.3s;
 }
 
 .studio-pool i {
-  transition: opacity 1.4s cubic-bezier(0.33, 0.1, 0.25, 1) 0.35s;
+  transition: opacity 1.2s cubic-bezier(0.33, 0.1, 0.25, 1) 0.1s;
 }
 
 .studio-wash i {
-  transition: opacity 1.8s cubic-bezier(0.33, 0.1, 0.25, 1) 1.15s;
+  transition: opacity 1.5s cubic-bezier(0.33, 0.1, 0.25, 1) 0.55s;
 }
 
 html[data-studio='lit'] .studio-unlit {

@@ -10,11 +10,11 @@ import { lenisRef } from '@/motion/SmoothScrollProvider'
 const ViewerCanvas = dynamic(() => import('./ViewerCanvas'), { ssr: false })
 
 const VIEW_BUTTONS: { view: ViewName; label: string }[] = [
-  { view: 'front', label: 'FRONT' },
-  { view: 'right', label: 'RIGHT' },
-  { view: 'rear', label: 'REAR' },
-  { view: 'left', label: 'LEFT' },
-  { view: 'top', label: 'TOP' },
+  { view: 'front', label: 'Front' },
+  { view: 'right', label: 'Right' },
+  { view: 'rear', label: 'Rear' },
+  { view: 'left', label: 'Left' },
+  { view: 'top', label: 'Top' },
 ]
 
 type FsElement = HTMLElement & { webkitRequestFullscreen?: () => void }
@@ -63,7 +63,7 @@ export function ViewerLauncher() {
       <span className="viewer-launch-icon" aria-hidden="true">
         ⟲
       </span>
-      360° VIEW
+      360° view
     </button>
   )
 }
@@ -145,13 +145,13 @@ export function ProductViewer() {
     <div ref={rootRef} className="viewer" role="dialog" aria-modal="true" aria-labelledby="viewer-title">
       <header className="viewer-head">
         <div>
-          <p className="viewer-kicker">360° VIEW · INTERACTIVE MODEL</p>
+          <p className="viewer-kicker">360° view · Interactive model</p>
           <h2 className="viewer-title" id="viewer-title">
             INFINOS Pro Dual-Chamber Bag
           </h2>
         </div>
         <button ref={closeRef} type="button" className="viewer-close" onClick={closeProductViewer} aria-label="Close 360° view and return to the website">
-          <span aria-hidden="true">✕</span> CLOSE
+          <span aria-hidden="true">✕</span> Close
         </button>
       </header>
 
@@ -166,7 +166,7 @@ export function ProductViewer() {
         )}
         {webgl && (
           <p className="viewer-hint" aria-hidden="true">
-            DRAG TO ROTATE · PINCH OR SCROLL TO ZOOM
+            Drag to rotate · Pinch or scroll to zoom
           </p>
         )}
       </div>
@@ -201,7 +201,7 @@ export function ProductViewer() {
           </div>
           <div className="viewer-group" role="group" aria-label="View options">
             <button type="button" className="viewer-btn viewer-btn--text" onClick={() => send({ type: 'reset' })}>
-              RESET
+              Reset
             </button>
             <button
               type="button"
@@ -209,11 +209,11 @@ export function ProductViewer() {
               aria-pressed={autoRotate}
               onClick={() => setAutoRotate(!autoRotate)}
             >
-              AUTO-ROTATE {autoRotate ? 'ON' : 'OFF'}
+              Auto-rotate {autoRotate ? 'on' : 'off'}
             </button>
             {fsSupported && (
               <button type="button" className="viewer-btn viewer-btn--text" aria-pressed={fullscreen} onClick={toggleFullscreen}>
-                {fullscreen ? 'EXIT FULL SCREEN' : 'FULL SCREEN'}
+                {fullscreen ? 'Exit full screen' : 'Full screen'}
               </button>
             )}
           </div>
