@@ -26,6 +26,8 @@ export interface ExperienceState {
   sequenceReady: Record<string, boolean>
   /** whether the frame for the current scroll position (or a close neighbour) is loaded */
   sequenceFrameOk: boolean
+  /** phones: the opening frames have handed over to the live model once; the reveal plays live from then on (chapters.ts) */
+  liveReveal: boolean
   /** opening: share of the reveal frames preloaded (0..1) */
   openingProgress: number
   /** opening: reveal frames are ready — the product may light up */
@@ -62,6 +64,7 @@ export const useExperienceStore = create<ExperienceState>((set) => ({
   sequenceId: null,
   sequenceReady: {},
   sequenceFrameOk: false,
+  liveReveal: false,
   openingProgress: 0,
   openingReady: false,
   introPhase: 'loading',

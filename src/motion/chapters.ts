@@ -100,11 +100,21 @@ function sameStages(a: StageAmounts, b: StageAmounts, tol: number) {
  * the film and its first frames are a tight close-up of the front emblem — so on a tall screen they could only show
  * fragments of the bag. The live scene follows the identical camera path and opening stages, renders the whole bag
  * at any framing (composition.ts phone track), and the phone never downloads or decodes those 120 frames.
+ *
+ * `liveReveal`: phones open the story on the photoreal reveal frames (First Light and the first scroll), which hand
+ * over to the live model at the hero. Scrolling back up then played the frames again — but a phone keeps only ~10
+ * decoded frames, so the frame for a quick return was often still decoding and the stage swapped between the photo and
+ * the live model (lit differently, a few pixels apart) several times a second: the owner's device video, 2026-11-11.
+ * After that first handover the live model, which follows the identical camera path, plays the reveal both ways.
  */
-export function framesFor(chapter: Chapter, phone: boolean): SequenceId | undefined {
+export function framesFor(chapter: Chapter, phone: boolean, liveReveal = false): SequenceId | undefined {
   if (phone && chapter.sequence === 'open') return undefined
+  if (phone && liveReveal && chapter.sequence === 'reveal') return undefined
   return chapter.sequence
 }
+
+/** where the reveal frames have handed over to the live model (the hero chapter, which has no frames) */
+const REVEAL_END = CHAPTERS.find((c) => c.id === 'reveal')!.end
 
 export function chapterAt(progress: number): Chapter {
   return CHAPTERS.find((c) => progress >= c.start && progress < c.end) ?? CHAPTERS[CHAPTERS.length - 1]
@@ -122,11 +132,14 @@ export function applyScrollProgress(progress: number, exact = false): void {
   const explodedAmount = computeExplodedAmount(chapter.phase, chapterProgress)
   const stages = computeStages(chapter.phase, chapterProgress)
   const state = useExperienceStore.getState()
-  const sequence = framesFor(chapter, state.phone)
+  const patch: Partial<typeof state> = {}
+  // the hero is on screen with the live model in it: from here on, phones play the reveal live (framesFor)
+  const liveReveal = state.liveReveal || (state.phone && state.modelReady && clamped >= REVEAL_END)
+  if (liveReveal !== state.liveReveal) patch.liveReveal = liveReveal
+  const sequence = framesFor(chapter, state.phone, liveReveal)
   const sequenceCover = sequence ? computeSequenceCover(chapter, chapterProgress) : 0
 
   const phaseChanged = state.phase !== chapter.phase
-  const patch: Partial<typeof state> = {}
 
   if (state.progress !== clamped) patch.progress = clamped
   if (state.chapterProgress !== chapterProgress) patch.chapterProgress = chapterProgress

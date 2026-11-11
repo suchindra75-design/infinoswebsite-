@@ -191,7 +191,8 @@ class FrameSet {
     const far = [...this.bitmaps.keys()].sort((a, b) => Math.abs(b - this.target) - Math.abs(a - this.target))
     for (const i of far) {
       if (this.bitmaps.size <= this.maxBitmaps) break
-      if (Math.abs(i - this.target) <= 1) continue
+      // frame 0 stays: it is the page's resting frame (First Light, and the top of the story)
+      if (Math.abs(i - this.target) <= 1 || i === 0) continue
       this.bitmaps.get(i)?.close()
       this.bitmaps.delete(i)
     }
@@ -206,6 +207,16 @@ class FrameSet {
       if (b) return { frame: b, index: i + d, distance: d }
     }
     return null
+  }
+
+  /** the decoded frame closest to i, at any distance */
+  closest(i: number): { frame: Decoded; index: number; distance: number } | null {
+    let best: { frame: Decoded; index: number; distance: number } | null = null
+    for (const [index, frame] of this.bitmaps) {
+      const distance = Math.abs(index - i)
+      if (!best || distance < best.distance) best = { frame, index, distance }
+    }
+    return best
   }
 
   dispose() {
@@ -287,6 +298,8 @@ export function ImageSequence() {
     }, 250)
 
     let lastKey = ''
+    // whether the last tick showed a frame (see the fallback in draw)
+    let showing = false
     const comp: Composition = { x: 0.5, y: 0.5, s: 1 }
     const setLayers = (seq: number) => {
       const o = String(seq)
@@ -313,6 +326,7 @@ export function ImageSequence() {
       // screen turns to a layout that shows them
       if (progress > 0.12 && !phoneLayout.matches) sets.open.start()
       if (!set || set.failed || sequenceCover <= 0.001) {
+        showing = false
         setLayers(0)
         return
       }
@@ -320,9 +334,13 @@ export function ImageSequence() {
       const cp = Math.min(1, Math.max(0, (progress - chapter.start) / (chapter.end - chapter.start)))
       const index = sequenceFrame(set.def, chapter.hold ? 0 : cp)
       set.want(index)
-      const found = set.nearest(index)
-      // only cover the live model with a frame that shows (nearly) the right moment; otherwise the live scene,
-      // which is always exact, stays visible until the right frame is decoded
+      // Cover the live model only with a frame that shows (nearly) the right moment; otherwise the live scene, which is
+      // always exact, stays visible until the right frame is decoded. Once frames are on screen, though, they stay: a
+      // farther decoded frame stands in for the few ms until the right one arrives. Dropping to the live model for those
+      // ms swapped the photo for a differently lit render and back — a visible flicker on phones, which decode slowly
+      // and keep few frames (owner's device video, 2026-11-11).
+      const found = set.nearest(index) ?? (showing ? set.closest(index) : null)
+      showing = !!found
       setFrameOk(!!found)
       setLayers(found ? sequenceCover : 0)
       if (!found) return

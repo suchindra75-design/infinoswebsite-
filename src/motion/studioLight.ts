@@ -8,7 +8,11 @@ import { smoothstep } from '@/motion/sequences'
  *    deeper contact shadow) builds through chapter 02 and has left again under the frames, before the live interior.
  * Both values are material uniforms, written every rendered frame (StudioShadow and ShadowCatcher, ProductCanvasInner).
  */
-export function forwardShadowWeight(progress: number) {
+export function forwardShadowWeight(progress: number, phone = false) {
+  // Phones never show the open sequence (chapters.ts framesFor), so there is no hand-over to match: on the live model
+  // through chapters 02-05 this wedge from behind was a long, hard-edged streak that changed shape in steps as the bag
+  // opened (owner's device video, 2026-11-11). The contact shadow grounds the bag there, as in every other chapter.
+  if (phone) return 0
   return 0.95 * smoothstep(0.215, 0.3, progress) * (1 - smoothstep(0.5, 0.56, progress))
 }
 

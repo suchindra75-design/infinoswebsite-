@@ -49,53 +49,37 @@ function RotationRig({ children }: { children: React.ReactNode }) {
 }
 
 /**
- * The contact shadow is rendered only when the pose changes (opening stages / model loaded), not
- * every frame: ContactShadows renders `frames` passes after each re-render. It sits inside the rotation rig, so the
- * drag yaw turns the baked shadow with the bag at no cost. (It is mounted after ExplodedViewController, so its single
- * pass runs after the new pose has been applied in the same frame.)
+ * The contact shadow is rendered only when the pose changes (opening stages / model loaded), never while it rests:
+ * ContactShadows renders `frames` passes after each re-render. It sits inside the rotation rig, so the drag yaw turns
+ * the baked shadow with the bag at no cost.
+ *
+ * While the bag opens or closes it follows every pose. It used to re-render in 1/24 steps of the stages: the bag moved
+ * smoothly and its shadow hopped behind it (the inner box sliding out, the closing in chapter 07 — owner's device video,
+ * 2026-11-11). Its pass is a 256/512 px depth render plus two blur passes, and only runs while the stages change.
  *
  * It sits just below the floor: drei draws its blur passes on a plane at the world origin, seen by the shadow camera at
  * this position looking up. Above the origin (it used to be at +1 mm), that plane was behind the camera, so every blur
  * pass cleared the shadow to nothing and the live chapters showed no contact shadow at all. Its strength follows the
  * frames it hands over to (studioLight.ts): a material uniform, written every rendered frame.
  */
-/**
- * Both floor shadows re-render in steps of the bag's pose (1/24 and 1/48), never every frame. When the pose comes to rest
- * inside a step — scrolling stopped, or the phone's eased story settled — the last render showed an earlier pose of
- * that step; ms after the pose last changed, they render once more for the exact pose at rest.
- */
-const SHADOW_SETTLE_MS = 160
-
 const exactPose = (s: { flap: number; lid: number; drop: number; boxOut: number; boxLid: number }) =>
   `${s.flap.toFixed(4)}:${s.lid.toFixed(4)}:${s.drop.toFixed(4)}:${s.boxOut.toFixed(4)}:${s.boxLid.toFixed(4)}`
 
 function StudioShadow({ isMobile }: { isMobile: boolean }) {
-  // opening stages only, in 1/24 steps: in the exploded overview the lower compartment never leaves the floor, so its
-  // footprint (all a contact shadow shows) does not change while the upper layers lift
-  const key = useExperienceStore((s) => {
-    const q = (v: number) => Math.round(v * 24)
-    const st = s.stages
-    return `${s.modelReady}:${q(st.flap)}:${q(st.lid)}:${q(st.drop)}:${q(st.boxOut)}:${q(st.boxLid)}`
-  })
   const ref = useRef<Group>(null)
-  const [settle, setSettle] = useState(0)
-  const armed = useRef({ at: '', pose: '' })
-  const timer = useRef(0)
-  useEffect(() => () => window.clearTimeout(timer.current), [])
+  // opening stages only: in the exploded overview the lower compartment never leaves the floor, so its footprint (all a
+  // contact shadow shows) does not change while the upper layers lift
+  const [pose, setPose] = useState('')
   useFrame(() => {
     const st = useExperienceStore.getState()
     const plane = ref.current?.children.find((c) => (c as Mesh).isMesh) as Mesh | undefined
     if (plane) (plane.material as MeshBasicMaterial).opacity = contactShadowOpacity(st.progress)
-    // a re-render (new step, or a settle) re-armed ContactShadows: it renders this frame, at this pose
-    const pose = exactPose(st.stages)
-    const at = `${key}|${settle}`
-    if (armed.current.at !== at) armed.current = { at, pose }
-    else if (pose !== armed.current.pose) {
-      window.clearTimeout(timer.current)
-      timer.current = window.setTimeout(() => {
-        setSettle((n) => n + 1)
-        requestFrame()
-      }, SHADOW_SETTLE_MS)
+    // a new pose re-renders this component, which re-arms ContactShadows: it renders in the next frame, at that frame's
+    // pose (one frame behind while the bag moves, exact once it rests)
+    const now = `${st.modelReady}:${exactPose(st.stages)}`
+    if (now !== pose) {
+      setPose(now)
+      requestFrame()
     }
   })
   return (
@@ -110,10 +94,17 @@ function StudioShadow({ isMobile }: { isMobile: boolean }) {
       resolution={isMobile ? 256 : 512}
       color="#000000"
       // a changing prop re-renders the component, which re-arms its frame counter
-      userData={{ pose: key, settle }}
+      userData={{ pose }}
     />
   )
 }
+
+/**
+ * The forward shadow (desktop only, studioLight.ts) re-renders in 1/48 steps of the bag's pose, never every frame. When
+ * the pose comes to rest inside a step, the last render showed an earlier pose of that step; ms after the pose last
+ * changed, it renders once more for the exact pose at rest.
+ */
+const SHADOW_SETTLE_MS = 160
 
 /**
  * The floor that receives the forward shadow (LightingSystem's shadow-only light): the open sequence begins with one, so
@@ -135,7 +126,7 @@ function ShadowCatcher() {
   useFrame(({ camera, gl }) => {
     camera.layers.enable(1)
     const st = useExperienceStore.getState()
-    const w = forwardShadowWeight(st.progress)
+    const w = forwardShadowWeight(st.progress, st.phone)
     catcher.uWeight.value = w
     const on = w > 0.002
     // the first rendered frame is the warm-up under the opening frames: draw the floor once (weight 0, invisible) so
