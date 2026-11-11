@@ -204,7 +204,10 @@ button {
 }
 
 .nav-brand img {
-  border-radius: 6px;
+  /* the mark at its own proportions (100 x 80), square-cornered like the intro's logo that lands on it */
+  width: 35px;
+  height: 28px;
+  border-radius: 0;
 }
 
 .nav-brand-suffix {

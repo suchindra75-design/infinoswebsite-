@@ -65,7 +65,7 @@ export function Nav() {
         className={`nav ${navVisible ? 'nav--visible' : ''} ${scrolled ? 'nav--scrolled' : ''}`}
       >
         <button className="nav-brand" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
-          <img src="/logo.jpg" alt="" width={28} height={28} />
+          <img src="/logo.jpg" alt="" width={35} height={28} />
           <span>
             {BRAND.name}
             <span className="nav-brand-suffix"> {BRAND.suffix}</span>
