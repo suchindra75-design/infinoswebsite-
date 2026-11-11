@@ -48,12 +48,10 @@ const box = (x: number, y: number, w: number, h: number): CSSProperties => ({
   width: `${(w / MW) * 100}%`,
   height: `${(h / MH) * 100}%`,
 })
-const WORD = 'infinos'
 const TYPE = `${BRAND.name} ${BRAND.suffix}`
 /** while the intro's logo is flying into the navigation bar, the bar's own logo waits hidden under it (intro.css) */
 const BRAND_PENDING = 'intro-brand-pending'
 
-const CORNERS: [number, number][] = [[26, 26], [379, 26], [379, 304], [26, 304]]
 const STREAKS = [
   { y: 18, d: 0.62, o: -0.1, w: 22, c: 'w' },
   { y: 31, d: 0.86, o: -0.5, w: 30, c: 'c' },
@@ -109,9 +107,20 @@ export function IntroSequence() {
       const navY = t && t !== 'none' ? new DOMMatrixReadOnly(t).m42 : 0
       const dx = to.left - from.left
       const dy = to.top - navY - from.top
+      const flight = (T.fly / clock.rate) * 1000
       mark.animate(
         [{ transform: 'none' }, { transform: `translate(${dx}px, ${dy}px) scale(${to.width / from.width}, ${to.height / from.height})` }],
-        { duration: (T.fly / clock.rate) * 1000, easing: 'cubic-bezier(0.65, 0, 0.2, 1)', fill: 'forwards' },
+        { duration: flight, easing: 'cubic-bezier(0.65, 0, 0.2, 1)', fill: 'forwards' },
+      )
+      // docking: one reflection crosses the logo as it settles into its place
+      mark.querySelector<HTMLElement>('.lg-sheen')?.animate(
+        [
+          { opacity: 0, transform: 'translateX(-140%) skewX(-18deg)' },
+          { opacity: 1, offset: 0.2 },
+          { opacity: 1, offset: 0.7 },
+          { opacity: 0, transform: 'translateX(400%) skewX(-18deg)' },
+        ],
+        { duration: 520, delay: flight - 140, easing: 'cubic-bezier(0.45, 0, 0.25, 1)', fill: 'backwards' },
       )
     }
 
@@ -244,11 +253,7 @@ export function IntroSequence() {
               <span className="lg-trace lg-trace--top" style={box(0, 162, 411, 3)} />
               <span className="lg-trace lg-trace--bottom" style={box(0, 162, 411, 3)} />
               <span className="lg-core" style={box(66, 68, 273, 193)}>
-                <span className="lg-word" aria-hidden="true">
-                  {WORD.split('').map((ch, i) => (
-                    <span key={i} className="lg-ch" style={{ '--i': i } as CSSProperties}>{ch}</span>
-                  ))}
-                </span>
+                <span className="lg-word" aria-hidden="true">infinos</span>
               </span>
               <span className="lg-side lg-side--t" style={box(26, 26, 353, 42)} />
               <span className="lg-side lg-side--r" style={box(339, 68, 40, 193)} />
@@ -256,9 +261,6 @@ export function IntroSequence() {
               <span className="lg-side lg-side--l" style={box(26, 68, 40, 193)} />
               <span className="lg-tm" style={box(377, 305, 32, 20)}>TM</span>
               <span className="lg-sheen-clip"><span className="lg-sheen" /></span>
-              {CORNERS.map(([x, y], i) => (
-                <span key={i} className="lg-spark" style={{ ...box(x - 30, y - 30, 60, 60), '--i': i } as CSSProperties} />
-              ))}
             </div>
           </div>
           <div className="lg-type">

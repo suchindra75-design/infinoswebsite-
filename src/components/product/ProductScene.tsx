@@ -1,6 +1,7 @@
 'use client'
 
 import dynamic from 'next/dynamic'
+import { useEffect, useState } from 'react'
 import { useExperienceStore } from '@/state/experienceStore'
 import { ProductFallback } from './ProductFallback'
 import { ImageSequence, liveLayerRef } from '@/components/sequence/ImageSequence'
@@ -10,6 +11,14 @@ const ProductCanvas = dynamic(() => import('./ProductCanvasInner').then((m) => m
 })
 
 const coarsePointer = () => typeof window !== 'undefined' && window.matchMedia('(hover: none) and (pointer: coarse)').matches
+
+/**
+ * ms after the intro hands over (`ready`) before the live model mounts: First Light has finished by then. Creating the
+ * WebGL context and compiling its shaders holds the GPU thread that the compositor draws every frame with (traced: a
+ * 1.1 s context creation plus ~0.5 s of program links at 4x CPU throttle), so mounted at the reveal it froze the
+ * product's emergence and the studio light; the opening frames show the product until the hero handover anyway.
+ */
+const LIVE_AFTER_READY = 1200
 
 const ModelLoadIndicator = dynamic(() => import('./ModelLoadIndicator'), { ssr: false })
 
@@ -34,13 +43,24 @@ export function ProductScene() {
   // whose backdrop and studio-light iris fade away on the compositor (intro.css) — the product emerges by visibility
   // only, never blurred or re-exposed: the first visible frame is the final full-resolution frame.
   const stageFade = intro === 'loading' || intro === 'logo' || intro === 'outro' ? 0 : 1
-  // The live model is first needed at the reveal -> hero handover, so it loads and compiles from the product reveal
-  // on (its compile can then never stall the loader or the logo). If the opening frames are not ready when the logo
+  // The live model is first needed at the reveal -> hero handover, so it loads and compiles once the intro has fully
+  // handed over (LIVE_AFTER_READY) — its compile can then never stall the loader, the logo or the reveal. If the opening frames are not ready when the logo
   // starts, it mounts at once instead, so it can stand in for them at 4 s — except on touch screens: there its 4 MB
   // download would compete with the few opening frames still missing on a mobile connection, and its texture uploads
   // and shader compiles would land on the logo animation (the GPU is shared with the compositor). Phones wait for the
   // frames instead (IntroSequence maxWait still bounds the wait).
-  const mountModel = intro === 'product' || intro === 'ready' || (intro !== 'loading' && !openingReady && !coarsePointer())
+  const [liveDue, setLiveDue] = useState(false)
+  useEffect(() => {
+    if (intro !== 'ready' || liveDue) return
+    const t = window.setTimeout(() => setLiveDue(true), LIVE_AFTER_READY)
+    return () => window.clearTimeout(t)
+  }, [intro, liveDue])
+  const revealed = intro === 'product' || intro === 'ready'
+  const mountModel =
+    liveDue ||
+    // the frames could not show the reveal (maxWait): the model stands in for them at once
+    (revealed && !openingReady) ||
+    (intro !== 'loading' && !openingReady && !coarsePointer())
 
   return (
     <div className="stage-canvas" style={{ opacity: stageFade, visibility: stageFade <= 0.001 ? 'hidden' : 'visible' }}>

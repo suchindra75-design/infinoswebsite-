@@ -52,11 +52,14 @@ export function ViewerLauncher() {
   const open = useExperienceStore((s) => s.viewerOpen)
   // the floating button belongs to the product story; past its end, chapter 08's CTA and the navigation offer the view
   const pastStory = useExperienceStore((s) => s.progress >= 0.995)
+  // it arrives with the navigation, once the intro has handed over (never over the reveal, in the wrong ink)
+  const introDone = useExperienceStore((s) => s.introPhase === 'ready')
+  const hidden = open || pastStory || !introDone
   return (
     <button
       type="button"
-      className={`viewer-launch ${open || pastStory ? 'viewer-launch--hidden' : ''}`}
-      tabIndex={pastStory ? -1 : undefined}
+      className={`viewer-launch ${hidden ? 'viewer-launch--hidden' : ''}`}
+      tabIndex={hidden ? -1 : undefined}
       onClick={(e) => openProductViewer(e.currentTarget)}
       aria-haspopup="dialog"
     >

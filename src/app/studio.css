@@ -326,15 +326,5 @@ html[data-ink='dark'] .ed-cta-btn--primary {
   border-color: #08121b;
 }
 
-/* while the ink changes with the light, the opening's visible overlays cross-fade their colours */
-html[data-ink-fade] .nav,
-html[data-ink-fade] .nav-brand,
-html[data-ink-fade] .nav-link,
-html[data-ink-fade] .viewer-launch,
-html[data-ink-fade] .ed-progress,
-html[data-ink-fade] .ed-progress * {
-  transition: color 0.7s ease, background-color 0.7s ease, border-color 0.7s ease, opacity 0.6s ease, transform 0.6s ease;
-}
-
 /* ── The coolant showcase is not in the atelier: it is the cold room (globals.css .cx-backdrop, midnight). Its overlays
    keep the light ink of the dark surfaces, whatever the studio's ink. */

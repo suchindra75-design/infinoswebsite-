@@ -3,13 +3,17 @@
                                  "speeder": jitter, fazer trails, long fazers, drifting clouds -> city bokeh); it
                                  leaves, and the road's light collapses into one point at the centre.
    2–3.55 s logo formation     — "Encapsulation": the point ignites into a light line that splits into the coral
-                                 shell, the gold frame locks in around it like an insulated layer, the payload
-                                 (the wordmark) rises inside the black core, a reflection sweeps the mark.
+                                 shell, the gold frame is drawn around it in one clockwise stroke like an insulated
+                                 layer, the payload (the wordmark) rises inside the black core, a reflection sweeps
+                                 the mark. Flat (2D) on purpose: the earlier 3D tilt drew the pieces out of register
+                                 on Android while they assembled.
    3.55 s → the logo shrinks into its place in the navigation bar (IntroSequence, measured), never fading; it hands
             over to the bar's own logo once the bar has faded in under it.
    3.9 s →  product            — the studio light opens from the centre around the product.
 
-   Rules: only transform and opacity are animated (compositor-run, so a busy main thread cannot stall the intro);
+   Rules: only transform and opacity are animated (compositor-run, so a busy main thread cannot stall the intro); no
+   blurred box-shadows on the moving light (their raster held the GPU thread as the logo appeared on phones); the live
+   3D model is not created until after the intro (ProductScene LIVE_AFTER_READY) — its WebGL context shares that thread;
    every animation-delay is ABSOLUTE seconds since page load — IntroSequence starts all of them at document-timeline
    time 0 (navigation start). Animations exist only under .intro[data-run] (added once the page is interactive).
    ═════════════════════════════════════════════════════════════════════════════════════════════════════════════ */
@@ -67,7 +71,8 @@ html.intro-brand-pending .nav-brand img {
   opacity: 0;
 }
 
-.intro:not([data-phase='loading']) .intro-loading {
+/* the loader leaves the layer tree with the reveal, not as the logo starts (that hand-over must not rebuild layers) */
+.intro--product .intro-loading {
   display: none;
 }
 
@@ -228,7 +233,6 @@ html.intro-brand-pending .nav-brand img {
   height: 2px;
   opacity: 0;
   background: linear-gradient(90deg, transparent 6%, rgba(111, 147, 173, 0.75) 34%, #fff4dc 50%, rgba(230, 236, 240, 0.75) 66%, transparent 94%);
-  box-shadow: 0 0 14px rgba(255, 210, 150, 0.55);
 }
 
 .ld-meter {
@@ -275,7 +279,7 @@ html.intro-brand-pending .nav-brand img {
 .intro[data-run] .ld-streak { animation-name: ld-streak; animation-timing-function: linear; animation-iteration-count: infinite; }
 .intro[data-run] .ld-road { animation: ld-scene 2s linear 0s both; }
 .intro[data-run] .ld-lanes { animation: ld-lanes 0.2s linear 0s infinite; }
-.intro[data-run] .ld-move { animation: ld-drive 1.22s linear 0.6s both; }
+.intro[data-run] .ld-move { animation: ld-drive 1.5s linear 0.28s both; }
 .intro[data-run] .ld-jitter { animation: ld-jitter 0.42s linear 0s infinite; }
 .intro[data-run] .ld-wheel { animation: ld-wheel 0.3s linear 0s infinite; }
 .intro[data-run] .ld-beam { animation: ld-beam 1.3s ease-in-out 0s infinite; }
@@ -292,17 +296,17 @@ html.intro-brand-pending .nav-brand img {
   100% { opacity: 0; }
 }
 
-/* in 0.5–0.9 s (after hydration has settled), out 1.52–1.82 s */
+/* in 0.1–0.45 s, out 1.56–1.84 s */
 @keyframes ld-scene {
-  0%, 25% { opacity: 0; }
-  45%, 76% { opacity: 1; }
-  91%, 100% { opacity: 0; }
+  0%, 5% { opacity: 0; }
+  22.5%, 78% { opacity: 1; }
+  92%, 100% { opacity: 0; }
 }
 
 @keyframes ld-meter {
-  0%, 30% { opacity: 0; transform: translate(-50%, 6px); }
-  44%, 74% { opacity: 1; transform: translate(-50%, 0); }
-  86%, 100% { opacity: 0; transform: translate(-50%, 0); }
+  0%, 12% { opacity: 0; transform: translate(-50%, 6px); }
+  30%, 76% { opacity: 1; transform: translate(-50%, 0); }
+  88%, 100% { opacity: 0; transform: translate(-50%, 0); }
 }
 
 @keyframes ld-sky {
@@ -318,11 +322,11 @@ html.intro-brand-pending .nav-brand img {
   to { transform: translateX(-180px); }
 }
 
-/* drive in (0.6–1.15 s), cruise, accelerate out to the right (1.49–1.82 s) */
+/* drive in (0.28–0.88 s), cruise (to 1.46 s), accelerate out to the right (1.46–1.78 s) */
 @keyframes ld-drive {
-  0% { transform: translateX(-80vw); animation-timing-function: cubic-bezier(0.12, 0.9, 0.24, 1); }
-  45.1% { transform: translateX(0); animation-timing-function: linear; }
-  72.95% { transform: translateX(0); animation-timing-function: cubic-bezier(0.6, 0, 0.92, 0.35); }
+  0% { transform: translateX(-80vw); animation-timing-function: cubic-bezier(0.16, 0.84, 0.3, 1); }
+  40% { transform: translateX(0); animation-timing-function: linear; }
+  78.7% { transform: translateX(0); animation-timing-function: cubic-bezier(0.55, 0, 0.9, 0.4); }
   100% { transform: translateX(95vw); }
 }
 
@@ -351,14 +355,14 @@ html.intro-brand-pending .nav-brand img {
 }
 
 @keyframes ld-trail-stretch {
-  0%, 81% { transform: scaleX(1); }
+  0%, 80% { transform: scaleX(1); }
   100% { transform: scaleX(3.2); }
 }
 
 @keyframes ld-collapse {
-  0%, 25% { opacity: 0; transform: translateY(0) scale(1, 1); }
-  45%, 80% { opacity: 0.45; transform: translateY(0) scale(1, 1); }
-  89% { opacity: 1; transform: translateY(0) scale(1, 1.8); animation-timing-function: cubic-bezier(0.5, 0, 0.2, 1); }
+  0%, 5% { opacity: 0; transform: translateY(0) scale(1, 1); }
+  22.5%, 76% { opacity: 0.45; transform: translateY(0) scale(1, 1); }
+  86% { opacity: 1; transform: translateY(0) scale(1, 1.8); animation-timing-function: cubic-bezier(0.55, 0, 0.25, 1); }
   99% { opacity: 1; transform: translateY(calc(var(--vh) * -0.405)) scale(0.004, 2.2); }
   100% { opacity: 0; transform: translateY(calc(var(--vh) * -0.405)) scale(0.004, 2.2); }
 }
@@ -391,7 +395,6 @@ html.intro-brand-pending .nav-brand img {
   height: 2px;
   margin: -1px 0 0 -48vw;
   background: linear-gradient(90deg, transparent, rgba(111, 147, 173, 0.55) 24%, #fff6e6 50%, rgba(230, 236, 240, 0.55) 76%, transparent);
-  box-shadow: 0 0 18px rgba(255, 205, 150, 0.55);
   opacity: 0;
 }
 
@@ -413,7 +416,6 @@ html.intro-brand-pending .nav-brand img {
 .lg-dive {
   position: absolute;
   inset: 0;
-  perspective: 1100px;
   /* the flight (IntroSequence) scales the mark from its top-left corner onto the bar's logo */
   transform-origin: 0 0;
   will-change: transform;
@@ -422,7 +424,6 @@ html.intro-brand-pending .nav-brand img {
 .lg-tilt {
   position: absolute;
   inset: 0;
-  transform-style: preserve-3d;
 }
 
 .lg-tilt > span {
@@ -442,9 +443,14 @@ html.intro-brand-pending .nav-brand img {
   background: var(--gold);
 }
 
+/* the frame is drawn clockwise in one stroke: each side grows from the corner the previous one ended at */
+.lg-side--t { transform-origin: 0 50%; }
+.lg-side--r { transform-origin: 50% 0; }
+.lg-side--b { transform-origin: 100% 50%; }
+.lg-side--l { transform-origin: 50% 100%; }
+
 /* "white-hot" overlay: the shell and frame form from light, then cool to their brand colours */
-.lg-bar::after,
-.lg-side::after {
+.lg-bar::after {
   content: '';
   position: absolute;
   inset: 0;
@@ -454,8 +460,18 @@ html.intro-brand-pending .nav-brand img {
 
 .lg-trace {
   background: linear-gradient(90deg, transparent, #fff 14%, #fff 86%, transparent);
-  box-shadow: 0 0 10px 1px rgba(255, 220, 170, 0.85), 0 0 34px 5px rgba(111, 147, 173, 0.45);
   opacity: 0;
+}
+
+/* the line's glow: a soft gradient band around it (not a blurred shadow) */
+.lg-trace::before {
+  content: '';
+  position: absolute;
+  left: 4%;
+  right: 4%;
+  top: -500%;
+  bottom: -500%;
+  background: linear-gradient(180deg, rgba(255, 220, 170, 0) 0%, rgba(255, 220, 170, 0.32) 50%, rgba(255, 220, 170, 0) 100%);
 }
 
 .lg-trace--top { --ty: calc(var(--mh) * -0.405); }
@@ -511,28 +527,6 @@ html.intro-brand-pending .nav-brand img {
   transform: translateX(-140%) skewX(-18deg);
 }
 
-.lg-spark {
-  border-radius: 50%;
-  background: radial-gradient(circle, #fff 0 5%, rgba(255, 228, 175, 0.9) 9%, rgba(230, 236, 240, 0.32) 22%, transparent 50%);
-  opacity: 0;
-}
-
-.lg-spark::before,
-.lg-spark::after {
-  content: '';
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  width: 180%;
-  height: 1.5px;
-  margin: -0.75px 0 0 -90%;
-  background: linear-gradient(90deg, transparent, rgba(255, 245, 225, 0.9), transparent);
-}
-
-.lg-spark::after {
-  transform: rotate(90deg) scaleX(0.6);
-}
-
 .lg-type {
   position: absolute;
   top: calc(100% + var(--mw) * 0.15);
@@ -577,30 +571,21 @@ html.intro-brand-pending .nav-brand img {
 .intro[data-run] .intro-logo { animation: lg-presence 2s linear 2s both; }
 .intro[data-run] .lg-flare { animation: lg-flare 0.5s cubic-bezier(0.2, 0.7, 0.3, 1) 2s both; }
 .intro[data-run] .lg-streak { animation: lg-streak 0.62s cubic-bezier(0.2, 0.7, 0.3, 1) 2s both; }
-.intro[data-run] .lg-tilt { animation: lg-tilt 1.45s linear 2s both; }
+.intro[data-run] .lg-tilt { animation: lg-rise 0.9s cubic-bezier(0.2, 0.7, 0.2, 1) 2.3s both; }
 .intro[data-run] .lg-trace { animation: lg-trace 0.6s linear 2.02s both; }
 .intro[data-run] .lg-bar { animation: lg-bar 0.38s cubic-bezier(0.2, 0.9, 0.25, 1) 2.34s both; }
 .intro[data-run] .lg-bar::after { animation: lg-heat 0.55s ease-out 2.36s both; }
 .intro[data-run] .lg-band { animation: lg-fade 0.3s ease-out 2.38s both; }
 .intro[data-run] .lg-core { animation: lg-fade 0.3s ease-out 2.5s both; }
-.intro[data-run] .lg-side { animation: lg-side 0.42s cubic-bezier(0.16, 1, 0.3, 1) both; }
-.intro[data-run] .lg-side::after { animation: lg-heat 0.6s ease-out both; }
-.intro[data-run] .lg-side--t { --fx: 0px; --fy: calc(var(--mw) * -0.17); animation-delay: 2.44s; }
-.intro[data-run] .lg-side--r { --fx: calc(var(--mw) * 0.17); --fy: 0px; animation-delay: 2.48s; }
-.intro[data-run] .lg-side--b { --fx: 0px; --fy: calc(var(--mw) * 0.17); animation-delay: 2.52s; }
-.intro[data-run] .lg-side--l { --fx: calc(var(--mw) * -0.17); --fy: 0px; animation-delay: 2.56s; }
-.intro[data-run] .lg-side--t::after { animation-delay: 2.5s; }
-.intro[data-run] .lg-side--r::after { animation-delay: 2.54s; }
-.intro[data-run] .lg-side--b::after { animation-delay: 2.58s; }
-.intro[data-run] .lg-side--l::after { animation-delay: 2.62s; }
-.intro[data-run] .lg-spark { animation: lg-spark 0.45s ease-out calc(2.8s + var(--i) * 0.04s) both; }
-.intro[data-run] .lg-ch {
-  animation: lg-ch-in 0.42s cubic-bezier(0.16, 1, 0.3, 1) calc(2.64s + var(--i) * 0.035s) both;
-}
+.intro[data-run] .lg-side--t { animation: lg-draw-x 0.15s cubic-bezier(0.5, 0, 1, 1) 2.48s both; }
+.intro[data-run] .lg-side--r { animation: lg-draw-y 0.09s linear 2.63s both; }
+.intro[data-run] .lg-side--b { animation: lg-draw-x 0.15s linear 2.72s both; }
+.intro[data-run] .lg-side--l { animation: lg-draw-y 0.1s cubic-bezier(0, 0, 0.4, 1) 2.87s both; }
+.intro[data-run] .lg-word { animation: lg-word-in 0.6s cubic-bezier(0.16, 1, 0.3, 1) 2.64s both; }
 .intro[data-run] .lg-tm { animation: lg-fade 0.3s ease-out 3.02s both; }
 .intro[data-run] .lg-sheen { animation: lg-sheen 0.62s cubic-bezier(0.45, 0, 0.25, 1) 2.98s both; }
 .intro[data-run] .lg-floor { animation: lg-fade 0.8s ease-out 2.5s both, lg-out 0.2s ease-in 3.55s forwards; }
-.intro[data-run] .lg-type-ch { animation: lg-type-in 0.38s cubic-bezier(0.16, 1, 0.3, 1) calc(2.86s + var(--i) * 0.016s) both; }
+.intro[data-run] .lg-type-name { animation: lg-type-in 0.6s cubic-bezier(0.16, 1, 0.3, 1) 2.86s both; }
 .intro[data-run] .lg-type-tagline { animation: lg-fade 0.35s ease-out 3.05s both; }
 .intro[data-run] .lg-type { animation: lg-type-out 0.22s ease-in 3.55s forwards; }
 
@@ -633,11 +618,10 @@ html.intro-brand-pending .nav-brand img {
   100% { opacity: 0; transform: scaleX(1.15); }
 }
 
-/* the mark forms lying back in depth (horizontal lines stay level with the flare), then rises upright and holds flat,
-   ready to fly into the bar */
-@keyframes lg-tilt {
-  0%, 22% { transform: translateZ(calc(var(--mw) * -0.22)) rotateX(38deg); animation-timing-function: cubic-bezier(0.3, 0.6, 0.2, 1); }
-  66%, 100% { transform: translateZ(0) rotateX(0deg); }
+/* the mark settles to its full size as it forms (flat), then holds still, ready to fly into the bar */
+@keyframes lg-rise {
+  from { transform: scale(0.94); }
+  to { transform: scale(1); }
 }
 
 /* light line expands from the centre, then splits to the coral bars */
@@ -660,21 +644,20 @@ html.intro-brand-pending .nav-brand img {
   100% { opacity: 0; }
 }
 
-@keyframes lg-side {
-  0% { opacity: 0; transform: translate(var(--fx), var(--fy)); }
+@keyframes lg-draw-x {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
+}
+
+@keyframes lg-draw-y {
+  from { transform: scaleY(0); }
+  to { transform: scaleY(1); }
+}
+
+/* the payload rises inside the core as one word (the core clips it) */
+@keyframes lg-word-in {
+  0% { opacity: 0; transform: translateY(55%); }
   35% { opacity: 1; }
-  100% { opacity: 1; transform: translate(0, 0); }
-}
-
-@keyframes lg-spark {
-  0% { opacity: 0; transform: scale(0.2) rotate(0deg); }
-  30% { opacity: 1; transform: scale(1) rotate(20deg); }
-  100% { opacity: 0; transform: scale(1.3) rotate(45deg); }
-}
-
-@keyframes lg-ch-in {
-  0% { opacity: 0; transform: translateY(105%); }
-  40% { opacity: 1; }
   100% { opacity: 1; transform: translateY(0); }
 }
 
@@ -685,7 +668,7 @@ html.intro-brand-pending .nav-brand img {
 }
 
 @keyframes lg-type-in {
-  0% { opacity: 0; transform: translateY(70%); }
+  0% { opacity: 0; transform: translateY(0.6em); }
   100% { opacity: 1; transform: translateY(0); }
 }
 
@@ -727,7 +710,6 @@ html.intro-brand-pending .nav-brand img {
 .intro[data-run='reduced'] .lg-flare,
 .intro[data-run='reduced'] .lg-streak,
 .intro[data-run='reduced'] .lg-trace,
-.intro[data-run='reduced'] .lg-spark,
 .intro[data-run='reduced'] .lg-sheen-clip {
   display: none;
 }
@@ -740,10 +722,10 @@ html.intro-brand-pending .nav-brand img {
 .intro[data-run='reduced'] .lg-tilt,
 .intro[data-run='reduced'] .lg-tilt > span,
 .intro[data-run='reduced'] .lg-tilt > span::after,
-.intro[data-run='reduced'] .lg-ch,
+.intro[data-run='reduced'] .lg-word,
 .intro[data-run='reduced'] .lg-floor,
 .intro[data-run='reduced'] .lg-type,
-.intro[data-run='reduced'] .lg-type-ch,
+.intro[data-run='reduced'] .lg-type-name,
 .intro[data-run='reduced'] .lg-type-tagline {
   animation: none;
 }
@@ -794,7 +776,8 @@ html.intro-brand-pending .nav-brand img {
     transition-duration: 0.88s;
   }
 
-  .intro--product .intro-iris {
-    animation-duration: 1s;
+  /* phones: the backdrop's fade alone reveals the product — one full-screen layer fewer to blend over the reveal */
+  .intro-iris {
+    display: none;
   }
 }

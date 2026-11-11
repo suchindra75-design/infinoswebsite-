@@ -17,9 +17,6 @@ const GLOW = 128
 /** the moving floor layer starts this far (in viewport heights) above the cove (studio.css .studio-floor) */
 const FLOOR_TOP = 0.4
 const FLOOR_HEIGHT = 1.1
-/** ms after the product reveal starts: the room (studio.css: 0.3 s delay + 1.5 s rise) is about half lit — before
- * the navigation appears (intro 'ready'), so it arrives in its final ink instead of changing colour on screen */
-const INK_AT = 950
 
 /**
  * The atelier behind the product (docs/PROPOSAL_ART_DIRECTION_R2.md, concept 2): a pale stone cyclorama lit by a tall
@@ -43,22 +40,12 @@ export function StudioEnvironment() {
   useEffect(() => {
     const html = document.documentElement
     html.dataset.studio = lit ? 'lit' : 'unlit'
-    if (!lit) return
-    if (reduced) {
-      html.dataset.ink = 'dark'
-      return
-    }
-    // the overlays change to graphite ink as the rising room passes mid-grey, cross-fading their colours (studio.css)
-    const ink = window.setTimeout(() => {
-      html.dataset.inkFade = ''
-      html.dataset.ink = 'dark'
-    }, INK_AT)
-    const settle = window.setTimeout(() => delete html.dataset.inkFade, INK_AT + 900)
-    return () => {
-      window.clearTimeout(ink)
-      window.clearTimeout(settle)
-    }
-  }, [lit, reduced])
+    // The overlays take their graphite ink with the first light, before any of them is shown: the navigation and the
+    // 360° button appear only once the intro has handed over (intro 'ready'), so they arrive in their final ink. (A
+    // timed switch drifted past that moment on phones — the phone intro is faster and long tasks delay timers — and
+    // the bar's white type faded out on screen, then came back dark.)
+    if (lit) html.dataset.ink = 'dark'
+  }, [lit])
 
   useEffect(() => {
     const root = rootRef.current
