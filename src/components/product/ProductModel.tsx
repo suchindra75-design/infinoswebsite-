@@ -45,6 +45,9 @@ function findMaterialByName(object: THREE.Object3D, name: string): THREE.MeshSta
   return material
 }
 
+/** parts that sit inside or against a shell, within its silhouette (see the shadow casters below) */
+const INNER_PARTS = /Zipper_|Screws|Velcro|Underside|Lining|Liner|_Pad_|Cable|BayItem/
+
 function ProductModelInner() {
   const source = PRODUCT.model.source as string
   const gltf = useGLTF(source)
@@ -65,12 +68,30 @@ function ProductModelInner() {
 
   useEffect(() => {
     const aniso = Math.min(8, gl.capabilities.getMaxAnisotropy())
+    // Shadow casters: the floor shadow (ShadowCatcher) is a very soft variance shadow, so only the bag's shells shape
+    // it. Surface decals (transparent: stitching, embroidery, emblems, mesh), small parts (badges, the screen, pulls,
+    // tags) and what sits inside or against a shell (linings, pads, zippers, velcro, the flap's underside, the cable and
+    // bay item) stay inside the silhouette of the part they belong to — yet each was one more draw in a shadow pass that
+    // re-renders on almost every frame of the exploded chapters (traced on a throttled phone: ~75 of ~140 draws per
+    // frame). 58 casters -> 19; screenshots of chapters 0.30-0.74 with all 58 differ by a few faint pixels at most.
+    // (ContactShadows' depth pass still draws every part: it is darkest where a part nears the floor, and leaving out
+    // even the decals — the inner box's mesh divider sits low — visibly lightened it under the inner box.)
+    // Sizes are measured in the model's own space.
+    const whole = new THREE.Box3().setFromObject(cloned).getSize(new THREE.Vector3())
+    const wholeMax = Math.max(whole.x, whole.y, whole.z) || 1
+    const part = new THREE.Box3()
+    const partSize = new THREE.Vector3()
     cloned.traverse((o) => {
       const mesh = o as THREE.Mesh
       if (!mesh.isMesh) return
+      const mats = Array.isArray(mesh.material) ? mesh.material : [mesh.material]
+      part.setFromObject(mesh).getSize(partSize)
+      const small = Math.max(partSize.x, partSize.y, partSize.z) / wholeMax < 0.12
+      const decal = mats.every((m) => m.transparent)
+      const inner = INNER_PARTS.test(mesh.name)
       // casts onto the studio floor (ShadowCatcher); receiveShadow stays off, so the product's own shading is untouched
-      mesh.castShadow = true
-      for (const m of Array.isArray(mesh.material) ? mesh.material : [mesh.material]) {
+      mesh.castShadow = !small && !decal && !inner
+      for (const m of mats) {
         const std = m as THREE.MeshStandardMaterial
         std.fog = false // the product is never fogged; only the studio floor fades into the background
         // Transparent + double-sided (the stitching, embroidery, emblem and mesh decals): three.js would draw these in

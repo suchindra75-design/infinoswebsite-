@@ -2,7 +2,7 @@
 
 import { ContactShadows } from '@react-three/drei'
 import { Canvas, advance, useFrame, useThree } from '@react-three/fiber'
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Vector2, type Group, type Mesh, type MeshBasicMaterial } from 'three'
 import { LightingSystem } from './LightingSystem'
 import { ProductRoot } from './ProductRoot'
@@ -59,6 +59,16 @@ function RotationRig({ children }: { children: React.ReactNode }) {
  * pass cleared the shadow to nothing and the live chapters showed no contact shadow at all. Its strength follows the
  * frames it hands over to (studioLight.ts): a material uniform, written every rendered frame.
  */
+/**
+ * Both floor shadows re-render in steps of the bag's pose (1/24 and 1/48), never every frame. When the pose comes to rest
+ * inside a step — scrolling stopped, or the phone's eased story settled — the last render showed an earlier pose of
+ * that step; ms after the pose last changed, they render once more for the exact pose at rest.
+ */
+const SHADOW_SETTLE_MS = 160
+
+const exactPose = (s: { flap: number; lid: number; drop: number; boxOut: number; boxLid: number }) =>
+  `${s.flap.toFixed(4)}:${s.lid.toFixed(4)}:${s.drop.toFixed(4)}:${s.boxOut.toFixed(4)}:${s.boxLid.toFixed(4)}`
+
 function StudioShadow({ isMobile }: { isMobile: boolean }) {
   // opening stages only, in 1/24 steps: in the exploded overview the lower compartment never leaves the floor, so its
   // footprint (all a contact shadow shows) does not change while the upper layers lift
@@ -68,9 +78,25 @@ function StudioShadow({ isMobile }: { isMobile: boolean }) {
     return `${s.modelReady}:${q(st.flap)}:${q(st.lid)}:${q(st.drop)}:${q(st.boxOut)}:${q(st.boxLid)}`
   })
   const ref = useRef<Group>(null)
+  const [settle, setSettle] = useState(0)
+  const armed = useRef({ at: '', pose: '' })
+  const timer = useRef(0)
+  useEffect(() => () => window.clearTimeout(timer.current), [])
   useFrame(() => {
+    const st = useExperienceStore.getState()
     const plane = ref.current?.children.find((c) => (c as Mesh).isMesh) as Mesh | undefined
-    if (plane) (plane.material as MeshBasicMaterial).opacity = contactShadowOpacity(useExperienceStore.getState().progress)
+    if (plane) (plane.material as MeshBasicMaterial).opacity = contactShadowOpacity(st.progress)
+    // a re-render (new step, or a settle) re-armed ContactShadows: it renders this frame, at this pose
+    const pose = exactPose(st.stages)
+    const at = `${key}|${settle}`
+    if (armed.current.at !== at) armed.current = { at, pose }
+    else if (pose !== armed.current.pose) {
+      window.clearTimeout(timer.current)
+      timer.current = window.setTimeout(() => {
+        setSettle((n) => n + 1)
+        requestFrame()
+      }, SHADOW_SETTLE_MS)
+    }
   })
   return (
     <ContactShadows
@@ -84,7 +110,7 @@ function StudioShadow({ isMobile }: { isMobile: boolean }) {
       resolution={isMobile ? 256 : 512}
       color="#000000"
       // a changing prop re-renders the component, which re-arms its frame counter
-      userData={{ pose: key }}
+      userData={{ pose: key, settle }}
     />
   )
 }
@@ -101,7 +127,11 @@ const catcher = { uWeight: { value: 0 }, uFade: { value: new Vector2(0.45, 1.8) 
 function ShadowCatcher() {
   const mesh = useRef<Mesh>(null)
   const last = useRef('')
+  const rendered = useRef('')
+  const settled = useRef(false)
+  const timer = useRef(0)
   const compiled = useRef(false)
+  useEffect(() => () => window.clearTimeout(timer.current), [])
   useFrame(({ camera, gl }) => {
     camera.layers.enable(1)
     const st = useExperienceStore.getState()
@@ -117,10 +147,20 @@ function ShadowCatcher() {
     const q = (v: number) => Math.round(v * 48)
     const s = st.stages
     const key = `${st.modelReady}:${q(s.flap)}:${q(s.lid)}:${q(s.drop)}:${q(s.boxOut)}:${q(s.boxLid)}:${q(st.explodedAmount)}:${q(rig.current?.rotation.y ?? 0)}`
-    if (key !== last.current) {
+    const exact = `${exactPose(s)}:${st.explodedAmount.toFixed(4)}:${(rig.current?.rotation.y ?? 0).toFixed(4)}`
+    if (key !== last.current || (settled.current && exact !== rendered.current)) {
       last.current = key
+      rendered.current = exact
       gl.shadowMap.needsUpdate = true
+    } else if (exact !== rendered.current) {
+      // moved inside a step: render the exact pose once it rests
+      window.clearTimeout(timer.current)
+      timer.current = window.setTimeout(() => {
+        settled.current = true
+        requestFrame()
+      }, SHADOW_SETTLE_MS)
     }
+    settled.current = false
   })
   return (
     <mesh ref={mesh} rotation-x={-Math.PI / 2} receiveShadow layers={1} renderOrder={-1} visible={false}>

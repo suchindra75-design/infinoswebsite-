@@ -90,8 +90,8 @@ export function computeSequenceCover(chapter: Chapter, chapterProgress: number):
   return fadeIn * (1 - smoothstep(1 - SEQUENCE_FADE, 1, chapterProgress))
 }
 
-function sameStages(a: StageAmounts, b: StageAmounts) {
-  return (Object.keys(a) as (keyof StageAmounts)[]).every((k) => Math.abs(a[k] - b[k]) < 0.0005)
+function sameStages(a: StageAmounts, b: StageAmounts, tol: number) {
+  return (Object.keys(a) as (keyof StageAmounts)[]).every((k) => (tol ? Math.abs(a[k] - b[k]) < tol : a[k] === b[k]))
 }
 
 /**
@@ -110,7 +110,12 @@ export function chapterAt(progress: number): Chapter {
   return CHAPTERS.find((c) => progress >= c.start && progress < c.end) ?? CHAPTERS[CHAPTERS.length - 1]
 }
 
-export function applyScrollProgress(progress: number): void {
+/**
+ * `exact`: write every value that differs at all. In motion, changes below a small tolerance are skipped (no redraw for
+ * an invisible change); an eased approach (touch screens, ScrollChapterController) would then come to rest up to that
+ * tolerance short of the exact pose, so the settled position is written exactly.
+ */
+export function applyScrollProgress(progress: number, exact = false): void {
   const clamped = Math.min(1, Math.max(0, progress))
   const chapter = chapterAt(clamped)
   const chapterProgress = Math.min(1, Math.max(0, (clamped - chapter.start) / (chapter.end - chapter.start)))
@@ -125,9 +130,10 @@ export function applyScrollProgress(progress: number): void {
 
   if (state.progress !== clamped) patch.progress = clamped
   if (state.chapterProgress !== chapterProgress) patch.chapterProgress = chapterProgress
-  if (Math.abs(state.explodedAmount - explodedAmount) > 0.001) patch.explodedAmount = explodedAmount
-  if (!sameStages(state.stages, stages)) patch.stages = stages
-  if (Math.abs(state.sequenceCover - sequenceCover) > 0.001 || (sequenceCover === 0) !== (state.sequenceCover === 0))
+  const tol = exact ? 0 : 0.001
+  if (Math.abs(state.explodedAmount - explodedAmount) > tol) patch.explodedAmount = explodedAmount
+  if (!sameStages(state.stages, stages, exact ? 0 : 0.0005)) patch.stages = stages
+  if (Math.abs(state.sequenceCover - sequenceCover) > tol || (sequenceCover === 0) !== (state.sequenceCover === 0))
     patch.sequenceCover = sequenceCover
   if (state.sequenceId !== (sequence ?? null)) patch.sequenceId = sequence ?? null
   if (phaseChanged) {

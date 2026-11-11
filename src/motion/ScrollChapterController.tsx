@@ -6,6 +6,15 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { applyScrollProgress } from '@/motion/chapters'
 import { lenisRef } from '@/motion/SmoothScrollProvider'
 import { useExperienceStore } from '@/state/experienceStore'
+import { addRenderer, requestFrame } from '@/motion/frameLoop'
+
+/**
+ * Touch screens: the story follows the scroll position through a short ease (time constant, ms). Desktop scrolling is
+ * already eased by Lenis; on a phone the browser scrolls natively and reports the position in uneven steps (finger
+ * moves, momentum, 60/90/120 Hz screens), so frames, model and text scrubbed straight from it stepped with every
+ * report. The story is not attached to the finger (the stage is fixed), so the ease reads as glide, not as lag.
+ */
+const TOUCH_EASE_MS = 90
 
 export function ScrollChapterController({
   targetRef,
@@ -24,6 +33,44 @@ export function ScrollChapterController({
       resizedAt = performance.now()
     }
     window.addEventListener('resize', onResize)
+
+    const touch =
+      window.matchMedia('(hover: none) and (pointer: coarse)').matches &&
+      !useExperienceStore.getState().reducedMotion &&
+      !window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    const follow = { current: 0, target: 0, last: 0 }
+    const show = (story: number) => {
+      if (!touch) return applyScrollProgress(story)
+      follow.target = story
+      requestFrame()
+    }
+    // jump straight to a position (first measure, rotation): no glide through the story in between
+    const snap = (story: number) => {
+      follow.current = follow.target = story
+      follow.last = 0
+      applyScrollProgress(story, true)
+    }
+    // first in every frame of the shared loop, so frames, model and text draw the eased position of the same frame
+    const unregisterEase = touch
+      ? addRenderer((now) => {
+          const d = follow.target - follow.current
+          if (Math.abs(d) < 0.00002) {
+            // at rest (after an ease, or a step smaller than the threshold): the exact story moment
+            if (follow.last || follow.current !== follow.target) {
+              follow.current = follow.target
+              applyScrollProgress(follow.current, true)
+            }
+            follow.last = 0
+            return false
+          }
+          const dt = follow.last ? Math.min(64, now - follow.last) : 1000 / 60
+          follow.last = now
+          follow.current += d * (1 - Math.exp(-dt / TOUCH_EASE_MS))
+          applyScrollProgress(follow.current)
+          return true
+        }, 0)
+      : null
+
     const trigger = ScrollTrigger.create({
       trigger: el,
       start: 'top top',
@@ -34,10 +81,10 @@ export function ScrollChapterController({
           settled.story = story
           settled.inStory = self.progress < 1
         }
-        applyScrollProgress(story)
+        show(story)
       },
     })
-    applyScrollProgress(trigger.progress)
+    snap(trigger.progress)
     // Switching between the phone layout and the others (rotating a phone, resizing a window): the scroll region changes
     // length with it (globals.css), so re-measure, then return the visitor to the same moment of the story. Past the
     // story, only the measurement changes.
@@ -52,7 +99,7 @@ export function ScrollChapterController({
       const y = start + p * Math.max(0, el.offsetHeight - window.innerHeight)
       if (lenisRef.current) lenisRef.current.scrollTo(y, { immediate: true, force: true })
       else window.scrollTo(0, y)
-      applyScrollProgress(p)
+      snap(p)
     }
     ScrollTrigger.addEventListener('refresh', reposition)
     const unsub = useExperienceStore.subscribe((s, prev) => {
@@ -65,6 +112,7 @@ export function ScrollChapterController({
       })
     })
     return () => {
+      unregisterEase?.()
       unsub()
       ScrollTrigger.removeEventListener('refresh', reposition)
       window.removeEventListener('resize', onResize)
