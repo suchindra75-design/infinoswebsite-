@@ -194,16 +194,9 @@ function FrameLoopBridge() {
   useEffect(() => addRenderer((now) => {
     // nothing is drawn until the product's programs have compiled in the background (frameLoop.ts liveScene)
     if (!liveScene.compiled) return
-    // nor before its first, warm-up render (texture uploads), which may wait for a pause in scrolling (ProductModel)
-    const warming = warmUp.pending
-    if (!liveScene.warmed && !warming) return
-    if (!liveLayerActive(useExperienceStore.getState()) && !warming) return
+    if (!liveLayerActive(useExperienceStore.getState()) && !warmUp.pending) return
     warmUp.pending = false
     advance(now, true, get())
-    if (warming && !liveScene.warmed) {
-      liveScene.warmed = true
-      useExperienceStore.setState({ modelReady: true })
-    }
   }, 30), [get])
   return null
 }
