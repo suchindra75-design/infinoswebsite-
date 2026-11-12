@@ -29,6 +29,9 @@ export const htmlPortal = liveLayerRef as unknown as React.RefObject<HTMLElement
 /** the held opening frame's cross-fade to the live model once it is ready (ms) */
 const HOLD_FADE_MS = 450
 
+/** how far ahead (s) of the frame on screen decoding starts while the visitor scrolls (a decode's latency on a phone) */
+const DECODE_LEAD_S = 0.12
+
 /** a decoded neighbour within this many frames may stand in for the exact frame while it is being decoded */
 const MAX_FRAME_DISTANCE = 4
 
@@ -76,6 +79,12 @@ class FrameSet {
   private decoding = new Set<number>()
   private target = 0
   private dir = 1
+  /** scroll speed through the frames (frames per second, signed), smoothed */
+  private vel = 0
+  private velAt = 0
+  /** the frames the decode window currently covers (priorities): kept first when the budget is full */
+  private keepLo = 0
+  private keepHi = 0
 
   constructor(
     readonly id: SequenceId,
@@ -141,6 +150,11 @@ class FrameSet {
 
   /** the frame the visitor is looking at; decoding follows it */
   want(i: number) {
+    const now = performance.now()
+    const dt = (now - this.velAt) / 1000
+    if (dt > 0 && dt < 0.25) this.vel = this.vel * 0.6 + ((i - this.target) / dt) * 0.4
+    else this.vel = 0
+    this.velAt = now
     if (i !== this.target) this.dir = i > this.target ? 1 : -1
     this.target = i
     if (!this.blobs[i] && this.queue.includes(i)) {
@@ -154,16 +168,32 @@ class FrameSet {
     this.pumpDecode()
   }
 
-  /** decode order around the target: ahead in the scroll direction first, a little behind for reversals */
+  /**
+   * Decode order: ahead in the scroll direction first, a little behind for reversals. While the visitor moves through
+   * the frames, a decode started at the frame on screen is out of date by the time it is ready (a phone decodes a frame
+   * in tens of ms while a swipe crosses several frames per frame), so the window starts where the scroll will be by
+   * then, and a fast swipe takes every second frame (the display accepts a neighbour, see `nearest`): the photos keep
+   * up instead of holding one frame and jumping.
+   */
   private priorities(): number[] {
-    const out: number[] = [this.target]
+    const n = this.def.frames
+    // speed fades once the visitor stops (no new frame wanted)
+    const v = this.vel * Math.exp(-(performance.now() - this.velAt) / 150)
+    const speed = Math.abs(v)
+    const step = speed > 40 ? 2 : 1
+    const lead = Math.round(v * DECODE_LEAD_S)
+    const from = Math.min(n - 1, Math.max(0, this.target + lead))
+    const out: number[] = from === this.target ? [this.target] : [from, this.target]
     const ahead = Math.max(2, Math.ceil(this.maxBitmaps * 0.65))
     const behind = Math.max(1, this.maxBitmaps - 1 - ahead)
     for (let k = 1; k <= ahead; k++) {
-      out.push(this.target + this.dir * k)
+      out.push(from + this.dir * k * step)
       if (k <= behind) out.push(this.target - this.dir * k)
     }
-    return out.filter((i) => i >= 0 && i < this.def.frames)
+    const kept = out.filter((i) => i >= 0 && i < n)
+    this.keepLo = Math.min(...kept)
+    this.keepHi = Math.max(...kept)
+    return kept
   }
 
   private pumpDecode() {
@@ -192,7 +222,9 @@ class FrameSet {
 
   private evict() {
     if (this.bitmaps.size <= this.maxBitmaps) return
-    const far = [...this.bitmaps.keys()].sort((a, b) => Math.abs(b - this.target) - Math.abs(a - this.target))
+    // outside the decode window first, then farthest from the frame on screen
+    const outside = (i: number) => (i < this.keepLo || i > this.keepHi ? 1 : 0)
+    const far = [...this.bitmaps.keys()].sort((a, b) => outside(b) - outside(a) || Math.abs(b - this.target) - Math.abs(a - this.target))
     for (const i of far) {
       if (this.bitmaps.size <= this.maxBitmaps) break
       // frame 0 stays: it is the page's resting frame (First Light, and the top of the story)
@@ -288,7 +320,7 @@ export function ImageSequence() {
       const w = variant === 'desktop' ? def.render?.width ?? 2560 : def.render?.mobileWidth ?? 1600
       const h = variant === 'desktop' ? def.render?.height ?? 1600 : def.render?.mobileHeight ?? 1000
       const maxBitmaps = Math.max(6, Math.min(40, Math.floor(budget / (w * h * 4))))
-      sets[id] = new FrameSet(id, def, variant, id === 'reveal' && !touch ? 'sequential' : 'progressive', maxBitmaps, small ? 2 : 3, onFetched, onDecoded)
+      sets[id] = new FrameSet(id, def, variant, id === 'reveal' && !touch ? 'sequential' : 'progressive', maxBitmaps, 3, onFetched, onDecoded)
     }
 
     // Safety nets: after 9 s continue once frame 0 is decoded (the frame-accuracy guard keeps the exact live model

@@ -33,8 +33,9 @@ export const warmUp = { pending: false }
 /**
  * The product's shader programs have finished compiling in the background (ProductModel: compileAsync). Until then the
  * live canvas is not drawn at all: a draw would make three.js wait on the main thread for every program to compile.
+ * `warmed`: the first render (texture uploads) has run; only then is the model ready to be seen (`modelReady`).
  */
-export const liveScene = { compiled: false }
+export const liveScene = { compiled: false, warmed: false }
 export function requestWarmRender() {
   warmUp.pending = true
   dirty = true
