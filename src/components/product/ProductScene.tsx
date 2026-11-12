@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react'
 import { useExperienceStore } from '@/state/experienceStore'
 import { ProductFallback } from './ProductFallback'
 import { ImageSequence, liveLayerRef } from '@/components/sequence/ImageSequence'
+import { trackScrollIdle, whenScrollIdle } from '@/motion/scrollIdle'
 
 const ProductCanvas = dynamic(() => import('./ProductCanvasInner').then((m) => m.ProductCanvasInner), {
   ssr: false,
@@ -51,9 +52,19 @@ export function ProductScene() {
   // frames instead (IntroSequence maxWait still bounds the wait).
   const [liveDue, setLiveDue] = useState(false)
   useEffect(() => {
+    trackScrollIdle()
+  }, [])
+  useEffect(() => {
     if (intro !== 'ready' || liveDue) return
-    const t = window.setTimeout(() => setLiveDue(true), LIVE_AFTER_READY)
-    return () => window.clearTimeout(t)
+    // touch screens: then at a pause in the visitor's scrolling, at the latest 1.5 s later (motion/scrollIdle.ts)
+    let cancel = () => {}
+    const t = window.setTimeout(() => {
+      cancel = whenScrollIdle(() => setLiveDue(true), 1500)
+    }, LIVE_AFTER_READY)
+    return () => {
+      window.clearTimeout(t)
+      cancel()
+    }
   }, [intro, liveDue])
   const revealed = intro === 'product' || intro === 'ready'
   const mountModel =

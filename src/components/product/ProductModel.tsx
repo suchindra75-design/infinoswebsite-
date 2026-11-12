@@ -12,6 +12,7 @@ import { sensorTarget } from './TelemetryVisualization'
 import { Hotspots } from './Hotspots'
 import { useExperienceStore } from '@/state/experienceStore'
 import { liveScene, requestWarmRender } from '@/motion/frameLoop'
+import { whenScrollIdle } from '@/motion/scrollIdle'
 
 function findNodeByName(root: THREE.Object3D, nodeName: string): THREE.Object3D | null {
   const target = nodeName.toLowerCase()
@@ -48,7 +49,18 @@ function findMaterialByName(object: THREE.Object3D, name: string): THREE.MeshSta
 /** parts that sit inside or against a shell, within its silhouette (see the shadow casters below) */
 const INNER_PARTS = /Zipper_|Screws|Velcro|Underside|Lining|Liner|_Pad_|Cable|BayItem/
 
+/**
+ * The file is downloaded and parsed first (suspends); the private clone and merge below (a ~240 ms task on a throttled
+ * phone) then wait for a pause in scrolling on touch screens, 1 s at most (motion/scrollIdle.ts).
+ */
 function ProductModelInner() {
+  useGLTF(PRODUCT.model.source as string)
+  const [build, setBuild] = useState(false)
+  useEffect(() => whenScrollIdle(() => setBuild(true), 1000), [])
+  return build ? <ProductModelBody /> : null
+}
+
+function ProductModelBody() {
   const source = PRODUCT.model.source as string
   const gltf = useGLTF(source)
   // a private clone with each part's same-material meshes merged into one draw (mergeMeshes.ts)
@@ -175,18 +187,23 @@ function ProductModelInner() {
     // is the model ready to stand in for the frames; it renders once, hidden under them, so textures upload before the
     // cross-fade.
     let live = true
+    let cancelWarm = () => {}
     gl.compileAsync(scene, camera)
       .catch(() => undefined)
       .then(() => {
         if (!live) return
         liveScene.compiled = true
-        useExperienceStore.setState({ modelReady: true })
-        requestWarmRender()
+        // the first render uploads every texture (the longest single task of the set-up): at a pause on touch screens,
+        // 1 s at most. `modelReady` follows that render (ProductCanvasInner FrameLoopBridge), so the stage's held frame
+        // only hands over to a model that is fully on the GPU.
+        cancelWarm = whenScrollIdle(requestWarmRender, 1000)
       })
 
     return () => {
       live = false
+      cancelWarm()
       liveScene.compiled = false
+      liveScene.warmed = false
       for (const spec of PRODUCT.modelComponents) unregisterProductComponent(spec.id)
       sensorTarget.current = null
       useExperienceStore.setState({ modelReady: false })
