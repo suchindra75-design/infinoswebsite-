@@ -28,6 +28,8 @@ export interface ExperienceState {
   sequenceFrameOk: boolean
   /** phones: the opening frames have handed over to the live model once; the reveal plays live from then on (chapters.ts) */
   liveReveal: boolean
+  /** the opening's hand-over frame is standing in for the live model, which is still loading (ImageSequence) */
+  stageHeld: boolean
   /** opening: share of the reveal frames preloaded (0..1) */
   openingProgress: number
   /** opening: reveal frames are ready — the product may light up */
@@ -65,6 +67,7 @@ export const useExperienceStore = create<ExperienceState>((set) => ({
   sequenceReady: {},
   sequenceFrameOk: false,
   liveReveal: false,
+  stageHeld: false,
   openingProgress: 0,
   openingReady: false,
   introPhase: 'loading',

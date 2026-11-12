@@ -6,9 +6,10 @@ import { chapterAt } from '@/motion/chapters'
 import { cameraAt } from '@/motion/cameraTrack'
 import { compositionAt, layoutMode, maxScale, type Composition } from '@/motion/composition'
 import { addRenderer, requestFrame } from '@/motion/frameLoop'
-import { SEQUENCES, filmLayout, sequenceFrame, sequenceGain, type SequenceDef, type SequenceId } from '@/motion/sequences'
+import { SEQUENCES, filmLayout, sequenceFrame, sequenceGain, sequenceLastCamera, type CameraPose, type SequenceDef, type SequenceId } from '@/motion/sequences'
 import { extendFilmEdges } from './filmEdges'
 import { PHONE_QUERY } from '@/motion/phoneLayout'
+import { stageSize } from '@/hooks/environment'
 
 type Variant = 'desktop' | 'mobile'
 
@@ -24,6 +25,9 @@ export const liveLayerRef: { current: HTMLDivElement | null } = { current: null 
  * React root during a render.
  */
 export const htmlPortal = liveLayerRef as unknown as React.RefObject<HTMLElement>
+
+/** the held opening frame's cross-fade to the live model once it is ready (ms) */
+const HOLD_FADE_MS = 450
 
 /** a decoded neighbour within this many frames may stand in for the exact frame while it is being decoded */
 const MAX_FRAME_DISTANCE = 4
@@ -312,45 +316,19 @@ export function ImageSequence() {
       if (useExperienceStore.getState().sequenceFrameOk !== ok) useExperienceStore.setState({ sequenceFrameOk: ok })
     }
 
-    const draw = () => {
-      const w = Math.round(canvas.clientWidth * dpr)
-      const h = Math.round(canvas.clientHeight * dpr)
-      if (w !== canvas.width || h !== canvas.height) {
-        canvas.width = w
-        canvas.height = h
-        lastKey = ''
-      }
-      const { progress, sequenceId, sequenceCover } = useExperienceStore.getState()
-      const set = sequenceId ? sets[sequenceId as SequenceId] : undefined
-      // phones play the open chapters on the live model (chapters.ts framesFor): their frames load only if the
-      // screen turns to a layout that shows them
-      if (progress > 0.12 && !phoneLayout.matches) sets.open.start()
-      if (!set || set.failed || sequenceCover <= 0.001) {
-        showing = false
-        setLayers(0)
-        return
-      }
-      const chapter = chapterAt(progress)
-      const cp = Math.min(1, Math.max(0, (progress - chapter.start) / (chapter.end - chapter.start)))
-      const index = sequenceFrame(set.def, chapter.hold ? 0 : cp)
-      set.want(index)
-      // Cover the live model only with a frame that shows (nearly) the right moment; otherwise the live scene, which is
-      // always exact, stays visible until the right frame is decoded. Once frames are on screen, though, they stay: a
-      // farther decoded frame stands in for the few ms until the right one arrives. Dropping to the live model for those
-      // ms swapped the photo for a differently lit render and back — a visible flicker on phones, which decode slowly
-      // and keep few frames (owner's device video, 2026-11-11).
-      const found = set.nearest(index) ?? (showing ? set.closest(index) : null)
-      showing = !!found
-      setFrameOk(!!found)
-      setLayers(found ? sequenceCover : 0)
-      if (!found) return
-      const cw = canvas.clientWidth
-      const ch = canvas.clientHeight
-      const key = `${sequenceId}:${found.index}:${w}x${h}:${progress.toFixed(5)}`
+    // The reveal's hand-over frame, held while the live model is still on its way (see draw)
+    let hold = 0
+    let holdFrom = 0
+    let pendingBefore = false
+    const setHeld = (held: boolean) => {
+      if (useExperienceStore.getState().stageHeld !== held) useExperienceStore.setState({ stageHeld: held })
+    }
+
+    const paint = (set: FrameSet, found: { frame: Decoded; index: number }, pose: CameraPose, progress: number, w: number, h: number, cw: number, ch: number) => {
+      const key = `${set.id}:${found.index}:${w}x${h}:${progress.toFixed(5)}`
       if (key === lastKey) return
       lastKey = key
       // same framing as the live camera: pose subject placed by the editorial composition
-      const pose = cameraAt(chapter.phase, cp)
       const l = filmLayout(cw, ch, pose, compositionAt(progress, layoutMode(cw, ch), comp, cw, ch))
       // whole device pixels: the shadow continued past the film edge (filmEdges.ts) then meets the frame without a
       // half-covered row between them (a sub-pixel shift, invisible, and well inside the live layer's alignment)
@@ -364,7 +342,7 @@ export function ImageSequence() {
       ctx.imageSmoothingQuality = 'low'
       ctx.drawImage(found.frame.source, x, y, fw, fh)
       // on the lit studio floor the frame's shadow must not end at the film edge (filmEdges.ts)
-      extendFilmEdges(ctx, found.frame.source, sequenceId as string, found.index, x, y, fw, fh)
+      extendFilmEdges(ctx, found.frame.source, set.id, found.index, x, y, fw, fh)
       // exposure match for the first open frames (sequences.json displayGainKeys): darken the drawn pixels only,
       // inside the canvas — a CSS filter on this full-screen layer would cost a GPU filter pass every frame
       const gain = sequenceGain(set.def, found.index / Math.max(1, set.def.frames - 1))
@@ -374,6 +352,77 @@ export function ImageSequence() {
         ctx.fillRect(x, y, fw, fh)
         ctx.globalCompositeOperation = 'source-over'
       }
+    }
+
+    const draw = (now: number) => {
+      // the canvas fills the stage: its size comes from the stage's ResizeObserver (hooks/environment.ts). Reading
+      // clientWidth here, after the text and studio layers had written their styles in this same frame, forced a full
+      // style recalculation every frame (traced: ~2.5 ms a frame on a phone at 4x CPU throttle)
+      const { W: cw, H: ch } = stageSize()
+      const w = Math.round(cw * dpr)
+      const h = Math.round(ch * dpr)
+      if (w !== canvas.width || h !== canvas.height) {
+        canvas.width = w
+        canvas.height = h
+        lastKey = ''
+      }
+      const st = useExperienceStore.getState()
+      const { progress, sequenceId, sequenceCover } = st
+      const set = sequenceId ? sets[sequenceId as SequenceId] : undefined
+      // phones play the open chapters on the live model (chapters.ts framesFor): their frames load only if the
+      // screen turns to a layout that shows them
+      if (progress > 0.12 && !phoneLayout.matches) sets.open.start()
+
+      // Waiting for the live model. On a phone connection it arrives seconds after the intro (measured: ~5 s at 12
+      // Mbps, ~8 s at 5 Mbps), and a visitor who swiped straight on found an empty floor under the hero's text. Until
+      // it has drawn, the reveal's hand-over frame stays on the stage — the same bag, placed where the live one will
+      // stand — and then cross-fades to it.
+      const pending = st.webglSupported && !st.modelFailed && !st.modelReady && st.introPhase === 'ready'
+      if (pending) hold = 1
+      else if (hold > 0) {
+        if (pendingBefore) holdFrom = now
+        hold = Math.max(0, 1 - (now - holdFrom) / HOLD_FADE_MS)
+      }
+      pendingBefore = pending
+      const reveal = sets.reveal
+      const framesHere = !!set && !set.failed && sequenceCover > 0.001
+
+      if (!framesHere) {
+        showing = false
+        // the hand-over frame or a near neighbour (not, say, the pinned first frame: it is posed elsewhere)
+        const last = reveal.def.frames - 1
+        const near = hold > 0 && !reveal.failed ? reveal.closest(last) : null
+        const held = near && near.distance <= MAX_FRAME_DISTANCE * 2 ? near : null
+        setHeld(!!held && pending)
+        if (hold > 0) reveal.want(last)
+        if (!held) {
+          setLayers(0)
+          return
+        }
+        setLayers(hold)
+        paint(reveal, held, sequenceLastCamera('reveal'), progress, w, h, cw, ch)
+        // still fading: one more frame
+        return hold > 0 && !pending
+      }
+      setHeld(false)
+
+      const chapter = chapterAt(progress)
+      const cp = Math.min(1, Math.max(0, (progress - chapter.start) / (chapter.end - chapter.start)))
+      const index = sequenceFrame(set.def, chapter.hold ? 0 : cp)
+      set.want(index)
+      // Cover the live model only with a frame that shows (nearly) the right moment; otherwise the live scene, which is
+      // always exact, stays visible until the right frame is decoded. Once frames are on screen, though, they stay: a
+      // farther decoded frame stands in for the few ms until the right one arrives. Dropping to the live model for those
+      // ms swapped the photo for a differently lit render and back — a visible flicker on phones, which decode slowly
+      // and keep few frames (owner's device video, 2026-11-11).
+      const found = set.nearest(index) ?? (showing ? set.closest(index) : null)
+      showing = !!found
+      setFrameOk(!!found)
+      // the reveal's own hand-over to the live model waits for the model as well (the held frame above continues it)
+      setLayers(found ? Math.max(sequenceCover, sequenceId === 'reveal' ? hold : 0) : 0)
+      if (!found) return
+      paint(set, found, cameraAt(chapter.phase, cp), progress, w, h, cw, ch)
+      return hold > 0 && !pending
     }
 
     const unregister = addRenderer(draw, 20)

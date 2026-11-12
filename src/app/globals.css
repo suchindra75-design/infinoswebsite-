@@ -398,6 +398,11 @@ button {
   animation: hotspot-pulse 2.4s ease-out infinite;
 }
 
+/* the marker is hidden (outside the hero, or facing away): its pulse rests (Hotspots.tsx) */
+.hotspot:not([data-on]) .hotspot-dot::after {
+  animation-play-state: paused;
+}
+
 @keyframes hotspot-pulse {
   from {
     transform: scale(0.6);

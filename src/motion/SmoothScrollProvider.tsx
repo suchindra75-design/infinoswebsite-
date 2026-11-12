@@ -19,7 +19,14 @@ export function SmoothScrollProvider({ children }: { children: React.ReactNode }
     lenisRef.current = lenis
     // the timed intro owns the first seconds: scrolling starts paused until it reports `ready` (IntroSequence)
     if (useExperienceStore.getState().introPhase !== 'ready') lenis.stop()
-    lenis.on('scroll', ScrollTrigger.update)
+    // Lenis smooths the wheel and drives the scroll position itself, so ScrollTrigger must follow it in the same frame.
+    // Touch scrolling stays native (Lenis does not smooth it): ScrollTrigger's own scroll listener already updates
+    // once per frame, and a second, synchronous update inside every native scroll event read the scroll position
+    // with styles dirty — a forced style recalculation per event (traced on a phone at 4x CPU throttle).
+    const touch = window.matchMedia('(hover: none) and (pointer: coarse)')
+    lenis.on('scroll', () => {
+      if (!touch.matches || lenis.isScrolling === 'smooth') ScrollTrigger.update()
+    })
     const raf = (time: number) => lenis.raf(time * 1000)
     // prioritised: Lenis -> ScrollTrigger -> store run first in every frame, then the shared frame loop
     // (motion/frameLoop.ts) draws text, frames and 3D for that same scroll position

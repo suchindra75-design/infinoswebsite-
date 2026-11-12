@@ -40,9 +40,10 @@ html.intro-lock body {
   pointer-events: none;
 }
 
-/* the landed logo has handed over to the navigation bar's own logo */
+/* the landed logo has handed over to the navigation bar's own logo: the overlay leaves the page entirely, so its endless
+   loader animations (sky, lanes, wheels, trail) stop instead of ticking unseen for the rest of the visit */
 .intro[data-gone] {
-  visibility: hidden;
+  display: none;
 }
 
 /* the bar's logo waits under the flying one, so the two are never seen at once */

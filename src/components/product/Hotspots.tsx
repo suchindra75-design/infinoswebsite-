@@ -13,6 +13,7 @@ function Marker({ h }: { h: Hotspot }) {
   const group = useRef<THREE.Group>(null)
   const tmp = useMemo(() => ({ n: new THREE.Vector3(), p: new THREE.Vector3(), c: new THREE.Vector3() }), [])
   const active = useExperienceStore((s) => s.hotspot === h.id)
+  const shown = useRef<boolean | null>(null)
 
   useFrame(({ camera }) => {
     const el = ref.current
@@ -24,9 +25,18 @@ function Marker({ h }: { h: Hotspot }) {
     g.getWorldPosition(tmp.p)
     const facing = tmp.n.dot(tmp.c.copy(camera.position).sub(tmp.p).normalize())
     const visible = phase === 'hero' && modelReady && facing > 0.15
-    el.style.opacity = visible ? String(Math.min(1, (facing - 0.15) / 0.25)) : '0'
-    el.style.pointerEvents = visible ? 'auto' : 'none'
-    el.tabIndex = visible ? 0 : -1
+    const opacity = visible ? Math.min(1, (facing - 0.15) / 0.25).toFixed(3) : '0'
+    // written only when they change: this runs on every rendered frame of the whole story
+    if (el.style.opacity !== opacity) el.style.opacity = opacity
+    if (shown.current !== visible) {
+      shown.current = visible
+      el.style.pointerEvents = visible ? 'auto' : 'none'
+      el.tabIndex = visible ? 0 : -1
+      // the dot's pulse (an endless CSS animation) runs only while the marker shows: outside the hero it restyled the
+      // hidden marker on every frame of the story (globals.css .hotspot:not([data-on]))
+      if (visible) el.dataset.on = ''
+      else delete el.dataset.on
+    }
   })
 
   const select = () => {
